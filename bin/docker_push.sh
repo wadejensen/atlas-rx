@@ -18,5 +18,5 @@ echo "$DOCKER_HUB_PW" | docker login --username wadejensen --password-stdin
 
 git_sha=$(git rev-parse --short=8 HEAD)
 
-docker build -t "atlas:$git_sha" -t atlas:latest .
+docker build -t "wadejensen/atlas:$git_sha" -t wadejensen/atlas:latest .
 docker push wadejensen/atlas

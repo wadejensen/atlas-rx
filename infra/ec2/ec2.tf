@@ -20,8 +20,16 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+data "terraform_remote_state" "iam" {
+  backend = "local"
+
+  config {
+    path = "../iam/terraform.tfstate"
+  }
+}
+
 resource "aws_instance" "atlas-server" {
-  count = 1
+  count = 0
   # Ubuntu 18.04
   ami = "ami-0b76c3b150c6b1423"
   key_name = "adhoc"
@@ -30,6 +38,7 @@ resource "aws_instance" "atlas-server" {
   associate_public_ip_address = true
   monitoring = false
   subnet_id = "${data.terraform_remote_state.vpc.subnet_public}"
+  iam_instance_profile = "${data.terraform_remote_state.iam.atlas_instance_profile}"
   instance_initiated_shutdown_behavior = "terminate"
   # Install docker and start docker daemon
   user_data = <<SCRIPT
@@ -39,18 +48,18 @@ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(
 apt-get update
 apt-cache policy docker-ce
 apt-get install -y docker-ce
+apt-get install -y awscli
 systemctl status docker
-docker run docker/whalesay cowsay "wade woz here" > /wade-woz-here.txt
 
 KMS_ENCRYPTED_KEY="AQICAHhUjEp+8CCFIY/q4LCQMt4IcEHznznw61ye221S4AwPhwGejeenErY4wC/XnlFg4ggWAAAAgTB/BgkqhkiG9w0BBwagcjBwAgEAMGsGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMjp3wf7jIKY81phTjAgEQgD5glYhuQrwibdrzdKC+H4FHR0PGoFcZmWpZBAB/bt6Ms5k5mBkIYdgQW3eE5jnj0kJzy0FdEMvRYr65/Oku+A=="
-echo "$KMS_ENCRYPTED_KEY" | base64 --decode > encrypted.key
-DOCKER_HUB_PW="$(aws kms decrypt \
-  --profile wjensen \
-  --ciphertext-blob fileb://encrypted.key \
+aws kms decrypt \
+  --ciphertext-blob fileb://<(echo "$KMS_ENCRYPTED_KEY" | base64 --decode) \
+  --region "ap-southeast-2" \
   --output text \
   --query Plaintext \
-  | base64 --decode)"
-echo "$DOCKER_HUB_PW" | docker login --username wadejensen --password-stdin
+  | base64 --decode \
+  | docker login --username wadejensen --password-stdin
+docker run -p 3000:3000 wadejensen/atlas:latest
 SCRIPT
 
   root_block_device {

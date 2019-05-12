@@ -2,7 +2,7 @@ FROM node:12-alpine AS BUILD_ENV
 
 WORKDIR /work
 COPY . /work/
-RUN ls /work/
+
 RUN npm install
 RUN npm run package
 
