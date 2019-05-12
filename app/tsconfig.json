@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "es6",
+    "incremental": true,
+    "outDir": "build",
+    "baseUrl": ".",
+    "rootDirs": [
+      "./src/ts"
+    ],
+    "paths": {
+      "common/*": ["common/src/ts/*"]
+    },
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "importHelpers": false
+  },
+  "include": [
+    "server/src/ts/**/*",
+    "common/src/ts/**/*"
+  ]
+}

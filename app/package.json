@@ -1,0 +1,42 @@
+{
+  "name": "atlas",
+  "version": "0.0.1",
+  "description": "Real estate hackery",
+  "main": "server/target/server.js",
+  "types": "target/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wadejensen/atlas-v2.git"
+  },
+  "author": "wadejensen",
+  "license": "UNLICENSED",
+  "bin": {
+    "atlas": "node dist/server.js"
+  },
+  "scripts": {
+    "build:watch": "tsc --watch",
+    "build": "tsc",
+    "package": "webpack --config webpack.config.js --mode production; cp -r static dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "node target/server.js"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "ts-loader": "^6.0.0",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "dependencies": {
+    "commander": "2.20.0",
+    "express": "4.16.4",
+    "typescript": "3.4.2"
+  },
+  "engines": {
+    "node": ">=10.7.0 < 11",
+    "yarn": ">=1.12.3 < 2 || >=1.7.0 < 1.10"
+  },
+  "nodemonConfig": {
+    "ignore": ["dist/*"],
+    "delay": "2500"
+  }
+}
