@@ -3,6 +3,7 @@ import path from "path";
 
 // @ts-ignore
 import { Person } from "common/person"
+import { FlatmatesClient } from "./flatmates/flatmates_client";
 
 let x = {
   "helloHello": 1,
@@ -10,6 +11,8 @@ let x = {
   "danceyDance": 3,
   "lamee_paradise": 4
 };
+
+FlatmatesClient.create();
 
 console.log(x);
 
