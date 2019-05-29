@@ -5,8 +5,11 @@
     "strict": true,
     "target": "es6",
     "incremental": true,
-    "outDir": "target",
+    "outDir": "build",
     "baseUrl": ".",
+    "rootDirs": [
+      "./src/ts"
+    ],
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
