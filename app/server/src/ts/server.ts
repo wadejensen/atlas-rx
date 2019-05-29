@@ -26,29 +26,31 @@ console.log(p);
 function startServer() {
   // Create Express server
   const app = express();
+  registerRoutes(app);
+  app.listen(3000, () => console.log("Listening on port 3000"));
 
-  const apiClients: Promise<[FlatmatesClient, string]> = Promise.all([
-    FlatmatesClient.create(),
-    Promise.resolve("Yay!")
-  ]);
-
-  apiClients.then( clients => {
-      const [flatmatesClient, googleMapsClient] = clients;
-
-      console.log(flatmatesClient);
-      console.log(googleMapsClient);
-
-      app.set('flatmatesClient', flatmatesClient);
-      app.set('googleMapsClient', googleMapsClient);
-      registerRoutes(app);
-      app.listen(3000, () => console.log("Listening on port 3000"));
-    },
-    reason => {
-      console.log(`Could not initialize API clients for reason: ${reason}`);
-      process.exit(1);
-
-    }
-  );
+  //const apiClients: Promise<[FlatmatesClient, string]> = Promise.all([
+  //   FlatmatesClient.create(),
+  //   Promise.resolve("Yay!")
+  // ]);
+  //
+  // apiClients.then( clients => {
+  //     const [flatmatesClient, googleMapsClient] = clients;
+  //
+  //     console.log(flatmatesClient);
+  //     console.log(googleMapsClient);
+  //
+  //     app.set('flatmatesClient', flatmatesClient);
+  //     app.set('googleMapsClient', googleMapsClient);
+  //     registerRoutes(app);
+  //     app.listen(3000, () => console.log("Listening on port 3000"));
+  //   },
+  //   reason => {
+  //     console.log(`Could not initialize API clients for reason: ${reason}`);
+  //     process.exit(1);
+  //
+  //   }
+  // );
 }
 
 function registerRoutes(app: Express) {
@@ -65,8 +67,7 @@ function helloHandler(req: express.Request, res: express.Response): void {
 function index(req: express.Request, res: express.Response): void {
   console.log(__dirname + '/static/index.html');
 
-  let flatmatesClient: FlatmatesClient = req.app.get('flatmatesClient');
-  console.log(flatmatesClient);
+  FlatmatesClient.create().then( fmc => console.log(fmc));
 
   res.sendFile(__dirname + '/static/index.html');
 }

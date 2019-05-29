@@ -4,19 +4,29 @@ import { Maybe } from "common/fp/option";
 import {Try, TryCatch} from "common/fp/try";
 
 export class FlatmatesClient {
-    private static readonly baseUrl: string = "https://flatmates.com.au";
+
     constructor(private sessionId: string, private sessionToken: string) {}
+
+    private static readonly baseUrl: string = "https://flatmates.com.au";
+    private static _client: FlatmatesClient | null = null;
 
     static async create(): Promise<FlatmatesClient>
     {
-        const resp: Response = await fetch(FlatmatesClient.baseUrl);
-        const html: string = await resp.text();
+        if (this._client != null) {
+            console.log("Returning cached client.");
+            return Promise.resolve(this._client);
+        } else {
+            const resp: Response = await fetch(FlatmatesClient.baseUrl);
+            const html: string = await resp.text();
 
-        const sessionId: Try<string> = FlatmatesClient.parseSessionId(resp);
-        const sessionToken: Try<string> = FlatmatesClient.parseSessionToken(html);
+            const sessionId: Try<string> = FlatmatesClient.parseSessionId(resp);
+            const sessionToken: Try<string> = FlatmatesClient.parseSessionToken(html);
 
-        // Trigger potential exceptions since they will cause the promise to be rejected
-        return new FlatmatesClient(sessionId.get(), sessionToken.get());
+            // Trigger potential exceptions since they will cause the promise to be rejected.
+            // Cache flatmates API client for global process use.
+            this._client = new FlatmatesClient(sessionId.get(), sessionToken.get());
+            return this._client;
+        }
     }
 
     /**

@@ -17,5 +17,5 @@ aws kms decrypt \
 
 git_sha=$(git rev-parse --short=8 HEAD)
 
-docker build -t "wadejensen/atlas:$git_sha" -t wadejensen/atlas:latest .
+docker build -t "wadejensen/atlas:${git_sha}" -t wadejensen/atlas:latest .
 docker push wadejensen/atlas
