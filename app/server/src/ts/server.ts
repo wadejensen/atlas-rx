@@ -1,9 +1,10 @@
-import express from "express";
+import express, {Express} from "express";
 import path from "path";
 
 // @ts-ignore
 import { Person } from "common/person"
 import { FlatmatesClient } from "./flatmates/flatmates_client";
+import {Failure, Success, Try, TryCatch} from "common/fp/try";
 
 let x = {
   "helloHello": 1,
@@ -12,32 +13,60 @@ let x = {
   "lamee_paradise": 4
 };
 
-FlatmatesClient.create();
-
 console.log(x);
 
-let p = new Person("Wade", 23, "Software Engineer", 100000.0);
+startServer();
 
+let p = new Person("Wade", 23, "Software Engineer", 100000.0);
 console.log(p);
 
-// Create Express server
-const app = express();
+/**
+ * Launch Express webserver and initialize global API clients
+ */
+function startServer() {
+  // Create Express server
+  const app = express();
+
+  const apiClients: Promise<[FlatmatesClient, string]> = Promise.all([
+    FlatmatesClient.create(),
+    Promise.resolve("Yay!")
+  ]);
+
+  apiClients.then( clients => {
+      const [flatmatesClient, googleMapsClient] = clients;
+
+      console.log(flatmatesClient);
+      console.log(googleMapsClient);
+
+      app.set('flatmatesClient', flatmatesClient);
+      app.set('googleMapsClient', googleMapsClient);
+      registerRoutes(app);
+      app.listen(3000, () => console.log("Listening on port 3000"));
+    },
+    reason => {
+      console.log(`Could not initialize API clients for reason: ${reason}`);
+      process.exit(1);
+
+    }
+  );
+}
+
+function registerRoutes(app: Express) {
+  app.use('/', express.static(__dirname + '/static'));
+  app.get('/', helloHandler);
+  app.get('/indexx', index);
+
+}
 
 function helloHandler(req: express.Request, res: express.Response): void {
-    res.send('Hello World')
+  res.send('Hello World')
 }
 
 function index(req: express.Request, res: express.Response): void {
-    console.log(__dirname + '/static/index.html');
-    res.sendFile(__dirname + '/static/index.html');
+  console.log(__dirname + '/static/index.html');
+
+  let flatmatesClient: FlatmatesClient = req.app.get('flatmatesClient');
+  console.log(flatmatesClient);
+
+  res.sendFile(__dirname + '/static/index.html');
 }
-
-app.use('/', express.static(__dirname + '/static'));
-
-app.get('/', helloHandler);
-
-app.get('/indexx', index);
-
-app.listen(3000, () => console.log("Listening on port 3000"));
-
-export default app;
