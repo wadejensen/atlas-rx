@@ -3,11 +3,10 @@ export class Async {
    * Performs a computation after specified delay.
    */
   static delay<T>(fn: () => Promise<T>, delayMs: number): Promise<T> {
-    return new Promise(
-      (resolve, reject) => resolve(setTimeout(() => {}, delayMs))
-    ).then( (_) => Promise.resolve(fn()))
+    return new Promise((resolve, reject) =>
+      setTimeout(() => resolve(fn()), delayMs)
+    )
   }
-
   /**
    * Performs a computation with a specified max runtime, after which a
    * fallback result will be used.
@@ -19,8 +18,8 @@ export class Async {
   ): Promise<T> {
     return Promise.race([
       fn(),
-      Async.delay(() => Promise.resolve(fallback()), timeoutMs)]
-    );
+      Async.delay(() => Promise.resolve(fallback()), timeoutMs)
+    ]);
   }
 
   /**
@@ -34,8 +33,8 @@ export class Async {
   ): Promise<T> {
     return Promise.race([
       fn(),
-      Async.delay(() => Promise.reject(message), timeoutMs)]
-    );
+      Async.delay(() => Promise.reject(message), timeoutMs)
+    ]);
   }
 
   /**
@@ -72,7 +71,7 @@ export class Async {
       retryCount: number
   ): Promise<T> {
     return fn().catch((reason) => {
-      if (retryCount + 1 == maxRetries) {
+      if (retryCount == maxRetries) {
         return Promise.reject(
           `Retried request ${maxRetries} times. Last error: ${reason}`
         )
@@ -82,8 +81,8 @@ export class Async {
           () => this.doBackoff(
             fn,
             maxRetries,
-            retryCount + 1,
-            delayMs
+            delayMs,
+            retryCount + 1
           ),
           delayMs
         )
@@ -109,9 +108,8 @@ export class Async {
     delayMs: number,
     retryCount: number
   ): Promise<T> {
-    console.log("Do exp backoff");
     return fn().catch((reason) => {
-      if (retryCount + 1 == maxRetries) {
+      if (retryCount == maxRetries) {
         return Promise.reject(
           `Retried request ${maxRetries} times. Last error: ${reason}`
         )
@@ -121,8 +119,8 @@ export class Async {
           () => this.doExponentialBackoff(
             fn,
             maxRetries,
+            delayMs * 2,
             retryCount + 1,
-            delayMs * 2
           ),
           delayMs
         )

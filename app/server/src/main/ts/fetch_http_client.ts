@@ -70,8 +70,12 @@ export class FetchHTTPClient {
     console.log("Dispatch");
     // perform fetch with a timeout deadline for each HTTP request and the
     // selected retry backoff policy
-    if (this.MAX_RETRIES < 0) {
-      return this.fetchWithDeadline(req);
+    if (this.MAX_RETRIES <= 0) {
+      console.log("MAX_RETRIES <= 0");
+
+      let res = this.fetchWithDeadline(req)
+      console.log(res);
+      return res;
     }
     else if (!this.EXPONENTIAL_BACKOFF) {
       return Async.backoff(
@@ -91,10 +95,14 @@ export class FetchHTTPClient {
 
   private fetchWithDeadline(req: Request): Promise<Response> {
     // Wrap the fetch API with a timeout
-    return Async.timeoutError(
-      () => fetch(req),
-      this.REQUEST_TIMEOUT_MS,
-      `HTTP request timed out after ${this.REQUEST_TIMEOUT_MS}ms`
-    );
+    console.log("Fetch with deadline");
+    console.log(`Timeout = ${this.REQUEST_TIMEOUT_MS}`)
+
+    return fetch(req);
+    // return Async.timeoutError(
+    //   () => fetch(req),
+    //   this.REQUEST_TIMEOUT_MS,
+    //   `HTTP request timed out after ${this.REQUEST_TIMEOUT_MS}ms`
+    // );
   }
 }
