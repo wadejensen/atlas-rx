@@ -10,7 +10,12 @@ provider "aws" {
   region = "${var.region}"
 }
 
+variable "enabled" {
+  default = 0
+}
+
 resource "aws_vpc" "main" {
+  count = "${var.enabled}"
   cidr_block = "10.0.0.0/16"
   enable_dns_hostnames = true
   tags = {
@@ -19,10 +24,12 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_internet_gateway" "gw" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
 }
 
 resource "aws_route_table" "public" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
 
   route {
@@ -32,15 +39,18 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_eip" "nat" {
+  count = "${var.enabled}"
   vpc = "true"
 }
 
 resource "aws_nat_gateway" "nat" {
+  count = "${var.enabled}"
   allocation_id = "${aws_eip.nat.id}"
   subnet_id = "${aws_subnet.public.id}"
 }
 
 resource "aws_route_table" "private" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
 
   route {
@@ -50,6 +60,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_subnet" "public" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
   cidr_block = "10.0.0.0/24"
   availability_zone = "${var.az}"
@@ -60,11 +71,13 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table_association" "public" {
+  count = "${var.enabled}"
   subnet_id = "${aws_subnet.public.id}"
   route_table_id = "${aws_route_table.public.id}"
 }
 
 resource "aws_subnet" "private" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
   cidr_block = "10.0.1.0/24"
   availability_zone = "${var.az}"
@@ -74,11 +87,13 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_route_table_association" "private_aa" {
+  count = "${var.enabled}"
   subnet_id = "${aws_subnet.private.id}"
   route_table_id = "${aws_route_table.private.id}"
 }
 
 resource "aws_security_group" "atlas_public" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
   name = "atlas.public"
   description = "atlas public subnet access"
@@ -117,6 +132,7 @@ resource "aws_security_group" "atlas_public" {
 }
 
 resource "aws_security_group" "atlas_private" {
+  count = "${var.enabled}"
   vpc_id = "${aws_vpc.main.id}"
   name = "atlas"
   description = "atlas private subnet access"
@@ -149,13 +165,13 @@ resource "aws_security_group" "atlas_private" {
 }
 
 output "subnet_public" {
-  value = "${aws_subnet.public.id}"
+  value = "${aws_subnet.public.*.id}"
 }
 
 output "subnet_private" {
-  value = "${aws_subnet.private.id}"
+  value = "${aws_subnet.private.*.id}"
 }
 
 output "security_group_atlas_public" {
-  value = "${aws_security_group.atlas_public.id}"
+  value = "${aws_security_group.atlas_public.*.id}"
 }

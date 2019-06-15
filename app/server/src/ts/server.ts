@@ -1,10 +1,11 @@
 import express, {Express} from "express";
-import path from "path";
-
 // @ts-ignore
-import { Person } from "common/person"
-import { FlatmatesClient } from "./flatmates/flatmates_client";
-import {Failure, Success, Try, TryCatch} from "common/fp/try";
+import {Person} from "common/person"
+import {FlatmatesClient} from "./flatmates/flatmates_client";
+import {RoomType} from "./flatmates/map_markers_request";
+import {Coord, Geo} from "./geo";
+
+// import fetch, { Request, Response } from "node-fetch"
 
 let x = {
   "helloHello": 1,
@@ -15,7 +16,7 @@ let x = {
 
 console.log(x);
 
-startServer();
+startServer()
 
 let p = new Person("Wade", 23, "Software Engineer", 100000.0);
 console.log(p);
@@ -29,35 +30,29 @@ function startServer() {
   registerRoutes(app);
   app.listen(3000, () => console.log("Listening on port 3000"));
 
-  //const apiClients: Promise<[FlatmatesClient, string]> = Promise.all([
-  //   FlatmatesClient.create(),
-  //   Promise.resolve("Yay!")
-  // ]);
-  //
-  // apiClients.then( clients => {
-  //     const [flatmatesClient, googleMapsClient] = clients;
-  //
-  //     console.log(flatmatesClient);
-  //     console.log(googleMapsClient);
-  //
-  //     app.set('flatmatesClient', flatmatesClient);
-  //     app.set('googleMapsClient', googleMapsClient);
-  //     registerRoutes(app);
-  //     app.listen(3000, () => console.log("Listening on port 3000"));
-  //   },
-  //   reason => {
-  //     console.log(`Could not initialize API clients for reason: ${reason}`);
-  //     process.exit(1);
-  //
-  //   }
-  // );
+  let resp = FlatmatesClient.flatmatesListings(
+    {
+      boundingBox: Geo.boundingBox(
+        new Coord(-33.874322, 151.194749),
+        new Coord(-33.883343, 151.209044)
+      ),
+      room: RoomType.PRIVATE_ROOM,
+    });
+
+  resp
+    .then(r => r.json())
+    .then(json => {
+      console.log("Gooooood result");
+      console.log(json["listings"][0]);
+      console.log("Gooooood result");
+    })
+    .catch( reason => console.log(reason));
 }
 
 function registerRoutes(app: Express) {
   app.use('/', express.static(__dirname + '/static'));
   app.get('/', helloHandler);
   app.get('/indexx', index);
-
 }
 
 function helloHandler(req: express.Request, res: express.Response): void {
