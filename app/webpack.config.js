@@ -2,7 +2,7 @@ path = require("path");
 
 module.exports = [
     {
-        entry: './server/src/ts/server.ts',
+        entry: './server/src/main/ts/server.ts',
         module: {
             rules: [
                 {
@@ -20,7 +20,7 @@ module.exports = [
         resolve: {
             extensions: [ '.ts', '.tsx', '.js' ],
             alias: {
-                common: path.resolve(__dirname, 'common/src/ts/'),
+                common: path.resolve(__dirname, 'common/src/main/ts/'),
             }
         },
         output: {
@@ -44,7 +44,7 @@ module.exports = [
         resolve: {
             extensions: [ '.ts', '.tsx', '.js' ],
             alias: {
-                common: path.resolve(__dirname, 'common/src/ts/'),
+                common: path.resolve(__dirname, 'common/src/main/ts/'),
             }
         },
         output: {

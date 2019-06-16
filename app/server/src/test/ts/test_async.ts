@@ -1,6 +1,5 @@
 import {Async} from "../../main/ts/async";
 import nock from "nock";
-import {FetchHTTPClient} from "../../main/ts/fetch_http_client";
 import fetch from "node-fetch"
 
 describe("Async", () => {

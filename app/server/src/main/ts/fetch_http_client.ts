@@ -1,11 +1,9 @@
 import {Preconditions} from "./preconditions";
 import {Async} from "./async";
-
+import {Headers, HTTPClient} from "./http_client";
 import fetch, { Request, Response } from "node-fetch"
 
-export type Headers = { [key: string]: string }
-
-export class FetchHTTPClient {
+export class FetchHTTPClient implements HTTPClient {
   private readonly RETRY_LIMIT = 1000;
 
   constructor(
@@ -14,19 +12,19 @@ export class FetchHTTPClient {
     readonly BACKOFF_DELAY_MS: number,
     readonly EXPONENTIAL_BACKOFF: boolean
   ) {
+    // Prevent callers triggering stack overflow
     Preconditions.checkArgument(
       MAX_RETRIES <= 1000,
-      `Max retries must be below ${this.RETRY_LIMIT}`
+      `Max retries must be less than or equal to ${this.RETRY_LIMIT}`
     );
   }
 
-  get(url: string, headers?: Headers, body?: string): Promise<Response> {
+  get(url: string, headers?: Headers): Promise<Response> {
     try {
       console.log("GET");
       let x = this.dispatch(new Request(url, {
         method: "GET",
         headers: headers,
-        body: body
       }));
       console.log("WTF");
       return x;
@@ -98,11 +96,10 @@ export class FetchHTTPClient {
     console.log("Fetch with deadline");
     console.log(`Timeout = ${this.REQUEST_TIMEOUT_MS}`)
 
-    return fetch(req);
-    // return Async.timeoutError(
-    //   () => fetch(req),
-    //   this.REQUEST_TIMEOUT_MS,
-    //   `HTTP request timed out after ${this.REQUEST_TIMEOUT_MS}ms`
-    // );
+    return Async.timeoutError(
+      () => fetch(req),
+      this.REQUEST_TIMEOUT_MS,
+      `HTTP request timed out after ${this.REQUEST_TIMEOUT_MS}ms`
+    );
   }
 }

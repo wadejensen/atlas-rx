@@ -16,9 +16,9 @@
   "scripts": {
     "build:watch": "tsc --watch",
     "build": "tsc",
-    "package": "webpack --config webpack.config.js --mode production; cp -r static dist",
+    "package": "webpack --config webpack.config.js --mode production && cp -r static dist",
     "test": "jest",
-    "deploy": "node target/server.js"
+    "deploy": "node dist/server.js"
   },
   "devDependencies": {
     "@types/express": "^4.16.1",

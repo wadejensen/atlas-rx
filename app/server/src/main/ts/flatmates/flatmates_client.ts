@@ -3,14 +3,16 @@ import {Try, TryCatch} from "common/fp/try";
 
 import {FlatmatesListingsRequest, PropertyType, RoomType, Search} from "./map_markers_request";
 import {BoundingBox} from "../geo";
-import {FetchHTTPClient} from "../http_client";
+import {HTTPClient, Headers} from "../http_client";
 
 import fetch, { Request, Response } from "node-fetch"
+
+import {FetchHTTPClient} from "../fetch_http_client";
 
 export class FlatmatesClient {
 
   constructor(
-    private readonly httpClient: FetchHTTPClient,
+    private readonly httpClient: HTTPClient,
     private sessionId: string,
     private sessionToken: string,
   ) {}
@@ -27,8 +29,8 @@ export class FlatmatesClient {
 
       console.log("1");
 
-      let httpClient: FetchHTTPClient = new FetchHTTPClient(1000, 3, 2000, true);
-      const resp: Response = await httpClient.get(FlatmatesClient.baseUrl);
+      let httpClient: HTTPClient = new FetchHTTPClient(1000, 3, 2000, true);
+      const resp = await httpClient.get(FlatmatesClient.baseUrl);
       const html: string = await resp.text();
 
       // Trigger potential exceptions since they will cause the promise to be rejected.

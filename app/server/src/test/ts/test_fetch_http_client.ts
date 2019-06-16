@@ -4,7 +4,16 @@ import nock from "nock";
 import fetch from "node-fetch";
 import {FetchHTTPClient} from "../../main/ts/fetch_http_client";
 
-// describe("FetchHTTPClient", () => {
+describe("FetchHTTPClient", () => {
+  test("constructor asserts max retries <= 1000", () => {
+    try {
+      let httpClient = new FetchHTTPClient(1000, 1001, 0, false);
+    } catch (e) {
+      expect(e.message).toBe("Max retries must be less than or equal to 1000")
+    }
+  });
+
+});
 //   test("get", async () => {
 //     const scope = nock("http://www.example.com")
 //       .get("/resource")
