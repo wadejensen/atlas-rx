@@ -6,4 +6,5 @@ export interface HTTPClient {
   post(url: string, headers?: Headers, body?: string): Promise<Response>
   put(url: string, headers?: Headers, body?: string): Promise<Response>
   delete(url: string, headers?: Headers, body?: string): Promise<Response>
+  dispatch(req: Request): Promise<Response>
 }

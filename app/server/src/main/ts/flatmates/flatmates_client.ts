@@ -1,13 +1,13 @@
 import { Maybe } from "common/fp/option";
 import {Try, TryCatch} from "common/fp/try";
-
+import Cheerio from "cheerio"
 import {FlatmatesListingsRequest, PropertyType, RoomType, Search} from "./map_markers_request";
 import {BoundingBox} from "../geo";
 import {HTTPClient, Headers} from "../http_client";
-
 import fetch, { Request, Response } from "node-fetch"
 
 import {FetchHTTPClient} from "../fetch_http_client";
+import {FlatmatesListing, MapMarkersResponse} from "./map_markers_response";
 
 export class FlatmatesClient {
 
@@ -20,27 +20,23 @@ export class FlatmatesClient {
   private static readonly baseUrl: string = "https://flatmates.com.au";
   private static _client: FlatmatesClient | null = null;
 
-  static async create(): Promise<FlatmatesClient>
-  {
+  static async create(): Promise<FlatmatesClient> {
     if (this._client != null) {
         console.log("Returning cached client.");
         return Promise.resolve(this._client);
     } else {
-
-      console.log("1");
-
-      let httpClient: HTTPClient = new FetchHTTPClient(1000, 3, 2000, true);
-      const resp = await httpClient.get(FlatmatesClient.baseUrl);
-      const html: string = await resp.text();
+      let httpClient: HTTPClient = new FetchHTTPClient(1000, 3, 300, true);
+      let resp = await httpClient.get(FlatmatesClient.baseUrl);
+      let html: string = await resp.text();
 
       // Trigger potential exceptions since they will cause the promise to be rejected.
-      const sessionId: string = FlatmatesClient.parseSessionId(resp).get();
-      const sessionToken: string = FlatmatesClient.parseSessionToken(html).get();
-
-      console.log("2");
+      let cookie = resp.headers.get("set-cookie");
+      let sessionId: string = FlatmatesClient.parseSessionId(cookie).get();
+      let sessionToken: string = FlatmatesClient.parseSessionToken(html).get();
 
       // Cache flatmates API client for global process use.
       this._client = new FlatmatesClient(httpClient, sessionId, sessionToken);
+      console.log(this._client);
       return this._client;
     }
   }
@@ -57,11 +53,10 @@ export class FlatmatesClient {
     propertyTypes?: Array<PropertyType>,
     minBudget?: number,
     maxBudget?: number,
-  }): Promise<Response> {
-    console.log("3");
+  }): Promise<MapMarkersResponse> {
     return FlatmatesClient
       .create()
-      .then( flatmatesClient => {
+      .then( async (flatmatesClient) => {
         let reqBody = FlatmatesClient.buildListingsRequest({
           boundingBox,
           room,
@@ -84,51 +79,24 @@ export class FlatmatesClient {
           }
         );
 
-        console.log("4");
-        return fetch(request);
-        // setup HTTP client with retires etc
+        let json: any = await flatmatesClient
+          .httpClient
+          .dispatch(request)
+          .then(r => r.json());
+
+        return FlatmatesClient.parseMapMarkersResponse(json);
       });
   }
 
-  // POST /map_markers HTTP/1.1
-  // Host: flatmates.com.au
-  // Connection: keep-alive
-  // Content-Length: 205
-  // Accept: application/json
-  // X-NewRelic-ID: VQUHUFdAAAQHUVNVBwQ=
-  //   Origin: https://flatmates.com.au
-  //   X-CSRF-Token: ziq/JYoGwWSzWE9zHuJLycsRG3fAZoXrMxrs7Mv7n5wgULrT7IWZejxlYEjcEubybveWLITeX41rzqhn88fhOw==
-  // User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
-  // Content-Type: application/json;charset=UTF-8
-  // Referer: https://flatmates.com.au/rooms/wolli-creek-2205/max-1000+private-room?search_source=search_function
-  // Accept-Encoding: gzip, deflate, br
-  // Accept-Language: en-GB,en-US;q=0.9,en;q=0.8
-  // Cookie: _session=Ijd0cTVIS3dZeUVMc0ZNck04aWo1YmloZiI%3D--069ff4a4d60fe57a17402056e88f431e6ec28a6c; _flatmates_session=ae4954dc7860614ac29a472c7594c802; __stripe_mid=37c7e53b-4022-4ac9-a4ab-82455d346c3c; _ga=GA1.3.532878047.1559367900; _fbp=fb.2.1559367900359.1296149440; __stripe_sid=b1b15c1f-9ce2-488f-80d2-d54f0e129897; _gid=GA1.3.1499748352.1559657847; _gat=1
-  //
-  //
-  // curl 'https://flatmates.com.au/map_markers' \
-  //   -H 'X-NewRelic-ID: VQUHUFdAAAQHUVNVBwQ=' \
-  //   -H 'Origin: https://flatmates.com.au' \
-  //   -H 'Accept-Encoding: gzip, deflate, br' \
-  //   -H 'X-CSRF-Token: ziq/JYoGwWSzWE9zHuJLycsRG3fAZoXrMxrs7Mv7n5wgULrT7IWZejxlYEjcEubybveWLITeX41rzqhn88fhOw==' \
-  //   -H 'Accept-Language: en-GB,en-US;q=0.9,en;q=0.8' \
-  //   -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36' \
-  //   -H 'Content-Type: application/json;charset=UTF-8' \
-  //   -H 'Accept: application/json' \
-  //   -H 'Referer: https://flatmates.com.au/rooms/wolli-creek-2205/max-1000+private-room?search_source=search_function' \
-  //   -H 'Cookie: _session=Ijd0cTVIS3dZeUVMc0ZNck04aWo1YmloZiI%3D--069ff4a4d60fe57a17402056e88f431e6ec28a6c; _flatmates_session=ae4954dc7860614ac29a472c7594c802; __stripe_mid=37c7e53b-4022-4ac9-a4ab-82455d346c3c; _ga=GA1.3.532878047.1559367900; _fbp=fb.2.1559367900359.1296149440; __stripe_sid=b1b15c1f-9ce2-488f-80d2-d54f0e129897; _gid=GA1.3.1499748352.1559657847; _gat=1' \
-  //   -H 'Connection: keep-alive' \
-  //   --data-binary '{"search":{"mode":"rooms","locations":["wolli-creek-2205"],"max_budget":1000,"room":"private-room","top_left":"-33.91680541979749,151.11446096743168","bottom_right":"-33.94315514216812,151.1923952325684"}}' \
-  //   --compressed
+  private static parseMapMarkersResponse(obj: any): MapMarkersResponse {
+    let matches: Array<any> = obj["matches"];
+    let nonMatches: Array<any> = obj["non_matches"];
 
-// {"search":{
-//   "mode":"rooms",
-//   "locations":["wolli-creek-2205"],
-//   "max_budget":1000,
-//   "room":"private-room",
-//   "top_left":"-33.91680541979749,151.11446096743168",
-//   "bottom_right":"-33.94315514216812,151.1923952325684"}
-// }'
+    return new MapMarkersResponse({
+      matches: matches.map( json => new FlatmatesListing({...json})),
+      non_matches: nonMatches.map( json => new FlatmatesListing({...json})),
+    });
+  }
 
   /**
    * Perform risky parsing of response header to determine session id for authentication
@@ -138,35 +106,33 @@ export class FlatmatesClient {
    * Desired result is this portion of the example above:
    * _flatmates_session=8d5efaf0352d09453e11c6879c407774
    *
-   * @param resp HTTP response from Flatmates.com.au homepage
+   * @param cookie The "set-cookie" header in the HTTP response from
+   * Flatmates.com.au homepage
    * @returns The flatmates session id for authentication
    */
-  private static parseSessionId(resp: Response): Try<string>
-  {
+  private static parseSessionId(cookie: string | null): Try<string> {
     return TryCatch(() => {
-        const cookie: string | null = resp.headers.get("set-cookie");
-        // perform risky parsing of cookie in response header
-        // @ts-ignore
-        const sessionIdMatches = cookie.match("_flatmates_session=[a-zA-Z0-9]+");
-        // We expect only one match
-        // @ts-ignore
-        return sessionIdMatches[0]
+      // perform risky parsing of cookie in response header
+      // @ts-ignore
+      const sessionIdMatches = cookie.match("_flatmates_session=[a-zA-Z0-9]+");
+      // We expect only one match
+      // @ts-ignore
+      return sessionIdMatches[0]
     })
   }
 
   /**
    * Perform risky parsing of the flatmates.com.au homepage for the csrf
-   * token used for authentication. Example of target div:
+   * token used for authentication.
+   *
+   * Example of target div:
    * <meta name="csrf-token" content="ZquiBuMVNjCl+bGWeMO4GNI+CZMVGIZM0HgPe+3idZkJ315HrPNHQaM44j1mcYqriTS9dfL7+mKX41Y+81Sb5Q==" />
+   * returns the content attribute:   ZquiBuMVNjCl+bGWeMO4GNI+CZMVGIZM0HgPe+3idZkJ315HrPNHQaM44j1mcYqriTS9dfL7+mKX41Y+81Sb5Q==
    */
   private static parseSessionToken(html: string): Try<string> {
     return TryCatch( () => {
-      const matches = html.match(".*csrf-token.*");
-      // @ts-ignore
-      const csrfTokenDiv = matches[0];
-      const tokenMatches = csrfTokenDiv.match("\"[a-zA-Z0-9|=|+|\\/]+\"");
-      // @ts-ignore
-      return tokenMatches[0].replace("\"", "");
+      const document = Cheerio.load(html);
+      return document("[name='csrf-token']").attr("content");
     });
   }
 

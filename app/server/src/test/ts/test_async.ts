@@ -206,7 +206,6 @@ reason: Service unavailable after one retry.")
       .catch(msg => {
         let finish = Date.now();
         let duration = finish - start;
-        console.log(duration);
         expect(duration).toBeGreaterThanOrEqual(120);
         expect(msg).toBe(
 "Retried request 2 times. Last error: \

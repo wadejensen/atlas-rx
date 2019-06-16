@@ -4,6 +4,7 @@ import {Person} from "common/person"
 import {FlatmatesClient} from "./flatmates/flatmates_client";
 import {RoomType} from "./flatmates/map_markers_request";
 import {Coord, Geo} from "./geo";
+import {MapMarkersResponse} from "./flatmates/map_markers_response";
 
 // import fetch, { Request, Response } from "node-fetch"
 
@@ -16,7 +17,7 @@ let x = {
 
 console.log(x);
 
-startServer()
+startServer();
 
 let p = new Person("Wade", 23, "Software Engineer", 100000.0);
 console.log(p);
@@ -30,7 +31,7 @@ function startServer() {
   registerRoutes(app);
   app.listen(3000, () => console.log("Listening on port 3000"));
 
-  let resp = FlatmatesClient.flatmatesListings(
+  let resp: Promise<MapMarkersResponse> = FlatmatesClient.flatmatesListings(
     {
       boundingBox: Geo.boundingBox(
         new Coord(-33.874322, 151.194749),
@@ -40,12 +41,7 @@ function startServer() {
     });
 
   resp
-    .then(r => r.json())
-    .then(json => {
-      console.log("Gooooood result");
-      console.log(json["listings"][0]);
-      console.log("Gooooood result");
-    })
+    .then(r => console.log(r.matches[0]))
     .catch( reason => console.log(reason));
 }
 
@@ -61,8 +57,6 @@ function helloHandler(req: express.Request, res: express.Response): void {
 
 function index(req: express.Request, res: express.Response): void {
   console.log(__dirname + '/static/index.html');
-
   FlatmatesClient.create().then( fmc => console.log(fmc));
-
   res.sendFile(__dirname + '/static/index.html');
 }

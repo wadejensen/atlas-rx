@@ -55,15 +55,10 @@ export class FetchHTTPClient implements HTTPClient {
    * selected retry backoff policy
    */
   dispatch(req: Request): Promise<Response> {
-    console.log("Dispatch");
     // perform fetch with a timeout deadline for each HTTP request and the
     // selected retry backoff policy
     if (this.MAX_RETRIES <= 0) {
-      console.log("MAX_RETRIES <= 0");
-
-      let res = this.fetchWithDeadline(req)
-      console.log(res);
-      return res;
+      return this.fetchWithDeadline(req);
     }
     else if (!this.EXPONENTIAL_BACKOFF) {
       return Async.backoff(
@@ -72,7 +67,6 @@ export class FetchHTTPClient implements HTTPClient {
         this.BACKOFF_DELAY_MS
       )
     } else {
-      console.log("Exp branch");
       return Async.exponentialBackoff(
         () => this.fetchWithDeadline(req),
         this.MAX_RETRIES,
