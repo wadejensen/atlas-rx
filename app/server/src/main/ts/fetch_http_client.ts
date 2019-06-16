@@ -20,20 +20,10 @@ export class FetchHTTPClient implements HTTPClient {
   }
 
   get(url: string, headers?: Headers): Promise<Response> {
-    try {
-      console.log("GET");
-      let x = this.dispatch(new Request(url, {
-        method: "GET",
-        headers: headers,
-      }));
-      console.log("WTF");
-      return x;
-    }
-    catch (e) {
-      console.log("Boom");
-      console.error(e);
-      throw e;
-    }
+    return this.dispatch(new Request(url, {
+      method: "GET",
+      headers: headers,
+    }));
   }
 
   post(url: string, headers?: Headers, body?: string): Promise<Response> {
@@ -93,9 +83,6 @@ export class FetchHTTPClient implements HTTPClient {
 
   private fetchWithDeadline(req: Request): Promise<Response> {
     // Wrap the fetch API with a timeout
-    console.log("Fetch with deadline");
-    console.log(`Timeout = ${this.REQUEST_TIMEOUT_MS}`)
-
     return Async.timeoutError(
       () => fetch(req),
       this.REQUEST_TIMEOUT_MS,
