@@ -13,7 +13,8 @@ describe("Async", () => {
     let result = await Async.delay(() => Promise.resolve("payload"), 50);
     let finish = Date.now();
     let duration = finish - start;
-    expect(duration).toBeGreaterThanOrEqual(50);
+    // Some flake observed when expectation set to 50
+    expect(duration).toBeGreaterThanOrEqual(49);
   });
 
   test("timeout (result)", async () => {
