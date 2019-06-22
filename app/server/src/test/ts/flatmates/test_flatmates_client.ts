@@ -5,13 +5,22 @@ import {
   ListingsRequest,
   RoomType,
   Search
-} from "../../../main/ts/flatmates/flatmates_listings_request";
+} from "../../../main/ts/flatmates/listings_request";
 import nock from "nock";
 import {FetchHTTPClient} from "../../../main/ts/fetch_http_client";
 import {
   FlatmatesListing,
   ListingsResponse
-} from "../../../main/ts/flatmates/map_markers_response";
+} from "../../../main/ts/flatmates/listings_response";
+import {
+  AutocompleteRequest, Completion, Contexts, Fuzzy,
+  LocationSuggest
+} from "../../../main/ts/flatmates/autocomplete_request";
+import {Request} from "node-fetch";
+import {
+  AutocompleteResponse,
+  AutocompleteResult
+} from "../../../main/ts/flatmates/autocomplete_result";
 
 describe("FlatmatesClient", () => {
   test("create factory method correctly creates a FlatmatesClient", async () => {
@@ -36,6 +45,180 @@ describe("FlatmatesClient", () => {
         "ZquiBuMVNjCl+bGWeMO4GNI+CZMVGIZM0HgPe+3idZkJ315HrPNHQaM44j1mcYqriTS9dfL7+mKX41Y+81Sb5Q==",
       );
       expect(client).toStrictEqual(expected);
+    } catch (e) {
+      console.error(e);
+      fail();
+    }
+  });
+
+  test("autocomplete returns a list of typeahead autocomplete POI suggestions", async () => {
+    const flatmatesClient = new FlatmatesClient(
+      new FetchHTTPClient(1000, 3, 300, true),
+      "dummy_session_id",
+      "dummy_session_token",
+    );
+
+    const req = FlatmatesClient.buildAutocompleteRequest("redfer");
+
+    const scope = nock("https://flatmates.com.au")
+      .post("/autocomplete", JSON.stringify(req), { reqheaders:
+          {
+            ["accept"]: "application/json",
+            ["accept-encoding"]: "gzip, deflate, br",
+            ["content-type"]: "application/json;charset=utf-8",
+            ["user-agent"]: "",
+            ["content-length"]: "197",
+            ["connection"]: "close",
+          }
+      })
+      .reply(200, {
+        "took": 1,
+        "timed_out": false,
+        "_shards": {
+          "total": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "hits": {
+          "total": 0,
+          "max_score": 0.0,
+          "hits": []
+        },
+        "suggest": {
+          "location_suggest": [
+            {
+              "text": "redf",
+              "offset": 0,
+              "length": 4,
+              "options": [
+                {
+                  "text": "Redfern",
+                  "_index": "locations_production_20170321151001639",
+                  "_type": "location",
+                  "_id": "287",
+                  "_score": 1908.0,
+                  "_source": {
+                    "id": 287,
+                    "state": "NSW",
+                    "city": "Sydney",
+                    "suburb": "Redfern",
+                    "postcode": "2016",
+                    "country": "AU",
+                    "created_at": "2014-12-29T14:53:38.219Z",
+                    "updated_at": "2019-06-15T14:42:54.371Z",
+                    "latitude": -33.892963,
+                    "longitude": 151.2053979,
+                    "polygon": [],
+                    "location_type": "suburb",
+                    "key": "redfern-2016",
+                    "average_rent": 327,
+                    "temp_latitude": null,
+                    "temp_longitude": null,
+                    "radius": 6,
+                    "name": null,
+                    "short_name": null,
+                    "synonyms": [],
+                    "location": [151.2053979, -33.892963],
+                    "search_title": "Redfern, Sydney, NSW, 2016",
+                    "short_title": "Redfern, 2016",
+                    "suggest": {
+                      "input": ["Sydney", "2016", "Redfern", "Redfern 2016", "Redfern NSW"],
+                      "weight": 477,
+                      "contexts": {
+                        "location_type": ["suburb"]
+                      }
+                    }
+                  },
+                  "contexts": {
+                    "location_type": ["suburb"]
+                  }
+                },
+                {
+                  "text": "Red Hill",
+                  "_index": "locations_production_20170321151001639",
+                  "_type": "location",
+                  "_id": "8019",
+                  "_score": 720.0,
+                  "_source": {
+                    "id": 8019,
+                    "state": "QLD",
+                    "city": "Brisbane",
+                    "suburb": "Red Hill",
+                    "postcode": "4059",
+                    "country": "AU",
+                    "created_at": "2014-12-29T14:53:53.385Z",
+                    "updated_at": "2019-06-22T15:15:56.694Z",
+                    "latitude": -27.451,
+                    "longitude": 153.004,
+                    "polygon": [],
+                    "location_type": "suburb",
+                    "key": "red-hill-4059",
+                    "average_rent": 200,
+                    "temp_latitude": null,
+                    "temp_longitude": null,
+                    "radius": 5,
+                    "name": null,
+                    "short_name": null,
+                    "synonyms": [],
+                    "location": [153.004, -27.451],
+                    "search_title": "Red Hill, Brisbane, QLD, 4059",
+                    "short_title": "Red Hill, 4059",
+                    "suggest": {
+                      "input": ["Brisbane", "4059", "Red Hill", "Red Hill 4059", "Red Hill QLD"],
+                      "weight": 180,
+                      "contexts": {
+                        "location_type": ["suburb"]
+                      }
+                    }
+                  },
+                  "contexts": {
+                    "location_type": ["suburb"]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      });
+
+    const expected = new AutocompleteResponse("redf", [
+      new AutocompleteResult({
+        text: "Redfern",
+        state: "NSW",
+        city: "Sydney",
+        suburb: "Redfern",
+        postcode: "2016",
+        country: "AU",
+        latitude: -33.892963,
+        longitude: 151.2053979,
+        location_type: "suburb",
+        average_rent: 327,
+        name: null,
+        short_name: null,
+        search_title: "Redfern, Sydney, NSW, 2016",
+        short_title: "Redfern, 2016",
+      }),
+      new AutocompleteResult({
+        text: "Red Hill",
+        state: "QLD",
+        city: "Brisbane",
+        suburb: "Red Hill",
+        postcode: "4059",
+        country: "AU",
+        latitude: -27.451,
+        longitude: 153.004,
+        location_type: "suburb",
+        average_rent: 200,
+        name: null,
+        short_name: null,
+        search_title: "Red Hill, Brisbane, QLD, 4059",
+        short_title: "Red Hill, 4059",
+
+      }),
+    ]);
+    try {
+      const resp: AutocompleteResponse = await flatmatesClient.autocomplete(req);
+      expect(resp).toStrictEqual(expected);
     } catch (e) {
       console.error(e);
       fail();
@@ -160,5 +343,21 @@ describe("FlatmatesClient", () => {
       )
     );
     expect(reqBody).toStrictEqual(expected);
+  });
+
+  test("buildAutocompleteRequest creates the correct AutocompleteRequest", () => {
+    const req = FlatmatesClient.buildAutocompleteRequest("redfer");
+    const expected = new AutocompleteRequest(
+      new LocationSuggest(
+        "redfer",
+        new Completion(
+          "suggest",
+          5,
+          new Fuzzy("AUTO"),
+          new Contexts(["suburb", "city", "university", "tram_stop", "train_station"]),
+        )
+      )
+    );
+    expect(req).toStrictEqual(expected);
   });
 });

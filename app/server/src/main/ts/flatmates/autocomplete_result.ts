@@ -1,5 +1,8 @@
+export class AutocompleteResponse {
+  constructor(query: string, results: Array<AutocompleteResult>) {}
+}
+
 export class AutocompleteResult {
-  readonly query: string;
   readonly text: string;
   readonly state: string;
   readonly city: string;
@@ -10,13 +13,12 @@ export class AutocompleteResult {
   readonly longitude: number;
   readonly location_type: string;
   readonly average_rent: number;
-  readonly name: string;
+  readonly name: string | null;
   readonly short_name: string | null;
   readonly search_title: string;
   readonly short_title: string;
 
   constructor(opts: {
-    query: string,
     text: string,
     state: string,
     city: string,
@@ -32,7 +34,6 @@ export class AutocompleteResult {
     search_title: string,
     short_title: string,
   }) {
-    this.query = opts.query;
     this.text = opts.text;
     this.state = opts.state;
     this.city = opts.city;

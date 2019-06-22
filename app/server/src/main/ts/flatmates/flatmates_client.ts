@@ -5,7 +5,7 @@ import {HTTPClient} from "../http_client";
 import {Request} from "node-fetch"
 
 import {FetchHTTPClient} from "../fetch_http_client";
-import {AutocompleteResult} from "./autocomplete_result";
+import {AutocompleteResponse, AutocompleteResult} from "./autocomplete_result";
 import {ListingsRequest, PropertyType, RoomType, Search} from "./listings_request";
 import {
   AutocompleteRequest,
@@ -41,7 +41,11 @@ export class FlatmatesClient {
     return new FlatmatesClient(httpClient, sessionId, sessionToken);
   }
 
-  async autocomplete(req: AutocompleteRequest): Promise<Array<AutocompleteResult>> {
+  /**
+   * Perform an api call to get suburb location and POI autocomplete from flatmates.com.au.
+   * POIs include: suburb, city, university, tram_stop, train_station.
+   */
+  async autocomplete(req: AutocompleteRequest): Promise<AutocompleteResponse> {
     let request = new Request(FlatmatesClient.BASE_URL + "/autocomplete",
       {
         "method": "POST",
@@ -51,7 +55,7 @@ export class FlatmatesClient {
           "content-type": "application/json;charset=UTF-8",
           "user-agent": "",
         },
-        body: JSON.stringify(req), // "{\"location_suggest\":{\"text\":\"redfern station\",\"completion\":{\"field\":\"suggest\",\"size\":5,\"fuzzy\":{\"fuzziness\":\"AUTO\"},\"contexts\":{\"location_type\":[\"suburb\",\"city\",\"university\",\"tram_stop\",\"train_station\"]}}}}", //
+        body: JSON.stringify(req),
       });
 
     let json = await this.httpClient
@@ -143,15 +147,14 @@ export class FlatmatesClient {
     );
   }
 
-  private static parseAutocompleteResponse(obj: any): Try<Array<AutocompleteResult>> {
-    return TryCatch( () => {
+  private static parseAutocompleteResponse(obj: any): Try<AutocompleteResponse> {
+    return TryCatch(() => {
       const locationSuggest = obj["suggest"]["location_suggest"];
-      return locationSuggest.map((json: any) => {
+      const results = locationSuggest.map((json: any) => {
         const options = json["options"][0];
         const source = options["_source"];
 
         return new AutocompleteResult({
-          query: locationSuggest["text"],
           text: options["text"],
           state: source["state"],
           city: source["city"],
@@ -168,79 +171,9 @@ export class FlatmatesClient {
           short_title: source["short_title"],
         })
       });
+      return new AutocompleteResponse(locationSuggest["text"], results);
     });
-
-    let x = {
-      "took":1,
-      "timed_out":false,
-      "_shards":{
-        "total":5,
-        "successful":5,
-        "failed":0
-      },
-      "hits":{
-        "total":0,
-        "max_score":0.0,
-        "hits":[]
-      },
-      "suggest":{
-        "location_suggest":[
-          {"text":"redfern station",
-            "offset":0,
-            "length":15,
-            "options":[
-              {
-                "text":"Redfern Station",
-                "_index":"locations_production_20170321151001639",
-                "_type":"location",
-                "_id":"19306",
-                "_score":15.0,
-                "_source":{
-                  "id":19306,
-                  "state":"NSW",
-                  "city":"Sydney",
-                  "suburb":"Eveleigh",
-                  "postcode":"2015",
-                  "country":"AU",
-                  "created_at": "2017-03-15T09:33:11.159Z",
-                  "updated_at":"2019-06-15T14:55:42.607Z",
-                  "latitude":-33.8916355,
-                  "longitude":151.1987696,
-                  "polygon":[],
-                  "location_type":"train_station",
-                  "key":"redfern-station-sydney",
-                  "average_rent":328,
-                  "temp_latitude":null,
-                  "temp_longitude":null,
-                  "radius":5,
-                  "name":"Redfern Station",
-                  "short_name":null,
-                  "synonyms":[],
-                  "location":[151.1987696,-33.8916355],
-                  "search_title":"Redfern Station, Sydney, NSW, 2015",
-                  "short_title":"Redfern Station",
-                  "suggest":{
-                    "input":[
-                      "Sydney",
-                      "2015",
-                      "Redfern Station"
-                    ],
-                    "weight":0,
-                    "contexts":{
-                      "location_type":["train_station"]
-                    }
-                  }
-                },
-                "contexts":{
-                  "location_type":["train_station"]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
-  }
+  };
 
   /**
    * Perform risky parsing of response header to determine session id for authentication
@@ -251,7 +184,7 @@ export class FlatmatesClient {
    * _flatmates_session=8d5efaf0352d09453e11c6879c407774
    *
    * @param cookie The "set-cookie" header in the HTTP response from
-   * Flatmates.com.au homepage
+   * flatmates.com.au homepage
    * @returns The flatmates session id for authentication
    */
   private static parseSessionId(cookie: string | null): Try<string> {
