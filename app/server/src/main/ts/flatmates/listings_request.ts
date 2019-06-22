@@ -1,4 +1,4 @@
-export class FlatmatesListingsRequest {
+export class ListingsRequest {
   constructor(readonly search: Search) {}
 }
 

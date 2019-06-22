@@ -1,8 +1,8 @@
 import express, {Request, Response} from "express";
 import {FlatmatesClient} from "./flatmates/flatmates_client";
-import {MapMarkersResponse} from "./flatmates/map_markers_response";
+import {ListingsResponse} from "./flatmates/listings_response";
 import {Coord, Geo} from "./geo";
-import {RoomType} from "./flatmates/flatmates_listings_request";
+import {RoomType} from "./flatmates/listings_request";
 
 /**
  * Atlas server instance running on Express middleware
@@ -25,6 +25,10 @@ export class AtlasServer {
     app.get('/indexx', AtlasServer.index);
 
     app.listen(3000, () => console.log("Listening on port 3000"));
+
+    let query = FlatmatesClient.buildAutocompleteRequest("redfer");
+    let suggestions = await this.flatmatesClient.autocomplete(query);
+    console.dir(suggestions);
   }
 
   static helloHandler(req: Request, res: Response): void {
@@ -47,7 +51,7 @@ export class AtlasServer {
       roomType: RoomType.PRIVATE_ROOM,
     });
 
-    let resp: Promise<MapMarkersResponse> = this.flatmatesClient!
+    let resp: Promise<ListingsResponse> = this.flatmatesClient!
       .flatmatesListings(req);
 
     resp

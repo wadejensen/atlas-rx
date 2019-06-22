@@ -2,7 +2,7 @@ import {FlatmatesClient} from "../../../main/ts/flatmates/flatmates_client";
 import {Try} from "../../../../../common/src/main/ts/fp/try";
 import {Coord, Geo} from "../../../main/ts/geo";
 import {
-  FlatmatesListingsRequest,
+  ListingsRequest,
   RoomType,
   Search
 } from "../../../main/ts/flatmates/flatmates_listings_request";
@@ -10,7 +10,7 @@ import nock from "nock";
 import {FetchHTTPClient} from "../../../main/ts/fetch_http_client";
 import {
   FlatmatesListing,
-  MapMarkersResponse
+  ListingsResponse
 } from "../../../main/ts/flatmates/map_markers_response";
 
 describe("FlatmatesClient", () => {
@@ -49,7 +49,7 @@ describe("FlatmatesClient", () => {
       "dummy_session_token",
     );
 
-    const reqBody = new FlatmatesListingsRequest(
+    const reqBody = new ListingsRequest(
       new Search(
         "rooms",
         "private-room",
@@ -93,7 +93,7 @@ describe("FlatmatesClient", () => {
         'non_matches': [],
       });
 
-    const expected = new MapMarkersResponse({
+    const expected = new ListingsResponse({
       matches: [new FlatmatesListing({
         head: 'Sydney, Sydney',
         subheading: 'Furnished room with own bathroom',
@@ -110,7 +110,7 @@ describe("FlatmatesClient", () => {
     });
 
     try {
-      const resp: MapMarkersResponse = await flatmatesClient.flatmatesListings(reqBody);
+      const resp: ListingsResponse = await flatmatesClient.flatmatesListings(reqBody);
       expect(resp).toStrictEqual(expected);
     } catch (e) {
       console.error(e);
@@ -138,7 +138,7 @@ describe("FlatmatesClient", () => {
     expect(sessionToken.get()).toBe("ZquiBuMVNjCl+bGWeMO4GNI+CZMVGIZM0HgPe+3idZkJ315HrPNHQaM44j1mcYqriTS9dfL7+mKX41Y+81Sb5Q==")
   });
 
-  test("buildListingsRequest creates the correct FlatmatesListingsRequest", () => {
+  test("buildListingsRequest creates the correct ListingsRequest", () => {
     const reqBody = FlatmatesClient.buildListingsRequest({
       boundingBox: Geo.boundingBox(
         new Coord(-33.874322, 151.194749),
@@ -148,7 +148,7 @@ describe("FlatmatesClient", () => {
       minBudget: 10,
       maxBudget: 500,
     });
-    const expected = new FlatmatesListingsRequest(
+    const expected = new ListingsRequest(
       new Search(
         "rooms",
         "private-room",

@@ -1,4 +1,4 @@
-export class MapMarkersResponse {
+export class ListingsResponse {
   readonly matches: Array<FlatmatesListing>;
   readonly non_matches: Array<FlatmatesListing>;
 
