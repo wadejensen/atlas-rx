@@ -1,15 +1,21 @@
 import { Maybe } from "common/fp/option";
 import {Try, TryCatch} from "common/fp/try";
 import Cheerio from "cheerio"
-import {FlatmatesListingsRequest, PropertyType, RoomType, Search} from "./map_markers_request";
 import {BoundingBox} from "../geo";
 import {HTTPClient, Headers} from "../http_client";
 import fetch, { Request, Response } from "node-fetch"
 
 import {FetchHTTPClient} from "../fetch_http_client";
 import {FlatmatesListing, MapMarkersResponse} from "./map_markers_response";
+import {
+  FlatmatesListingsRequest,
+  PropertyType,
+  RoomType,
+  Search
+} from "./flatmates_listings_request";
 
 export class FlatmatesClient {
+  private static readonly BASE_URL: string = "https://flatmates.com.au";
 
   constructor(
     private readonly httpClient: HTTPClient,
@@ -17,84 +23,61 @@ export class FlatmatesClient {
     private sessionToken: string,
   ) {}
 
-  private static readonly baseUrl: string = "https://flatmates.com.au";
-  private static _client: FlatmatesClient | null = null;
-
+  /**
+   * Factory method for a {@link FlatmatesClient}
+   */
   static async create(): Promise<FlatmatesClient> {
-    if (this._client != null) {
-        console.log("Returning cached client.");
-        return Promise.resolve(this._client);
-    } else {
-      let httpClient: HTTPClient = new FetchHTTPClient(1000, 3, 300, true);
-      let resp = await httpClient.get(FlatmatesClient.baseUrl);
-      let html: string = await resp.text();
+    let httpClient: HTTPClient = new FetchHTTPClient(1000, 3, 300, true);
+    let resp = await httpClient.get(FlatmatesClient.BASE_URL);
+    let html: string = await resp.text();
 
-      // Trigger potential exceptions since they will cause the promise to be rejected.
-      let cookie = resp.headers.get("set-cookie");
-      let sessionId: string = FlatmatesClient.parseSessionId(cookie).get();
-      let sessionToken: string = FlatmatesClient.parseSessionToken(html).get();
+    // Trigger potential exceptions since they will cause the promise to be rejected.
+    let cookie = resp.headers.get("set-cookie");
+    let sessionId: string = this.parseSessionId(cookie).get();
+    let sessionToken: string = this.parseSessionToken(html).get();
 
-      // Cache flatmates API client for global process use.
-      this._client = new FlatmatesClient(httpClient, sessionId, sessionToken);
-      console.log(this._client);
-      return this._client;
-    }
+    return new FlatmatesClient(httpClient, sessionId, sessionToken);
   }
 
-  static async flatmatesListings({
-    boundingBox,
-    room,
-    propertyTypes,
-    minBudget,
-    maxBudget,
-  }: {
-    boundingBox: BoundingBox
-    room?: RoomType,
-    propertyTypes?: Array<PropertyType>,
-    minBudget?: number,
-    maxBudget?: number,
-  }): Promise<MapMarkersResponse> {
-    return FlatmatesClient
-      .create()
-      .then( async (flatmatesClient) => {
-        let reqBody = FlatmatesClient.buildListingsRequest({
-          boundingBox,
-          room,
-          propertyTypes,
-          minBudget,
-          maxBudget,
-        });
+  /**
+   * List residential rooms for rent on flatmates.com.au
+   * //TODO(wadejensen) handle API paging
+   */
+  async flatmatesListings(req: FlatmatesListingsRequest): Promise<MapMarkersResponse> {
+    let request = new Request(FlatmatesClient.BASE_URL + "/map_markers",
+      {
+        method: "POST",
+        headers: {
+          "accept":"application/json",
+          "accept-encoding": "gzip, deflate, br",
+          "content-type": "application/json;charset=UTF-8",
+          "cookie": this.sessionId,
+          "user-agent": "",
+          "x-csrf-token": this.sessionToken,
+        },
+        body: JSON.stringify(req)
+      }
+    );
 
-        let request = new Request(this.baseUrl + "/map_markers",
-          {
-            method: "POST",
-            headers: {
-              "Accept":"application/json",
-              "Accept-Encoding": "gzip, deflate, br",
-              "Content-Type": "application/json;charset=UTF-8",
-              "Cookie": flatmatesClient.sessionId,
-              "X-CSRF-Token": flatmatesClient.sessionToken
-            },
-            body: JSON.stringify(reqBody)
-          }
-        );
+    let json: any = await this.httpClient
+      .dispatch(request)
+      .then(r => r.json());
 
-        let json: any = await flatmatesClient
-          .httpClient
-          .dispatch(request)
-          .then(r => r.json());
+    return FlatmatesClient.parseMapMarkersResponse(json).get();
+  }
 
-        return FlatmatesClient.parseMapMarkersResponse(json);
+  /**
+   * Attempt to parse map_markers response json into a MapMarkersResponse
+   */
+  private static parseMapMarkersResponse(obj: any): Try<MapMarkersResponse> {
+    return TryCatch( () => {
+      let matches: Array<any> = obj["matches"];
+      let nonMatches: Array<any> = obj["non_matches"];
+
+      return new MapMarkersResponse({
+        matches: matches.map( json => new FlatmatesListing({...json})),
+        non_matches: nonMatches.map( json => new FlatmatesListing({...json})),
       });
-  }
-
-  private static parseMapMarkersResponse(obj: any): MapMarkersResponse {
-    let matches: Array<any> = obj["matches"];
-    let nonMatches: Array<any> = obj["non_matches"];
-
-    return new MapMarkersResponse({
-      matches: matches.map( json => new FlatmatesListing({...json})),
-      non_matches: nonMatches.map( json => new FlatmatesListing({...json})),
     });
   }
 
@@ -131,20 +114,21 @@ export class FlatmatesClient {
    */
   private static parseSessionToken(html: string): Try<string> {
     return TryCatch( () => {
+      // jQuery API reimplemented for Node
       const document = Cheerio.load(html);
       return document("[name='csrf-token']").attr("content");
     });
   }
 
-  private static buildListingsRequest({
+  static buildListingsRequest({
     boundingBox,
-    room,
+    roomType,
     propertyTypes,
     minBudget,
     maxBudget,
   }: {
     boundingBox: BoundingBox
-    room?: RoomType,
+    roomType?: RoomType,
     propertyTypes?: Array<PropertyType>,
     minBudget?: number,
     maxBudget?: number,
@@ -152,7 +136,7 @@ export class FlatmatesClient {
     return new FlatmatesListingsRequest(
       new Search(
         "rooms",
-        room || null,
+        roomType || null,
         propertyTypes || null,
         minBudget || 0,
         maxBudget || 10_000,

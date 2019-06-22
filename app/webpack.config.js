@@ -2,7 +2,7 @@ path = require("path");
 
 module.exports = [
     {
-        entry: './server/src/main/ts/server.ts',
+        entry: './server/src/main/ts/index.ts',
         module: {
             rules: [
                 {
@@ -25,7 +25,7 @@ module.exports = [
         },
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: 'server.js'
+            filename: 'index.js'
         },
         stats: 'minimal',
     },

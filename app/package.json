@@ -2,7 +2,7 @@
   "name": "atlas",
   "version": "0.0.1",
   "description": "Real estate hackery",
-  "main": "server/target/server.js",
+  "main": "server/target/index.js",
   "types": "target/index.d.ts",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
     "build": "tsc",
     "package": "webpack --config webpack.config.js --mode production && cp -r static dist",
     "test": "jest",
-    "deploy": "node dist/server.js"
+    "deploy": "node dist/index.js"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.11",
