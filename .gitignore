@@ -1,4 +1,5 @@
 .idea
+.envrc
 *.tfstate
 .terraform
 *.tfstate.backup
