@@ -149,13 +149,13 @@ export class FlatmatesClient {
 
   private static parseAutocompleteResponse(obj: any): Try<AutocompleteResponse> {
     return TryCatch(() => {
-      const locationSuggest = obj["suggest"]["location_suggest"];
-      const results = locationSuggest.map((json: any) => {
-        const options = json["options"][0];
-        const source = options["_source"];
+      const locationSuggest = obj["suggest"]["location_suggest"][0];
+      const options = locationSuggest["options"];
+      const results = options.map((json: any) => {
+        const source = json["_source"];
 
         return new AutocompleteResult({
-          text: options["text"],
+          text: json["text"],
           state: source["state"],
           city: source["city"],
           suburb: source["suburb"],
@@ -169,7 +169,7 @@ export class FlatmatesClient {
           short_name: source["short_name"],
           search_title: source["search_title"],
           short_title: source["short_title"],
-        })
+        });
       });
       return new AutocompleteResponse(locationSuggest["text"], results);
     });

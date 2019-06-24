@@ -1,5 +1,5 @@
 export class AutocompleteResponse {
-  constructor(query: string, results: Array<AutocompleteResult>) {}
+  constructor(readonly query: string, readonly results: Array<AutocompleteResult>) {}
 }
 
 export class AutocompleteResult {

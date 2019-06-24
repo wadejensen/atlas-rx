@@ -36,9 +36,16 @@ export abstract class Try<T> {
   abstract isFailure(): boolean
 
   /**
-   * Returns the value from this `Success` or throws the exception if this is a `Failure`.
+   * Returns the value from this `Success` or throws the exception if this
+   * is a `Failure`.
    */
   abstract get(): T;
+
+  /**
+   * Returns the Error value from this `Failure` or throws a TypeError if this
+   * is a `Success`.
+   */
+  abstract err(): Error
 
   /**
    * Returns the value from this `Success` or the given `default` argument if
@@ -47,23 +54,13 @@ export abstract class Try<T> {
    * ''Note:'': This will throw an exception if it is not a success and default
    * throws an exception.
    */
-  getOrElse(defaultValue: () => T): T {
-    if (this.isSuccess())
-      return this.get();
-    else
-      return defaultValue();
-  }
+  abstract getOrElse(defaultValue: () => T): T
 
   /**
    * Returns this `Try` if it's a `Success` or the given `default` argument if
    * this is a `Failure`.
    */
-  orElse<U extends T>(alternative: () => Try<U>): Try<T> {
-    if (this.isSuccess())
-      return this;
-    else
-      return alternative();
-  }
+  abstract orElse<U extends T>(alternative: () => Try<U>): Try<T>
 
   /**
    * Returns the given function applied to the value from this `Success` or
@@ -116,6 +113,10 @@ export class Success<T> extends Try<T> {
 
   get(): T {
     return this.value;
+  }
+
+  err(): Error {
+    throw TypeError("Success type does not contain an error value.")
   }
 
   getOrElse(defaultValue: () => T): T {
@@ -174,6 +175,10 @@ export class Failure<T> extends Try<T> {
 
   get(): T {
     throw this.error;
+  }
+
+  err(): Error {
+    return this.error;
   }
 
   getOrElse(defaultValue: () => T): T {

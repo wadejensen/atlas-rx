@@ -1,22 +1,17 @@
 import {FlatmatesClient} from "../../../main/ts/flatmates/flatmates_client";
 import {Try} from "../../../../../common/src/main/ts/fp/try";
 import {Coord, Geo} from "../../../main/ts/geo";
-import {
-  ListingsRequest,
-  RoomType,
-  Search
-} from "../../../main/ts/flatmates/listings_request";
+import {ListingsRequest, RoomType, Search} from "../../../main/ts/flatmates/listings_request";
 import nock from "nock";
 import {FetchHTTPClient} from "../../../main/ts/fetch_http_client";
+import {FlatmatesListing, ListingsResponse} from "../../../main/ts/flatmates/listings_response";
 import {
-  FlatmatesListing,
-  ListingsResponse
-} from "../../../main/ts/flatmates/listings_response";
-import {
-  AutocompleteRequest, Completion, Contexts, Fuzzy,
+  AutocompleteRequest,
+  Completion,
+  Contexts,
+  Fuzzy,
   LocationSuggest
 } from "../../../main/ts/flatmates/autocomplete_request";
-import {Request} from "node-fetch";
 import {
   AutocompleteResponse,
   AutocompleteResult
