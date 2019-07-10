@@ -16,7 +16,8 @@
   "scripts": {
     "build:watch": "tsc --watch",
     "build": "tsc",
-    "package": "webpack --config webpack.config.js --mode production && cp -r static dist",
+    "dev-loop": "webpack --config webpack.config.js --mode development",
+    "package": "webpack --config webpack.config.js --mode production",
     "test": "jest",
     "deploy": "node dist/index.js"
   },

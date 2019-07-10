@@ -15,4 +15,3 @@ let p = new Person("Wade", 23, "Software Engineer", 100000.0);
 console.log(p);
 
 console.log(p);
-
