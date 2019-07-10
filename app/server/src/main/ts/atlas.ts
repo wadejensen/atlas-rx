@@ -14,6 +14,7 @@ import {
 } from "google__maps";
 import {Try, TryCatch} from "common/fp/try";
 import {sys} from "typescript";
+import * as path from "path";
 
 /**
  * Atlas server instance running on Express middleware
@@ -42,9 +43,9 @@ export class AtlasServer {
 
     // Register Express routes
     // Register static assets relative to '/' route
-    app.use('/', express.static(__dirname + '/static'));
-    app.get('/', this.helloHandler);
-    app.get('/indexx', this.index);
+    app.use('/', express.static(path.join(__dirname + '/../static')));
+    app.use('/', this.redirect);
+    app.get('/hello', this.helloHandler);
 
     app.listen(3000, () => console.log("Listening on port 3000"));
 
@@ -54,15 +55,15 @@ export class AtlasServer {
     console.dir(suggestions.results[0]);
   }
 
-  helloHandler(req: Request, res: Response): void {
-    res.send('Hello World')
+  redirect(req: Request, res: Response, next: any): void {
+    if (req.route === "/") {
+      res.redirect("/index.html")
+    }
+    next();
   }
 
-  index(req: Request, res: Response): void {
-    console.log(__dirname + '/static/index.html');
-    this.flatmatesClient.autocomplete(FlatmatesClient.buildAutocompleteRequest("hi"));
-    FlatmatesClient.create().then( fmc => console.log(fmc));
-    res.sendFile(__dirname + '/static/index.html');
+  helloHandler(req: Request, res: Response): void {
+    res.send('Hello World')
   }
 
   async moveToUnitTest() {

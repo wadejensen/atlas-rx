@@ -7,7 +7,7 @@ RUN npm install
 RUN npm run package
 
 FROM node:12-alpine
-WORKDIR /root
-COPY --from=BUILD_ENV /work/dist/ .
+COPY --from=BUILD_ENV /work/dist/ /app/dist
+COPY --from=BUILD_ENV /work/static/ /app/static
 
-ENTRYPOINT ["node", "/root/server.js"]
+CMD ["node", "/app/dist/index.js"]
