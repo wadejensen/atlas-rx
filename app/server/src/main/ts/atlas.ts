@@ -1,20 +1,12 @@
 import express, {Request, Response} from "express";
 import {FlatmatesClient} from "./flatmates/flatmates_client";
-import {ListingsResponse} from "./flatmates/listings_response";
-import {Coord, Geo} from "./geo";
-import {RoomType} from "./flatmates/listings_request";
 
-import {
-  ClientResponse,
-  createClient,
-  DistanceMatrixRequest,
-  DistanceMatrixResponse, GoogleMapsClient, LatLng,
-  RequestHandle,
-  ResponseCallback, TravelMode
-} from "google__maps";
+import {ClientResponse, DistanceMatrixResponse, GoogleMapsClient} from "google__maps";
 import {Try, TryCatch} from "common/fp/try";
 import {sys} from "typescript";
 import * as path from "path";
+
+import hbs from "hbs"
 
 /**
  * Atlas server instance running on Express middleware
@@ -41,10 +33,28 @@ export class AtlasServer {
     // Create Express server
     const app = express();
 
+    app.set('view engine', 'html');
+    app.engine('html', hbs.__express);
+
     // Register Express routes
     // Register static assets relative to '/' route
     app.use('/', express.static(path.join(__dirname + '/../static')));
-    app.use('/', this.redirect);
+    app.set('views', path.join(__dirname + '/../static/views'));
+
+    app.get('/', function(req, res){
+      // inject Google Maps Javascript API key into html
+      res.render('index', {
+        API_KEY: process.env.MAPS_JAVASCRIPT_API_KEY
+      });
+    });
+
+    app.get('/gmap', function(req, res){
+      // inject Google Maps Javascript API key into html
+      res.render('gmap', {
+        API_KEY: process.env.MAPS_JAVASCRIPT_API_KEY
+      });
+    });
+
     app.get('/hello', this.helloHandler);
 
     app.listen(3000, () => console.log("Listening on port 3000"));
@@ -53,13 +63,6 @@ export class AtlasServer {
     let suggestions = await this.flatmatesClient!.autocomplete(query);
     console.dir(suggestions.query);
     console.dir(suggestions.results[0]);
-  }
-
-  redirect(req: Request, res: Response, next: any): void {
-    if (req.route === "/") {
-      res.redirect("/index.html")
-    }
-    next();
   }
 
   helloHandler(req: Request, res: Response): void {

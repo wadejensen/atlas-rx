@@ -2,38 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <meta name="viewport" content="initial-scale=1.0">
     <title>Atlas</title>
     <link rel="stylesheet" href="style/atlas.css">
     <script src="app.js"></script>
 </head>
 <body>
     <div class="navbar" style="width:100%;display:flex;align-items:center;padding:0.8em">
-        <div>
-
-        </div>
         <a href=".">
-            <img src="globe.svg" alt="globe-vector" style="float:left;width:auto;height:8vh;">
+            <img src="globe.svg" alt="globe-vector" style="float:left;width:auto;height:5vh;">
         </a>
-<!--        width="50vw" height="50vw"-->
         <a href="." style="font-size: xx-large";>Atlas</a>
         <div style="width:100%;border:3px solid green;">
             <div class="searchbox" style="
             white-space:nowrap;
-            text-overflow: clip;
+            text-overflow:clip;
             overflow:hidden;
             display:inline-block;
-            margin-left: 10%;
+            margin-left:10%;
             width:50%;
             border:3px solid red;">
                 <p style="margin:1em; color:#f2f2f2">Search rooms to rent</p>
             </div>
         </div>
     </div>
-    <div class="thing" style="margin-top: 8vh">
+    <div class="thing" style="
+            margin-top: 10vh;
+            margin-left:8vh;
+            margin-right:8vh;
+            height:100%">
         <div class="copy">
             <p style="
-            border:3px solid purple";>
+            border:3px solid purple;
+            ">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                 incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
                 exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
@@ -42,14 +44,18 @@
                 deserunt mollit anim id est laborum.
             </p>
         </div>
+        <div id="map" style="height:50%;width:100%"></div>
     </div>
+    <script>
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -34.397, lng: 150.644},
+                zoom: 8,
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
+            async defer></script>
 </body>
 </html>
-
-<!--margin-left:50vw;-->
-<!--margin-right:50vw;-->
-<!--margin-top:2vw;-->
-<!--margin-bottom:2vw;-->
-<!--<div style="display:inline-block;width:10%;border:3px solid blue;">-->
-<!--    <p></p>-->
-<!--</div>-->
