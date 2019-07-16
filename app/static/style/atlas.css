@@ -34,3 +34,11 @@ html {
     background: #ddd;
     color: black;
 }
+
+/*
+ * Hack to hide "Use ctrl + scroll to zoom the map" overlay message
+ * https://stackoverflow.com/a/52414981/5813962
+ */
+.gm-style-pbc {
+  opacity: 0 !important;
+}

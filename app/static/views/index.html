@@ -30,8 +30,7 @@
     <div class="thing" style="
             margin-top: 10vh;
             margin-left:8vh;
-            margin-right:8vh;
-            height:100%">
+            margin-right:8vh;">
         <div class="copy">
             <p style="
             border:3px solid purple;
@@ -44,14 +43,15 @@
                 deserunt mollit anim id est laborum.
             </p>
         </div>
-        <div id="map" style="height:50%;width:100%"></div>
     </div>
+    <div id="map" style="height:50%;width:100%"></div>
     <script>
         var map;
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: -34.397, lng: 150.644},
                 zoom: 8,
+                gestureHandling: "cooperative",
             });
         }
     </script>
