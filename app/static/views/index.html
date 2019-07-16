@@ -53,6 +53,9 @@
                 zoom: 8,
                 gestureHandling: "cooperative",
             });
+            map.addListener('bounds_changed', function() {
+                console.log(map.getBounds());
+            });
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
