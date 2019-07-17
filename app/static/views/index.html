@@ -22,8 +22,9 @@
             display:inline-block;
             margin-left:10%;
             width:50%;
+            background: whitesmoke;
             border:3px solid red;">
-                <p style="margin:1em; color:#f2f2f2">Search rooms to rent</p>
+                <p style="margin:1em; color:darkslategray">Search rooms to rent</p>
             </div>
         </div>
     </div>
@@ -52,6 +53,7 @@
                 center: {lat: -34.397, lng: 150.644},
                 zoom: 8,
                 gestureHandling: "cooperative",
+                streetViewControl: false,
             });
             map.addListener('bounds_changed', function() {
                 console.log(map.getBounds());
