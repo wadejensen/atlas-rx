@@ -8,5 +8,6 @@ cd app
 
 nodemon \
   --ignore dist \
+  --ignore static \
   --ext ts,js,html,css \
   --exec "npm run dev-loop && npm run deploy"
