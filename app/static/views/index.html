@@ -45,7 +45,8 @@
             </p>
         </div>
     </div>
-    <div id="map" style="height:50%;width:100%"></div>
+    <div id="map" style="height:45%;width:100%"></div>
+    <canvas id="chart" style="height:45%;width:100%"></canvas>
     <script>
         var map;
         function initMap() {
@@ -59,8 +60,31 @@
                 console.log(map.getBounds());
             });
         }
+        var chart;
+        function initChart() {
+            var ctx = document.getElementById('chart').getContext('2d');
+            var chart = new Chart(ctx, {
+                // The type of chart we want to create
+                type: 'line',
+
+                // The data for our dataset
+                data: {
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: 'My First dataset',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: [0, 10, 5, 2, 20, 30, 45]
+                    }]
+                },
+                // Configuration options go here
+                options: {}
+            });
+        }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
+            async defer></script>
+    <script onload="initChart()" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
             async defer></script>
 </body>
 </html>
