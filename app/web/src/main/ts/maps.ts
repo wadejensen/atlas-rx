@@ -21,9 +21,9 @@ export function populateMap() {
     console.log(map.getBounds());
   });
   map_markers.push(new google.maps.Marker({
-    label: "A",
     position: { lat: -33.877019, lng: 151.205394 },
     map: map,
+    icon: markerIcon(123, new RGB(220, 30, 20), new RGB(250, 50, 40)),
   }))
 }
 
@@ -62,7 +62,7 @@ export class RGB {
  *                       \  /
  *                        \/
  */
-function markerIcon(price: number, fillRGB: RGB, outlineRGB: RGB): String {
+function markerIcon(price: number, fillRGB: RGB, outlineRGB: RGB): string {
     return "data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%2250px%22%20" +
       "height%3D%2226px%22%20viewBox%3D%220%200%2050%2026%22%20xmlns%3D%22" +
       "http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20stroke%3D%22%23" +
@@ -72,5 +72,5 @@ function markerIcon(price: number, fillRGB: RGB, outlineRGB: RGB): String {
       "%22%3E%3C%2Fpath%3E%3Ctext%20text-anchor%3D%22middle%22%20font-family%3D" +
       "%22%26%23x27%3BOpen%20Sans%26%23x27%3B%2C%20sans-serif%22%20font-size%3D" +
       "%2214%22%20font-weight%3D%22500%22%20fill%3D%22white%22%20x%3D%2225%22" +
-      "%20y%3D%2215%22%3E%24${price}%3C%2Ftext%3E%3C%2Fsvg%3E";
+      "%20y%3D%2215%22%3E%24" + price.toString() + "%3C%2Ftext%3E%3C%2Fsvg%3E";
 }
