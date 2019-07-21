@@ -1,6 +1,6 @@
-import {Preconditions} from "./preconditions";
-import {Async} from "./async";
-import {Headers, HTTPClient} from "./http_client";
+import { Preconditions } from "common/preconditions";
+import { Async} from "./async";
+import { Headers, HTTPClient} from "./http_client";
 import fetch, { Request, Response } from "node-fetch"
 
 export class FetchHTTPClient implements HTTPClient {

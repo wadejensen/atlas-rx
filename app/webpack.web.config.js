@@ -2,12 +2,17 @@ path = require("path");
 
 module.exports = [
     {
-        entry: './web/src/ts/app.ts',
+        entry: './web/src/main/ts/app.ts',
         module: {
             rules: [
                 {
                     test: /\.tsx?$/,
-                    use: 'ts-loader',
+                    use: [{
+                        loader: 'ts-loader',
+                        options: {
+                            configFile: "tsconfig.web.json"
+                        }
+                    }],
                     exclude: /node_modules/
                 }
             ]

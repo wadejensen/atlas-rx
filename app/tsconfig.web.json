@@ -8,14 +8,18 @@
     "outDir": "build",
     "baseUrl": ".",
     "rootDirs": [
-      "./src/ts"
+      "./src/main/ts"
     ],
+    "paths": {
+      "common/*": ["common/src/main/ts/*"]
+    },
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "importHelpers": false
   },
   "include": [
-    "src/**/*"
+    "web/src/main/ts/**/*",
+    "common/src/main/ts/**/*"
   ]
 }
