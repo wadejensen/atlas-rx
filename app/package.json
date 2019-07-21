@@ -14,10 +14,11 @@
     "atlas": "node dist/server.js"
   },
   "scripts": {
-    "build:watch": "tsc --watch",
-    "build": "tsc",
-    "dev-loop": "webpack --config webpack.config.js --mode development",
-    "package": "webpack --config webpack.config.js --mode production; cp -r static dist/static",
+    "build:server:prod": "webpack --config webpack.server.config.js --mode production",
+    "build:server:dev": "webpack --config webpack.server.config.js --mode development",
+    "build:web:prod": "webpack --config webpack.web.config.js --mode production",
+    "build:web:dev": "webpack --config webpack.web.config.js --mode development",
+    "package": "npm build:server:prod && npm build:web:prod",
     "test": "jest",
     "deploy": "node dist/index.js"
   },
