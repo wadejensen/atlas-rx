@@ -1,4 +1,31 @@
-import { Preconditions } from "./preconditions";
+import { Preconditions } from "common/preconditions";
+
+import {} from "googlemaps";
+
+// export function createGoogleMap(apiKey: string) {
+//   const googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=" + apiKey;
+//
+//   let googleMapsJSSnippet = document.createElement('script')
+//   googleMapsJSSnippet.type = 'text/javascript';
+//   googleMapsJSSnippet.src = googleMapsUrl;
+//   googleMapsJSSnippet.onload = initGoogleMap;
+//
+//   document.body.appendChild(googleMapsJSSnippet);
+// }
+
+declare var map: google.maps.Map;
+var map_markers: google.maps.Marker[] = [];
+
+export function populateMap() {
+  map.addListener('bounds_changed', function() {
+    console.log(map.getBounds());
+  });
+  map_markers.push(new google.maps.Marker({
+    label: "A",
+    position: { lat: -33.877019, lng: 151.205394 },
+    map: map,
+  }))
+}
 
 export class RGB {
  constructor(readonly r: number, readonly g: number, readonly b: number) {}

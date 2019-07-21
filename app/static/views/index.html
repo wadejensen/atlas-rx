@@ -6,7 +6,6 @@
     <meta name="viewport" content="initial-scale=1.0">
     <title>Atlas</title>
     <link rel="stylesheet" href="style/atlas.css">
-    <script src="app.js"></script>
 </head>
 <body>
     <div class="navbar" style="width:100%;display:flex;align-items:center;padding:0.8em">
@@ -51,15 +50,25 @@
         </div>
     </div>
     <div id="map" style="height:45%;width:100%"></div>
-    <canvas id="chart" style="height:45%;width:100%"></canvas>
+    <div class="chart-container" style="position: relative;height:45%;width:100%">
+        <canvas id="chart" ></canvas>
+    </div>
     <script>
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -33.873176, lng: 151.208148},
+                zoom: 14,
+                gestureHandling: "cooperative",
+                streetViewControl: false,
+            });
+        }
         var chart;
         function initChart() {
             var ctx = document.getElementById('chart').getContext('2d');
             var chart = new Chart(ctx, {
                 // The type of chart we want to create
                 type: 'line',
-
                 // The data for our dataset
                 data: {
                     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -71,7 +80,10 @@
                     }]
                 },
                 // Configuration options go here
-                options: {}
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
             });
         }
     </script>
@@ -79,5 +91,6 @@
             async defer></script>
     <script onload="initChart()" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
             async defer></script>
+    <script src="app.js" async defer></script>
 </body>
 </html>
