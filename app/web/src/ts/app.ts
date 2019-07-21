@@ -10,7 +10,7 @@ let x = {
 
 console.log(x);
 
-let p = new Person("Wade", 23, "Software Engineer", 100000.0);
+let p = new Person("Wade", 26, "Software Engineer", 100000.0);
 
 console.log(p);
 

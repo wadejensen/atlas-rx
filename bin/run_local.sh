@@ -10,6 +10,7 @@ cd app
 nodemon \
   --ignore dist \
   --ignore static \
+  --ignore server \
   --watch web/src \
   --ext ts \
   --exec "npm run build:web:dev" &
@@ -18,5 +19,7 @@ nodemon \
 nodemon \
   --ignore dist \
   --ignore static \
-  --ext ts,js,html,css \
+  --ignore web \
+  --watch server/src \
+  --ext ts \
   --exec "npm run build:server:dev && npm run deploy"
