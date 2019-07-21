@@ -1,4 +1,5 @@
-path = require("path");
+const path = require("path");
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = [
     {
@@ -32,6 +33,8 @@ module.exports = [
             path: path.resolve(__dirname, 'dist'),
             filename: 'index.js'
         },
-        stats: 'minimal',
+        optimization: {
+            minimizer: [new TerserPlugin()],
+        },
     },
 ];

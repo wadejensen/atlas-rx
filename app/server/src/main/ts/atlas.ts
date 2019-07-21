@@ -1,3 +1,4 @@
+import compression from "compression"
 import express, {Request, Response} from "express";
 import {FlatmatesClient} from "./flatmates/flatmates_client";
 
@@ -33,20 +34,17 @@ export class AtlasServer {
     // Create Express server
     const app = express();
 
+    // Enable gzip compression of bundles
+    app.use(compression());
+
+    // Setup view engine for API key templating
     app.set('view engine', 'html');
     app.engine('html', hbs.__express);
 
     // Register Express routes
     // Register static assets relative to '/' route
-    if (process.env.NODE_ENV == "production") {
-      app.use('/', express.static(path.join(__dirname + '/static')));
-      app.set('views', path.join(__dirname + '/static/views'));
-    } else if (process.env.NODE_ENV == "development") {
-      app.use('/', express.static(path.join(__dirname + '/../static')));
-      app.set('views', path.join(__dirname + '/../static/views'));
-    }
-
-
+    app.use('/', express.static(path.join(__dirname + '/static')));
+    app.set('views', path.join(__dirname + '/static/views'));
 
     app.get('/', function(req, res){
       // inject Google Maps Javascript API key into html

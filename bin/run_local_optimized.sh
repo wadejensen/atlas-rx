@@ -14,7 +14,7 @@ nodemon \
   --ignore server \
   --watch web/src \
   --ext ts \
-  --exec "npm run build:web:dev" &
+  --exec "npm run build:web:prod" &
 
 # Build and deploy backend in watch mode
 nodemon \
@@ -23,4 +23,4 @@ nodemon \
   --ignore web \
   --watch server/src \
   --ext ts \
-  --exec "npm run build:server:dev && npm run deploy"
+  --exec "npm run build:server:prod && npm run deploy"
