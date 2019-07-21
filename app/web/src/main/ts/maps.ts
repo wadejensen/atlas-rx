@@ -2,17 +2,6 @@ import { Preconditions } from "common/preconditions";
 
 import {} from "googlemaps";
 
-// export function createGoogleMap(apiKey: string) {
-//   const googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=" + apiKey;
-//
-//   let googleMapsJSSnippet = document.createElement('script')
-//   googleMapsJSSnippet.type = 'text/javascript';
-//   googleMapsJSSnippet.src = googleMapsUrl;
-//   googleMapsJSSnippet.onload = initGoogleMap;
-//
-//   document.body.appendChild(googleMapsJSSnippet);
-// }
-
 declare var map: google.maps.Map;
 var map_markers: google.maps.Marker[] = [];
 

@@ -30,10 +30,19 @@ html {
     text-decoration: none;
 }
 
-.navbar a:hover {
-    background: #ddd;
-    color: black;
+.searchbar {
+    float: left;
+    display: block;
+    background-color: #3c3c3c;
+    text-align: center;
+    padding: 0.5em;
+    text-decoration: none;
 }
+
+/*.navbar a:hover {*/
+/*    background: #ddd;*/
+/*    color: black;*/
+/*}*/
 
 /*
  * Hack to hide "Use ctrl + scroll to zoom the map" overlay message
