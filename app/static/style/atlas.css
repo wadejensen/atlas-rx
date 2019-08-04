@@ -33,14 +33,48 @@ html {
     text-decoration: none;
 }
 
+#navbar-margin {
+    margin-top: 8vh;
+    margin-left:8vh;
+    margin-right:8vh;
+}
+
+.branding {
+  display:flex;
+  align-items:center;
+  width: 25%;
+}
+
 .logo {
     height: 4vh;
     width: auto;
 }
 
+.search-container {
+    display:flex;
+    justify-self: center;
+    flex-direction:column;
+    align-content: flex-start;
+    align-items: flex-start;
+    position: relative;
+    padding: 1vh 1.5vw;
+    width:50%;
+    text-align: center;
+    z-index:2;
+}
+
 input.searchbox {
+    font-size: large;
+    height: 5vh;
+    width:100%;
+    white-space:nowrap;
+    text-overflow:clip;
+    padding:0.8em;
     border:none;
     border-radius: 0.4em;
+    color: #aaaaaa;
+    background-color: #464646;
+    z-index: 2;
 }
 
 input.searchbox:focus, #search-expand {
@@ -50,27 +84,39 @@ input.searchbox:focus, #search-expand {
     box-shadow: 0 0 0.15em 0 #5a5a5a;
 }
 
-/*#search-expand {*/
-/*    outline: none;*/
-/*    border: 0.25em solid #464646;*/
-/*    border-radius: 0.4em;*/
-/*    box-shadow: 0 0 0.15em 0 #5a5a5a, 0 0.25em 0 0 #5a5a5a;*/
-/*}*/
-
 ::placeholder {
     /*border: 4px solid #646464;*/
     color: #aaaaaa;
 }
 
-/*.navbar a:hover {*/
-/*    background: #ddd;*/
-/*    color: black;*/
-/*}*/
+#search-expand {
+  width: 100%;
+  /** element hidden until element style is set dynamically by js */
+  display:none;
+  align-items:flex-start;
+  flex-direction:column;
+  position: relative;
+  background-color: #464646;
+  border-radius: 0 0 0.4em 0.4em;
+  margin-top: 0.4em;
+  z-index: -1;
+}
+
+#map {
+    height:45%;
+    width:100%;
+}
 
 /*
- * Hack to hide "Use ctrl + scroll to zoom the map" overlay message
+ * Hack to hide "Use ctrl + scroll to zoom the map" overlay message on Google Map
  * https://stackoverflow.com/a/52414981/5813962
  */
 .gm-style-pbc {
   opacity: 0 !important;
+}
+
+.chart-container {
+    position: relative;
+    height:45%;
+    width:100%
 }

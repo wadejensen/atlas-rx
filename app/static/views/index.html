@@ -9,80 +9,22 @@
 </head>
 <body>
     <div class="navbar">
-        <div id="branding" style="
-            display:flex;
-            /*justify-content:flex-start;*/
-            align-items:center;
-            width: 25%;"
-            >
+        <div class="branding">
             <a href="." style="padding: 0">
                 <img class="logo" src="globe.svg" alt="globe-vector">
             </a>
             <a href="." style="font-size: xx-large;">Atlas</a>
         </div>
-<!--        <div id="horizontal-wrapper" style="-->
-<!--            display:flex;-->
-<!--            /*align-self:flex-start;*/-->
-<!--            flex-direction:row;-->
-<!--            justify-content:center;-->
-<!--            width: 100%;-->
-<!--            padding: 1vh 1.5vw;-->
-<!--            z-index:2;-->
-<!--          ">-->
-        <div id="search-container" style="
-            display:flex;
-            justify-self: center;
-            flex-direction:column;
-            align-content: flex-start;
-            align-items: flex-start;
-            width:50%;
-            /*align-items:center;*/
-            /*border:3px solid green;*/
-            /*overflow:visible;*/
-            /*display:table-cell;*/
-            /*vertical-align: middle;*/
-            text-align: center;
-            z-index:2;
-            position: relative;
-            padding: 1vh 1.5vw;"
-            >
-            <input id="search"
-                   class="searchbox"
-                   autocomplete="off"
-                   placeholder="Search rooms to rent"
+        <div class="search-container">
+            <input id="search" class="searchbox" autocomplete="off" placeholder="Search rooms to rent"
                    onfocus="
                 document.getElementById('search-expand').style.display='flex';
                 document.getElementById('search-expand').style.zIndex=2;"
                    onfocusout="
                  document.getElementById('search-expand').style.display='none';
                  document.getElementById('search-expand').style.zIndex=-1"
-                   style="
-                         /*float: left;*/
-                         height: 5vh;
-                         width:100%;
-                         color: #aaaaaa;
-                         background-color: #464646;
-                         white-space:nowrap;
-                         text-overflow:clip;
-                         padding:0.8em;
-                         font-size: large;
-                         /*margin-left:5%;*/
-                         z-index: 2;
-                ">
-            <div id="search-expand"
-                 style="
-             width: 100%;
-             display:none;
-             /*align-self: flex-start;*/
-             align-items:flex-start;
-             /*align-content: flex-start;*/
-             flex-direction:column;
-             position: relative;
-             background-color: #464646;
-             border-radius: 0 0 0.4em 0.4em;
-             margin-top: 0.4em;
-             z-index: -1;
-            ">
+                >
+            <div id="search-expand">
                 <a href="." style="font-size: xx-large;">TODO</a>
                 <a href="." style="font-size: xx-large;">TODO</a>
                 <a href="." style="font-size: xx-large;">TODO</a>
@@ -91,61 +33,17 @@
             </div>
         </div>
         </div>
-    <div class="thing" style="
-            margin-top: 8vh;
-            margin-left:8vh;
-            margin-right:8vh;">
-<!--        <div class="copy">-->
-<!--            <p style="-->
-<!--            border:3px solid purple;-->
-<!--            ">-->
-<!--                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor-->
-<!--                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud-->
-<!--                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute-->
-<!--                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla-->
-<!--                pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia-->
-<!--                deserunt mollit anim id est laborum.-->
-<!--            </p>-->
-<!--        </div>-->
-    </div>
-    <div id="map" style="height:45%;width:100%"></div>
-    <div class="chart-container" style="position: relative;height:45%;width:100%">
-        <canvas id="chart" ></canvas>
+    <div id="navbar-margin"></div>
+    <div id="map"></div>
+    <div class="chart-container">
+        <canvas id="chart"></canvas>
     </div>
     <script>
+        /** Declare globals **/
         var map;
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -33.873176, lng: 151.208148},
-                zoom: 14,
-                gestureHandling: "cooperative",
-                streetViewControl: false,
-            });
-        }
         var chart;
-        function initChart() {
-            var ctx = document.getElementById('chart').getContext('2d');
-            var chart = new Chart(ctx, {
-                // The type of chart we want to create
-                type: 'line',
-                // The data for our dataset
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: 'My First dataset',
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        data: [0, 10, 5, 2, 20, 30, 45]
-                    }]
-                },
-                // Configuration options go here
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                }
-            });
-        }
     </script>
+    <script src="js/init.js" async defer></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
             async defer></script>
     <script onload="initChart()" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
