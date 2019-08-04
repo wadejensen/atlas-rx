@@ -8,48 +8,103 @@
     <link rel="stylesheet" href="style/atlas.css">
 </head>
 <body>
-    <div class="navbar" style="width:100%;display:flex;align-items:center;padding:0.8em">
-        <a href="." style="">
-            <img src="globe.svg" alt="globe-vector" style="
-                float:left;
-                width:auto;
-                height:5vh;
-                margin-left:2vh;"
+    <div class="navbar" style="
+        display:flex;
+        flex-direction:row;
+        width:100%;
+        padding: 0.6vh 2vw;
+        overflow:visible">
+        <div id="branding" style="
+            display:flex;
+            /*justify-content:flex-start;*/
+            align-items:center;
+            width: 25%;"
             >
-            <a href="." style="font-size: xx-large;margin-right:2vh">Atlas</a>
-        </a>
-        <div style="
-            width:100%;
+            <a href="." style="padding: 0">
+                <img class="logo" src="globe.svg" alt="globe-vector">
+            </a>
+            <a href="." style="font-size: xx-large;">Atlas</a>
+        </div>
+<!--        <div id="horizontal-wrapper" style="-->
+<!--            display:flex;-->
+<!--            /*align-self:flex-start;*/-->
+<!--            flex-direction:row;-->
+<!--            justify-content:center;-->
+<!--            width: 100%;-->
+<!--            padding: 1vh 1.5vw;-->
+<!--            z-index:2;-->
+<!--          ">-->
+        <div id="search-container" style="
+            display:flex;
+            justify-self: center;
+            flex-direction:column;
+            align-content: flex-start;
+            align-items: flex-start;
+            width:50%;
+            /*align-items:center;*/
             /*border:3px solid green;*/
-            ">
-            <input class="searchbox" style="
-                float: left;
-                background-color: #464646;
-                white-space:nowrap;
-                text-overflow:clip;
-                overflow:hidden;
-                display:inline-block;
-                /*margin-left:5%;*/
-                width:75%;
-
-                /*border:3px solid red;*/
+            /*overflow:visible;*/
+            /*display:table-cell;*/
+            /*vertical-align: middle;*/
+            text-align: center;
+            z-index:2;
+            position: relative;
+            padding: 1vh 1.5vw;"
+            >
+            <input id="search"
+                   class="searchbox"
+                   autocomplete="off"
+                   placeholder="Search rooms to rent"
+                   onfocus="
+                document.getElementById('search-expand').style.display='flex';
+                document.getElementById('search-expand').style.zIndex=2;"
+                   onfocusout="
+                 document.getElementById('search-expand').style.display='none';
+                 document.getElementById('search-expand').style.zIndex=-1"
+                   style="
+                         /*float: left;*/
+                         height: 5vh;
+                         width:100%;
+                         color: #aaaaaa;
+                         background-color: #464646;
+                         white-space:nowrap;
+                         text-overflow:clip;
+                         padding:0.8em;
+                         font-size: large;
+                         /*margin-left:5%;*/
+                         z-index: 2;
                 ">
-<!--                <input type="search" placeholder="Search rooms to rent" style="margin:1em; color:#f2f2f2">-->
-<!--                    <div role="img" style="width: 2vw; height: 2vw;float:left;align-items:center;padding:0.8em">-->
-<!--                        <svg-->
-<!--                                width="100%"-->
-<!--                                height="100%"-->
-<!--                                viewBox="0 0 18 18"-->
-<!--                                fit=""-->
-<!--                                preserveAspectRatio="xMidYMid meet"-->
-<!--                                focusable="false">-->
-<!--                            <path d="M11.18 9.747l4.502 4.503-1.414 1.414-4.5-4.5a5 5 0 1 1 1.41-1.418zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill-rule="evenodd"></path>-->
-<!--                        </svg>-->
-<!--                    </div>-->
-<!--                </input>-->
+            <div id="search-expand"
+                 style="
+             width: 100%;
+             display:none;
+             /*align-self: flex-start;*/
+             align-items:flex-start;
+             /*align-content: flex-start;*/
+             flex-direction:column;
+             position: relative;
+             background-color: #464646;
+             border-radius: 0 0 0.4em 0.4em;
+             margin-top: 0.4em;
+             z-index: -1;
+            ">
+                <a href="." style="font-size: xx-large;">TODO</a>
+                <a href="." style="font-size: xx-large;">TODO</a>
+                <a href="." style="font-size: xx-large;">TODO</a>
+                <a href="." style="font-size: xx-large;">TODO</a>
+                <a href="." style="font-size: xx-large;">TODO</a>
             </div>
         </div>
-    </div>
+        </div>
+<!--        <div id="wrapper" style="-->
+<!--            display:flex;-->
+<!--            align-self:flex-start;-->
+<!--            justify-self:right;-->
+<!--            flex-direction:column;-->
+<!--            padding: 1vh 1.5vw;-->
+<!--            /*margin-left: 15%;*/-->
+<!--            width:50%;-->
+<!--            z-index:2;">-->
     <div class="thing" style="
             margin-top: 10vh;
             margin-left:8vh;
@@ -67,6 +122,16 @@
             </p>
         </div>
     </div>
+
+    <!--                <div style="-->
+    <!--                    height:40vh;-->
+    <!--                    background: slategray;-->
+    <!--                    z-index:1;-->
+    <!--                    width:100%;-->
+    <!--                    padding:3em;-->
+    <!--                    /*position: absolute;*/">-->
+    <!--                    Overflow search bar-->
+    <!--                </div>-->
     <div id="map" style="height:45%;width:100%"></div>
     <div class="chart-container" style="position: relative;height:45%;width:100%">
         <canvas id="chart" ></canvas>

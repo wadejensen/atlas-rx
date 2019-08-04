@@ -23,20 +23,40 @@ html {
 
 .navbar a {
     float: left;
-    display: block;
+    display: flex;
     color: #f2f2f2;
     text-align: center;
-    padding: 0.5em;
+    padding: 1vh 1.5vw;
     text-decoration: none;
 }
 
-.searchbar {
-    float: left;
-    display: block;
-    background-color: #3c3c3c;
-    text-align: center;
-    padding: 0.5em;
-    text-decoration: none;
+.logo {
+    height: 4vh;
+    width: auto;
+}
+
+input.searchbox {
+    border:none;
+    border-radius: 0.4em;
+}
+
+input.searchbox:focus, #search-expand {
+    outline: none;
+    /*border: 0.25em solid #464646;*/
+    border-radius: 0.4em 0.4em 0 0;
+    box-shadow: 0 0 0.15em 0 #5a5a5a;
+}
+
+/*#search-expand {*/
+/*    outline: none;*/
+/*    border: 0.25em solid #464646;*/
+/*    border-radius: 0.4em;*/
+/*    box-shadow: 0 0 0.15em 0 #5a5a5a, 0 0.25em 0 0 #5a5a5a;*/
+/*}*/
+
+::placeholder {
+    /*border: 4px solid #646464;*/
+    color: #aaaaaa;
 }
 
 /*.navbar a:hover {*/

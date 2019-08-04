@@ -7,6 +7,8 @@ set -o pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 APP_HOME="${REPO_ROOT}/app"
 
+cd "${APP_HOME}"
+
 # Build frontend in watch mode
 nodemon \
   --ignore dist \
