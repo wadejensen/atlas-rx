@@ -17,3 +17,18 @@ console.log(x);
 console.log(p);
 
 populateMap();
+
+function expandSearchBox(this: GlobalEventHandlers, ev: FocusEvent): any {
+    let searchExpand = document.getElementById('search-expand')!;
+    searchExpand.style.display="flex";
+    searchExpand.style.zIndex="2";
+}
+
+function collapseSearchBox(this: GlobalEventHandlers, ev: FocusEvent): any {
+    let searchExpand = document.getElementById('search-expand')!;
+    searchExpand.style.display = "none";
+    searchExpand.style.zIndex = "-1";
+}
+
+document.getElementById("search")!.onfocus = expandSearchBox;
+document.getElementById("search")!.onblur = collapseSearchBox;
