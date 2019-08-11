@@ -63,7 +63,7 @@ html {
     z-index:2;
 }
 
-input.searchbox {
+input.searchbox, input.parambox, select.parambox {
     font-size: large;
     height: 5vh;
     width:100%;
@@ -77,7 +77,7 @@ input.searchbox {
     z-index: 2;
 }
 
-input.searchbox:focus, #search-expand {
+input.searchbox:focus, input.parambox:focus, select.parambox, #search-expand {
     outline: none;
     /*border: 0.25em solid #464646;*/
     border-radius: 0.4em 0.4em 0 0;
@@ -119,4 +119,46 @@ input.searchbox:focus, #search-expand {
     position: relative;
     height:45%;
     width:100%
+}
+
+input.parambox {
+    font-size: large;
+    height: 5vh;
+    width:100%;
+    white-space:nowrap;
+    text-overflow:clip;
+    border:none;
+    border-radius: 0.4em;
+    color: lightcoral;
+    background-color: #c8c8c8;
+    z-index: 2;
+}
+
+input.parambox:focus {
+    outline: none;
+    /*border: 0.25em solid #464646;*/
+    border-radius: 0.4em 0.4em 0 0;
+    box-shadow: 0 0 0.15em 0 #5a5a5a;
+}
+
+#search-button {
+    font-size: x-large;
+    height: 10vh;
+    width:100%;
+    white-space:nowrap;
+    text-overflow:clip;
+    border:none;
+    border-radius: 0.4em;
+    color: #f2f2f2;
+    background-color: lightcoral;
+    z-index: 2;
+}
+
+input.searchbox::placeholder {
+    /* Firefox, Chrome, Opera */
+    text-align: justify;
+}
+input.searchbox:-ms-input-placeholder {
+    /* Microsoft Edge, Internet Explorer 10-11 */
+    text-align: justify;
 }

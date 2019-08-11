@@ -6,6 +6,7 @@ declare var map: google.maps.Map;
 var map_markers: google.maps.Marker[] = [];
 
 export function populateMap() {
+  //TODO(wadejensen) wait until `map` global variable is defined
   map.addListener('bounds_changed', function() {
     console.log(map.getBounds());
   });

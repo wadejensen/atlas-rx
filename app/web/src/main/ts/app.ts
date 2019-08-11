@@ -18,17 +18,20 @@ console.log(p);
 
 populateMap();
 
-function expandSearchBox(this: GlobalEventHandlers, ev: FocusEvent): any {
+function expandSearchBox(): any {
+    console.log("expand");
     let searchExpand = document.getElementById('search-expand')!;
     searchExpand.style.display="flex";
     searchExpand.style.zIndex="2";
 }
 
-function collapseSearchBox(this: GlobalEventHandlers, ev: FocusEvent): any {
+function collapseSearchBox(): any {
+    console.log("collapse");
     let searchExpand = document.getElementById('search-expand')!;
     searchExpand.style.display = "none";
     searchExpand.style.zIndex = "-1";
 }
 
 document.getElementById("search")!.onfocus = expandSearchBox;
-document.getElementById("search")!.onblur = collapseSearchBox;
+// TODO add a close and search button listener
+//document.getElementById("search")!.onblur = collapseSearchBox;
