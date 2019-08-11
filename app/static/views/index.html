@@ -18,25 +18,31 @@
         <div id="search-container" class="search-container">
             <input id="search" class="searchbox" autocomplete="off"
                    placeholder="Search rooms near: &nbsp;&nbsp;&nbsp;&nbsp;👔&nbsp;&nbsp;/&nbsp;&nbsp;🏫&nbsp;&nbsp;/&nbsp;&nbsp;👪">
+            <p id="min-rent" class="parambox click" style="color: #505050; background-color: #f2f2f2; margin: 0; border-bottom: 1px solid #505050;">Address suggestion</p>
+            <p id="min-rent" class="parambox click" style="color: #505050; background-color: #f2f2f2; margin: 0; border-bottom: 1px solid #505050;">Address suggestion</p>
+            <p id="min-rent" class="parambox click" style="color: #505050; background-color: #f2f2f2; margin: 0; border-bottom: 1px solid #505050;">Address suggestion</p>
+            <input id="search" class="searchbox" autocomplete="off"
+                   placeholder="Where do you commute to?">
             <div id="search-expand">
-                <div id="search-options" style="padding: 0.35em 0.35em 1em 1em;">
+                <div id="search-options" style="padding: 0.35em 1em 0.35em 1em;">
+
                     <div class="row" style="width: 100%; display: flex; flex-direction: row">
                         <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Min Rent ($/week)</div>
+                            <div style="padding:4px; text-align: left; color: lightcoral">Min Rent ($/w)</div>
                             <input type="text" id="min-rent" class="parambox" autocomplete="off" placeholder="100" style="color: #333333">
                         </div>
                         <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Max Rent ($/week)</div>
+                            <div style="padding:4px; text-align: left; color: lightcoral">Max Rent ($/w)</div>
                             <input type="text" id="max-rent" class="parambox" autocomplete="off" placeholder="400" style="color: #333333">
                         </div>
                     </div>
                     <div class="row" style="width: 100%; display: flex; flex-direction: row">
                         <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Min commute (mins)</div>
+                            <div style="padding:4px; text-align: left; color: lightcoral">Min time (mins)</div>
                             <input type="text" id="min-time" class="parambox" autocomplete="off" placeholder="0" style="color: #333333">
                         </div>
                         <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Max commute (mins)</div>
+                            <div style="padding:4px; text-align: left; color: lightcoral">Max time (mins)</div>
                             <input type="text" id="max-time" class="parambox" autocomplete="off" placeholder="30" style="color: #333333">
                         </div>
                     </div>
@@ -85,7 +91,7 @@
 <!--                    </div>-->
                 </div>
                 <div class="row" style="width: 100%; display: flex; flex-direction: row">
-                    <button type="button" id="search-button" class="parambox">
+                    <button type="button" id="search-button" class="parambox click">
                         Search
                     </button>
                 </div>
