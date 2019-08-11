@@ -13,19 +13,85 @@
             <a href="." style="padding: 0">
                 <img class="logo" src="globe.svg" alt="globe-vector">
             </a>
-            <a href="." style="font-size: xx-large;">Atlas</a>
+            <a href="." style="font-size: xx-large; color: lightcoral">Atlas</a>
         </div>
-        <div class="search-container">
-            <input id="search" class="searchbox" autocomplete="off" placeholder="Search rooms to rent">
+        <div id="search-container" class="search-container">
+            <input id="search" class="searchbox" autocomplete="off"
+                   placeholder="Search rooms near: &nbsp;&nbsp;&nbsp;&nbsp;👔&nbsp;&nbsp;/&nbsp;&nbsp;🏫&nbsp;&nbsp;/&nbsp;&nbsp;👪">
             <div id="search-expand">
-                <a href="." style="font-size: xx-large;">TODO</a>
-                <a href="." style="font-size: xx-large;">TODO</a>
-                <a href="." style="font-size: xx-large;">TODO</a>
-                <a href="." style="font-size: xx-large;">TODO</a>
-                <a href="." style="font-size: xx-large;">TODO</a>
+                <div id="search-options" style="padding: 0.35em 0.35em 1em 1em;">
+                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Min Rent ($/week)</div>
+                            <input type="text" id="min-rent" class="parambox" autocomplete="off" placeholder="100" style="color: #333333">
+                        </div>
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Max Rent ($/week)</div>
+                            <input type="text" id="max-rent" class="parambox" autocomplete="off" placeholder="400" style="color: #333333">
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Min commute (mins)</div>
+                            <input type="text" id="min-time" class="parambox" autocomplete="off" placeholder="0" style="color: #333333">
+                        </div>
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Max commute (mins)</div>
+                            <input type="text" id="max-time" class="parambox" autocomplete="off" placeholder="30" style="color: #333333">
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Room type</div>
+                            <select id="room-type" name="room-type" class="parambox">
+                                <option value="ANY_ROOM" selected>All rooms</option>
+                                <option value="PRIVATE_ROOM">Private room</option>
+                                <option value="SHARED_ROOM">Room shared with others</option>
+                            </select>
+                        </div>
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Property type</div>
+                            <select id="furnishing" name="furnishing" class="parambox">
+                                <option value="ANY_FURNISHING" selected>Any furnishing</option>
+                                <option value="FURNISHED_ROOM">Furnished room</option>
+                                <option value="UNFURNISHED_ROOM">Unfurnished room</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Bathroom type</div>
+                            <select id="bathroom-type" name="bathroom-type" class="parambox">
+                                <option value="ALL_BATHROOM_TYPES" selected>All bathroom types</option>
+                                <option value="ENSUITE_BATHROOM">Ensuite bathroom</option>
+                                <option value="OWN_BATHROOM">Own bathroom</option>
+                            </select>
+                        </div>
+                        <div class="search-param" style="width: 50%; padding: 0.35em">
+                            <div style="padding:4px; text-align: left; color: lightcoral">Parking</div>
+                            <select id="parking" name="parking" class="parambox">
+                                <option value="ANY_PARKING" selected>Any parking</option>
+                                <option value="NO_PARKING">No parking</option>
+                                <option value="ON_STREET_PARKING">On-street parking</option>
+                                <option value="OFF_STREET_PARKING">Off-street parking</option>
+                            </select>
+                        </div>
+                    </div>
+<!--                    <div class="row" style="width: 100%; display: flex; flex-direction: row">-->
+<!--                        <div class="search-param" style="width: 33%; padding: 0.35em">-->
+<!--                            <div style="padding:4px; text-align: left; color: lightcoral">Radius (km)</div>-->
+<!--                            <input type="text" id="radius" class="parambox" autocomplete="off" placeholder="20km" style="color: #333333">-->
+<!--                        </div>-->
+<!--                    </div>-->
+                </div>
+                <div class="row" style="width: 100%; display: flex; flex-direction: row">
+                    <button type="button" id="search-button" class="parambox">
+                        Search
+                    </button>
+                </div>
             </div>
         </div>
-        </div>
+    </div>
     <div id="navbar-margin"></div>
     <div id="map"></div>
     <div class="chart-container">
@@ -36,11 +102,9 @@
         var map;
         var chart;
     </script>
-    <script src="js/init.js" async defer></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
-            async defer></script>
-    <script onload="initChart()" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
-            async defer></script>
+    <script src="js/init.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap" defer></script>
+    <script onload="initChart()" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" defer></script>
     <script src="app.js" async defer></script>
 </body>
 </html>

@@ -77,7 +77,7 @@ input.searchbox, input.parambox, select.parambox {
     z-index: 2;
 }
 
-input.searchbox:focus, input.parambox:focus, select.parambox, #search-expand {
+input.searchbox:focus, input.parambox:focus, select.parambox {
     outline: none;
     /*border: 0.25em solid #464646;*/
     border-radius: 0.4em 0.4em 0 0;
@@ -90,16 +90,22 @@ input.searchbox:focus, input.parambox:focus, select.parambox, #search-expand {
 }
 
 #search-expand {
-  width: 100%;
-  /** element hidden until element style is set dynamically by js */
-  display:none;
-  align-items:flex-start;
-  flex-direction:column;
-  position: relative;
-  background-color: #464646;
-  border-radius: 0 0 0.4em 0.4em;
-  margin-top: 0.4em;
-  z-index: -1;
+    width: 100%;
+    /** element hidden until element style is set dynamically by js */
+    display:none;
+    position: relative;
+    align-items:flex-start;
+    flex-direction:column;
+    background-color: #464646;
+    border-radius: 0 0 0.4em 0.4em;
+    margin-top: 0.4em;
+    z-index: -1;
+}
+
+#search-options {
+    width: 100%;
+    align-items:flex-start;
+    flex-direction:column;
 }
 
 #map {
@@ -121,7 +127,7 @@ input.searchbox:focus, input.parambox:focus, select.parambox, #search-expand {
     width:100%
 }
 
-input.parambox {
+input.parambox, select.parambox {
     font-size: large;
     height: 5vh;
     width:100%;
@@ -129,12 +135,11 @@ input.parambox {
     text-overflow:clip;
     border:none;
     border-radius: 0.4em;
-    color: lightcoral;
     background-color: #c8c8c8;
     z-index: 2;
 }
 
-input.parambox:focus {
+input.parambox:focus, select.parambox:focus {
     outline: none;
     /*border: 0.25em solid #464646;*/
     border-radius: 0.4em 0.4em 0 0;
@@ -142,23 +147,26 @@ input.parambox:focus {
 }
 
 #search-button {
-    font-size: x-large;
+    font-size: xx-large;
     height: 10vh;
     width:100%;
     white-space:nowrap;
     text-overflow:clip;
-    border:none;
-    border-radius: 0.4em;
+    /*border:none;*/
+    /*border-radius: 0.4em;*/
+    /*margin-top: 0.5em;*/
     color: #f2f2f2;
     background-color: lightcoral;
-    z-index: 2;
+    z-index: 3;
+    outline: none;
+    border: 0.1em solid #F06260;
+    /*border-radius: 0 0 0.4em 0.4em;*/
+    box-shadow: 0 0 0.15em 0 #F06260;
 }
 
-input.searchbox::placeholder {
-    /* Firefox, Chrome, Opera */
-    text-align: justify;
-}
-input.searchbox:-ms-input-placeholder {
-    /* Microsoft Edge, Internet Explorer 10-11 */
-    text-align: justify;
-}
+/*#search-button {*/
+/*    outline: none;*/
+/*    border: 0.1em solid #F06260;*/
+
+/*}*/
+
