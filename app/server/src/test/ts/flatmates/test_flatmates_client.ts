@@ -1,8 +1,13 @@
 import {FlatmatesClient} from "../../../main/ts/flatmates/flatmates_client";
 import {Try} from "../../../../../common/src/main/ts/fp/try";
 import {Coord, Geo} from "../../../main/ts/geo";
-import {ListingsRequest, RoomType, Search} from "../../../main/ts/flatmates/listings_request";
-import nock from "nock";
+import {
+  FlatmatesListingsRequest,
+  ListingsRequest, ListingsRequestBuilder,
+  mapListingsRequest,
+  RoomType,
+  Search
+} from "../../../main/ts/flatmates/listings_request";
 import {FetchHTTPClient} from "../../../main/ts/fetch_http_client";
 import {FlatmatesListing, ListingsResponse} from "../../../main/ts/flatmates/listings_response";
 import {
@@ -16,6 +21,8 @@ import {
   AutocompleteResponse,
   AutocompleteResult
 } from "../../../main/ts/flatmates/autocomplete_result";
+
+const nock = require("nock");
 
 describe("FlatmatesClient", () => {
   test("create factory method correctly creates a FlatmatesClient", async () => {
@@ -39,7 +46,7 @@ describe("FlatmatesClient", () => {
         "_flatmates_session=797cd4cd931067289667a116e6ce3f4d",
         "ZquiBuMVNjCl+bGWeMO4GNI+CZMVGIZM0HgPe+3idZkJ315HrPNHQaM44j1mcYqriTS9dfL7+mKX41Y+81Sb5Q==",
       );
-      expect(client).toStrictEqual(expected);
+      expect(client.equals(expected)).toBeTruthy();
     } catch (e) {
       console.error(e);
       fail();
@@ -220,24 +227,25 @@ describe("FlatmatesClient", () => {
     }
   });
 
-  test("flatmatesListing returns a list of available rental room listings", async () => {
+  test("doGetFlatmatesListing returns a list of available rental room listings", async () => {
     const flatmatesClient = new FlatmatesClient(
       new FetchHTTPClient(1000, 3, 300, true),
       "dummy_session_id",
       "dummy_session_token",
     );
 
-    const reqBody = new ListingsRequest(
-      new Search(
-        "rooms",
-        "private-room",
-        null,
-        10,
-        500,
-        "-33.874322,151.194749",
-        "-33.883343,151.209044"
-      )
-    );
+    const req = new ListingsRequest({
+      boundingBox: Geo.boundingBox(
+        new Coord(-33.874322, 151.194749),
+        new Coord(-33.883343, 151.209044)
+      ),
+      roomType: RoomType.PRIVATE_ROOM,
+      propertyTypes: null,
+      minBudget: 10,
+      maxBudget: 500,
+    });
+
+    const reqBody = mapListingsRequest(req);
 
     // mock network calls to flatmates
     const scope = nock("https://flatmates.com.au")
@@ -288,7 +296,9 @@ describe("FlatmatesClient", () => {
     });
 
     try {
-      const resp: ListingsResponse = await flatmatesClient.flatmatesListings(reqBody);
+      // dynamically retrieve private method
+      let doGetFlatmatesListings = (flatmatesClient as any).doGetFlatmatesListings
+      const resp: ListingsResponse = await doGetFlatmatesListings(req);
       expect(resp).toStrictEqual(expected);
     } catch (e) {
       console.error(e);
@@ -316,8 +326,8 @@ describe("FlatmatesClient", () => {
     expect(sessionToken.get()).toBe("ZquiBuMVNjCl+bGWeMO4GNI+CZMVGIZM0HgPe+3idZkJ315HrPNHQaM44j1mcYqriTS9dfL7+mKX41Y+81Sb5Q==")
   });
 
-  test("buildListingsRequest creates the correct ListingsRequest", () => {
-    const reqBody = FlatmatesClient.buildListingsRequest({
+  test("mapListingsRequest creates the correct FlatmatesListingsRequest", () => {
+    const req = new ListingsRequest({
       boundingBox: Geo.boundingBox(
         new Coord(-33.874322, 151.194749),
         new Coord(-33.883343, 151.209044)
@@ -326,7 +336,8 @@ describe("FlatmatesClient", () => {
       minBudget: 10,
       maxBudget: 500,
     });
-    const expected = new ListingsRequest(
+    const flatmatesReq = mapListingsRequest(req);
+    const expected = new FlatmatesListingsRequest(
       new Search(
         "rooms",
         "private-room",
@@ -337,7 +348,7 @@ describe("FlatmatesClient", () => {
         "-33.883343,151.209044"
       )
     );
-    expect(reqBody).toStrictEqual(expected);
+    expect(flatmatesReq).toStrictEqual(expected);
   });
 
   test("buildAutocompleteRequest creates the correct AutocompleteRequest", () => {

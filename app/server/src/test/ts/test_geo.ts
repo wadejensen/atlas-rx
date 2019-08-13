@@ -71,4 +71,18 @@ describe("Geo", () => {
     expect(boundingBox.bottomRight.lat).toBe(-10.0);
     expect(boundingBox.bottomRight.lon).toBe(-170.0);
   });
+
+  test("quadrant1 of BoundingBox", () => {
+    const boundingBox = Geo.boundingBox(new Coord(10, 10), new Coord(-10, -10));
+    const [q1, q2, q3, q4] = Geo.quadrants(boundingBox);
+
+    expect(q1.topLeft).toStrictEqual(new Coord(10, 0));
+    expect(q1.bottomRight).toStrictEqual(new Coord(0, 10));
+    expect(q2.topLeft).toStrictEqual(new Coord(10, -10));
+    expect(q2.bottomRight).toStrictEqual(new Coord(0, 0));
+    expect(q3.topLeft).toStrictEqual(new Coord(0, -10));
+    expect(q3.bottomRight).toStrictEqual(new Coord(-10, 0));
+    expect(q4.topLeft).toStrictEqual(new Coord(0, 0));
+    expect(q4.bottomRight).toStrictEqual(new Coord(-10, 10));
+  });
 });

@@ -8,6 +8,9 @@ import {sys} from "typescript";
 import * as path from "path";
 
 import hbs from "hbs"
+import {Preconditions} from "../../../../common/src/main/ts/preconditions";
+import {ListingsRequest} from "common/flatmates/listings_request";
+import bodyParser = require("body-parser");
 
 /**
  * Atlas server instance running on Express middleware
@@ -37,6 +40,12 @@ export class AtlasServer {
     // Enable gzip compression of bundles
     app.use(compression());
 
+
+    // parse application/x-www-form-urlencoded
+    app.use(bodyParser.urlencoded({ extended: false }));
+    // parse application/json
+    app.use(bodyParser.json());
+
     // Setup view engine for API key templating
     app.set('view engine', 'html');
     app.engine('html', hbs.__express);
@@ -61,6 +70,8 @@ export class AtlasServer {
     });
 
     app.get('/hello', this.helloHandler);
+    app.get('/autocomplete/:query', this.autocompleteHandler);
+    app.post('/flatmates/listings', this.flatmatesGetListingsHandler);
 
     app.listen(3000, () => console.log("Listening on port 3000"));
 
@@ -70,8 +81,42 @@ export class AtlasServer {
     console.dir(suggestions.results[0]);
   }
 
-  helloHandler(req: Request, res: Response): void {
+  helloHandler = (req: Request, res: Response) => {
     res.send('Hello World')
+  };
+
+  autocompleteHandler = async (req: Request, res: Response) => {
+    const query = req.params.query;
+    try {
+      Preconditions.checkArgument(AtlasServer.isNonEmptyString(query),
+        "Query param in '/autocomplete/:query' must be a string of non-zero length");
+    } catch (err) {
+      res.status(400);
+      res.send(err);
+    }
+    try {
+      const resp = await this.flatmatesClient.autocomplete(
+        FlatmatesClient.buildAutocompleteRequest(query));
+      res.send(resp);
+    } catch (err) {
+      res.status(500);
+      res.send(err);
+    }
+  };
+
+  flatmatesGetListingsHandler = async (req: Request, res: Response) => {
+    const flatmatesListingsReq = new ListingsRequest({ ...req.body });
+    console.log(flatmatesListingsReq);
+    const resp = await this.flatmatesClient.getFlatmatesListings(flatmatesListingsReq, 0);
+    console.log(resp.size);
+    res.send({ values: Array.from(resp) });
+  };
+
+  static isNonEmptyString(val: any): boolean {
+    return val !== undefined &&
+      val !== null &&
+      typeof(val) == "string" &&
+      val.length > 0
   }
 
   async moveToUnitTest() {

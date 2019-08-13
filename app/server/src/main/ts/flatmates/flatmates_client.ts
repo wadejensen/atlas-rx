@@ -1,23 +1,25 @@
-import {Try, TryCatch} from "common/fp/try";
-import Cheerio from "cheerio"
-import {BoundingBox} from "../geo";
+import {Try, TryCatch} from "../../../../../common/src/main/ts/fp/try";
+import {BoundingBox, Geo} from "common/geo";
 import {HTTPClient} from "../http_client";
 import {Request} from "node-fetch"
 
 import {FetchHTTPClient} from "../fetch_http_client";
-import {AutocompleteResponse, AutocompleteResult} from "./autocomplete_result";
-import {ListingsRequest, PropertyType, RoomType, Search} from "./listings_request";
+import {AutocompleteResponse, AutocompleteResult} from "common/flatmates/autocomplete_result";
+import {ListingsRequest, ListingsRequestBuilder, mapListingsRequest,} from "common/flatmates/listings_request";
 import {
   AutocompleteRequest,
   Completion,
   Contexts,
   Fuzzy,
   LocationSuggest
-} from "./autocomplete_request";
-import {FlatmatesListing, ListingsResponse} from "./listings_response";
+} from "common/flatmates/autocomplete_request";
+import {FlatmatesListing, ListingsResponse} from "common/flatmates/listings_response";
+import {setMerge} from "common/set_util";
+import * as Cheerio from "cheerio";
 
 export class FlatmatesClient {
   private static readonly BASE_URL: string = "https://flatmates.com.au";
+  private static readonly LISTINGS_RESP_LIMIT = 200;
 
   constructor(
     private readonly httpClient: HTTPClient,
@@ -25,11 +27,16 @@ export class FlatmatesClient {
     private sessionToken: string,
   ) {}
 
+  equals(other: FlatmatesClient): boolean {
+    return this.sessionToken === other.sessionToken &&
+      this.sessionId === other.sessionId
+  }
+
   /**
    * Factory method for a {@link FlatmatesClient}
    */
   static async create(): Promise<FlatmatesClient> {
-    let httpClient: HTTPClient = new FetchHTTPClient(1000, 3, 300, true);
+    let httpClient: HTTPClient = new FetchHTTPClient(3000, 3, 300, true);
     let resp = await httpClient.get(FlatmatesClient.BASE_URL);
     let html: string = await resp.text();
 
@@ -67,56 +74,65 @@ export class FlatmatesClient {
 
   /**
    * List residential rooms for rent on flatmates.com.au
-   * //TODO(wadejensen) handle API paging
    */
-  async flatmatesListings(req: ListingsRequest): Promise<ListingsResponse> {
-    let request = new Request(FlatmatesClient.BASE_URL + "/map_markers",
-      {
-        method: "POST",
-        headers: {
-          "accept":"application/json",
-          "accept-encoding": "gzip, deflate, br",
-          "content-type": "application/json;charset=UTF-8",
-          "cookie": this.sessionId,
-          "user-agent": "",
-          "x-csrf-token": this.sessionToken,
-        },
-        body: JSON.stringify(req)
+  getFlatmatesListings: (req: ListingsRequest, i: number) => Promise<Set<FlatmatesListing>> =
+    async (req: ListingsRequest, i: number) => {
+      console.log(i);
+      // prevent accidental DDoS of flatmates
+      if (i > 10) {
+        console.warn("getFlatmatesListings method reached recusion depth of 10");
+        return new Set();
       }
-    );
+      const resp = await this.doGetFlatmatesListings(req);
+      if (resp.matches.length + resp.non_matches.length < FlatmatesClient.LISTINGS_RESP_LIMIT) {
+        return new Set(resp.matches);
+      } else {
+        // Request has likely saturated the 200 listing request limit.
+        // Divide and conquer.
+        const quadrants = Geo.quadrants(req.boundingBox);
+        const [req1, req2, req3, req4] = quadrants.map((quad: BoundingBox) => {
+          return ListingsRequestBuilder
+            .builder(req)
+            .withBoundingBox(quad)
+            .build()
+        });
 
-    let json: any = await this.httpClient
-      .dispatch(request)
-      .then(r => r.json());
+        // recursively query quadrants
+        const quadrantListings: Array<Set<FlatmatesListing>> = await Promise.all([
+          this.getFlatmatesListings(req1, i + 1),
+          this.getFlatmatesListings(req2, i + 1),
+          this.getFlatmatesListings(req3, i + 1),
+          this.getFlatmatesListings(req4, i + 1),
+        ]);
+        return quadrantListings.reduce(setMerge);
+      }
+  };
 
-    return FlatmatesClient.parseListingsResponse(json).get();
-  }
+  private doGetFlatmatesListings: (req: ListingsRequest) => Promise<ListingsResponse> =
+    async (req: ListingsRequest) => {
+      const flatmatesReq = mapListingsRequest(req);
+      let request = new Request(FlatmatesClient.BASE_URL + "/map_markers",
+        {
+          method: "POST",
+          headers: {
+            "accept":"application/json",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json;charset=UTF-8",
+            "cookie": this.sessionId,
+            "user-agent": "",
+            "x-csrf-token": this.sessionToken,
+          },
+          body: JSON.stringify(flatmatesReq),
+        }
+      );
 
-  static buildListingsRequest({
-    boundingBox,
-    roomType,
-    propertyTypes,
-    minBudget,
-    maxBudget,
-  }: {
-    boundingBox: BoundingBox
-    roomType?: RoomType,
-    propertyTypes?: Array<PropertyType>,
-    minBudget?: number,
-    maxBudget?: number,
-  }) {
-    return new ListingsRequest(
-      new Search(
-        "rooms",
-        roomType || null,
-        propertyTypes || null,
-        minBudget || 0,
-        maxBudget || 10_000,
-        `${boundingBox.topLeft.lat},${boundingBox.topLeft.lon}`,
-        `${boundingBox.bottomRight.lat},${boundingBox.bottomRight.lon}`,
-      )
-    )
-  }
+      let json: any = await this.httpClient
+        .dispatch(request)
+        .then(r => r.json());
+
+      return FlatmatesClient.parseListingsResponse(json).get();
+  };
+
 
   /**
    * Attempt to parse map_markers response json into a ListingsResponse

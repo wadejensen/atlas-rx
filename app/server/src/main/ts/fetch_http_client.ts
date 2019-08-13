@@ -1,4 +1,4 @@
-import { Preconditions } from "common/preconditions";
+import { Preconditions} from "../../../../common/src/main/ts/preconditions";
 import { Async} from "./async";
 import { Headers, HTTPClient} from "./http_client";
 import fetch, { Request, Response } from "node-fetch"

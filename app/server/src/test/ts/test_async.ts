@@ -1,5 +1,5 @@
 import {Async} from "../../main/ts/async";
-import nock from "nock";
+const nock = require("nock");
 import fetch from "node-fetch"
 
 describe("Async", () => {
