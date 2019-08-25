@@ -126,10 +126,11 @@ export class FlatmatesClient {
         }
       );
 
-      let json: any = await this.httpClient
-        .dispatch(request)
-        .then(r => r.json());
-
+      // delay each request by 300ms to be a good citizen
+      // log the rate and kill the server if it exceeds 1rps
+      let json = await this.httpClient
+          .dispatch(request)
+          .then(r => r.json());
       return FlatmatesClient.parseListingsResponse(json).get();
   };
 

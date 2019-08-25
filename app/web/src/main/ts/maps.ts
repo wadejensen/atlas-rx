@@ -1,20 +1,54 @@
 import { Preconditions } from "common/preconditions";
 
 import {} from "googlemaps";
+import {BoundingBox, Coord, Geo} from "../../../../common/src/main/ts/geo";
+import {Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
+import LatLng = google.maps.LatLng;
 
 declare var map: google.maps.Map;
 var map_markers: google.maps.Marker[] = [];
 
-export function populateMap() {
-  //TODO(wadejensen) wait until `map` global variable is defined
-  map.addListener('bounds_changed', function() {
-    console.log(map.getBounds());
+export function keepMapUpdated(updateMap: () => void) {
+  map.addListener('bounds_changed', _.throttle(updateMap, 500) );
+}
+
+// export function populateMap() {
+//   map.addListener('bounds_changed', function() {
+//     console.log(getBounds().get());
+//   });
+//   map_markers.push(new google.maps.Marker({
+//     position: { lat: -33.877019, lng: 151.205394 },
+//     map: map,
+//     icon: orangeMarkerIcon(123),
+//   }))
+// }
+
+// pass in a closure to be executed which creates map markers given a map
+// since otherwise markers will be created without being added to global state
+// and therefore we would be unable to track them
+export function addMapMarker(createMarker: (map: google.maps.Map) => google.maps.Marker) {
+  map_markers.push(createMarker(map));
+}
+
+export function removeOffscreenMarkers() {
+  //TODO(wadejensen)
+}
+
+export function getBounds(): Try<BoundingBox> {
+  return TryCatch( () => {
+    const bounds = map.getBounds();
+    return Geo.boundingBox(
+      new Coord(bounds!.getNorthEast().lat(), bounds!.getNorthEast().lng()),
+      new Coord(bounds!.getSouthWest().lat(), bounds!.getSouthWest().lng()),
+    );
+  }).recover((error) => {
+    throw new Error(`Failed to get map geo bounding box: ${error}`)
   });
-  map_markers.push(new google.maps.Marker({
-    position: { lat: -33.877019, lng: 151.205394 },
-    map: map,
-    icon: markerIcon(123, new RGB(220, 30, 20), new RGB(250, 50, 40)),
-  }))
+}
+
+export function centreMap(coord: Coord, zoomLevel: number = 15): void {
+  map.setCenter(new LatLng(coord.lat, coord.lon));
+  map.setZoom(zoomLevel)
 }
 
 export class RGB {
@@ -52,7 +86,7 @@ export class RGB {
  *                       \  /
  *                        \/
  */
-function markerIcon(price: number, fillRGB: RGB, outlineRGB: RGB): string {
+export function markerIcon(price: number, fillRGB: RGB, outlineRGB: RGB): string {
     return "data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%2250px%22%20" +
       "height%3D%2226px%22%20viewBox%3D%220%200%2050%2026%22%20xmlns%3D%22" +
       "http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20stroke%3D%22%23" +
@@ -63,4 +97,8 @@ function markerIcon(price: number, fillRGB: RGB, outlineRGB: RGB): string {
       "%22%26%23x27%3BOpen%20Sans%26%23x27%3B%2C%20sans-serif%22%20font-size%3D" +
       "%2214%22%20font-weight%3D%22500%22%20fill%3D%22white%22%20x%3D%2225%22" +
       "%20y%3D%2215%22%3E%24" + price.toString() + "%3C%2Ftext%3E%3C%2Fsvg%3E";
+}
+
+export function orangeMarkerIcon(price: number) {
+  return markerIcon(price, new RGB(220, 30, 20), new RGB(250, 50, 40));
 }

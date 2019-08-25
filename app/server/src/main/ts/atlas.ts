@@ -175,10 +175,8 @@ export class AtlasServer {
 
   flatmatesGetListingsHandler = async (req: Request, res: Response) => {
     const flatmatesListingsReq = new ListingsRequest({ ...req.body });
-    console.log(flatmatesListingsReq);
-    const resp = await this.flatmatesClient.getFlatmatesListings(flatmatesListingsReq, 0);
-    console.log(resp.size);
-    res.send({ values: Array.from(resp) });
+    const listings = await this.flatmatesClient.getFlatmatesListings(flatmatesListingsReq, 0);
+    res.send(new ListingsResponse({ matches: Array.from(listings), non_matches: [] }));
   };
 
   static isNonEmptyString(val: any): boolean {
