@@ -12,7 +12,7 @@ export class LosslessThrottle {
     setInterval(this.resetReqCount, 1000);
   }
 
-  resetReqCount = async () => {
+  private resetReqCount = async () => {
     if (this.reqCount != 0 && this.queueDepth != 0) {
       console.debug("Request rate = " + this.reqCount.toString() + " req/s");
       console.debug("Queue depth  = " + this.queueDepth.toString());

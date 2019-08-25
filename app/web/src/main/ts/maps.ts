@@ -4,12 +4,16 @@ import {} from "googlemaps";
 import {BoundingBox, Coord, Geo} from "../../../../common/src/main/ts/geo";
 import {Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
 import LatLng = google.maps.LatLng;
+import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {LossyThrottle} from "./lossy_throttle";
 
 declare var map: google.maps.Map;
 var map_markers: google.maps.Marker[] = [];
 
-export function keepMapUpdated(updateMap: () => void) {
-  map.addListener('bounds_changed', _.throttle(updateMap, 500) );
+const throttle = new LossyThrottle(1);
+
+export function keepMapUpdated(updateMap: () => Promise<void>) {
+  map.addListener('bounds_changed', () => throttle.apply(updateMap));
 }
 
 // export function populateMap() {
@@ -33,6 +37,14 @@ export function addMapMarker(createMarker: (map: google.maps.Map) => google.maps
 export function removeOffscreenMarkers() {
   //TODO(wadejensen)
 }
+
+export let createMapMarker = (listing: FlatmatesListing) => (map: google.maps.Map) => {
+  return new google.maps.Marker({
+    position: { lat: listing.latitude, lng: listing.longitude },
+    map: map,
+    icon: orangeMarkerIcon(listing.rent[0]),
+  })
+};
 
 export function getBounds(): Try<BoundingBox> {
   return TryCatch( () => {

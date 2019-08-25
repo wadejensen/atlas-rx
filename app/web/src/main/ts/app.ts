@@ -1,23 +1,10 @@
 // @ts-ignore
-import { Person } from "common/person"
-import {
-    addMapMarker,
-    centreMap,
-    getBounds, keepMapUpdated,
-    orangeMarkerIcon,
-    RGB
-} from "./maps"
-import {ListingsRequest} from "common/flatmates/listings_request";
-import {Coord, Geo} from "common/geo";
-import {BoundingBox} from "../../../../common/src/main/ts/geo";
-import {PropertyType, RoomType} from "../../../../common/src/main/ts/flatmates/listings_request";
-import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
-import {TryCatch} from "../../../../common/src/main/ts/fp/try";
-import {
-    FlatmatesListing,
-    ListingsResponse
-} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {Person} from "common/person"
+import {centreMap} from "./maps"
+import {Coord} from "common/geo";
 import {FreeBrowse} from "./page_state";
+import {googlePlacesAutocomplete, hello} from "./endpoints";
+import {setupContentUpdateListeners, setupStateChangeListeners} from "./listeners";
 
 let x = {
     "helloHello": 1,
@@ -32,73 +19,6 @@ console.log(x);
 
 console.log(p);
 
-function expandSearchBox(): any {
-    console.log("expand");
-    let searchExpand = document.getElementById('search-expand')!;
-    let search = document.getElementById('search1')!;
-    let searchSuggestions = document.getElementById('search-suggestions')!;
-
-    showElement(searchExpand);
-    showElement(search);
-    showElement(searchSuggestions);
-}
-
-function collapseSearchBox(): any {
-    console.log("collapse");
-
-    let searchExpand = document.getElementById('search-expand')!;
-    let search = document.getElementById('search1')!;
-    let searchSuggestions = document.getElementById('search-suggestions')!;
-
-    hideElement(searchExpand);
-    hideElement(search);
-    hideElement(searchSuggestions);
-}
-
-function showElement(element: HTMLElement): void {
-    element.style.display="flex";
-    element.style.zIndex="2";
-}
-
-function hideElement(element: HTMLElement): void {
-    element.style.display = "none";
-    element.style.zIndex = "-1";
-}
-
-document.getElementById("search1")!.addEventListener("focusin", expandSearchBox);
-document.getElementById("search2")!.addEventListener("focusin", expandSearchBox);
-// TODO add a close and search button listener
-//document.getElementById("search")!.onblur = collapseSearchBox;
-
-document.getElementById("search-button")!.addEventListener("click", collapseSearchBox);
-
-document.getElementById("search1")!.addEventListener("keyup", () => {
-    console.log("keyup event");
-    populateSearchSuggestions();
-});
-
-async function populateSearchSuggestions(): Promise<void> {
-    TryCatch( async () => {
-        const query = (document.getElementById("search1") as HTMLInputElement)!.value;
-        if (query != "") {
-            const suggestions = await googlePlacesAutocomplete(query)
-            console.log(suggestions);
-            updateSearchSuggestions(suggestions)
-        }
-    })
-}
-
-async function googlePlacesAutocomplete(
-  query: string
-): Promise<PlacesAutocompleteResult> {
-    return fetch(window.location + "google/places-autocomplete/" + query, {
-        method: "GET",
-        headers: {
-            "Content-Type": "Accept: application/json",
-        },
-    }).then(resp => resp.json());
-}
-
 // test making a request back to the server
 fetch(window.location + "hello")
   .then( resp => resp.text())
@@ -108,16 +28,14 @@ fetch(window.location + "flatmates/autocomplete/redfe")
   .then( json => console.log(json));
 
 
-async function getFlatmatesListings(req: ListingsRequest): Promise<ListingsResponse> {
-    console.log(JSON.stringify(req));
-    return fetch(window.location + "flatmates/listings", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req),
-    }).then(resp => resp.json())
-}
+// testing on application start to keep an eye out for regressions
+hello();
+googlePlacesAutocomplete("redfe").then( json => console.log(json));
+
+// setup web app dynamic content
+setupStateChangeListeners();
+setupContentUpdateListeners();
+
 // const listingsRequest = new ListingsRequest({
 //     boundingBox: Geo.boundingBox(
 //       new Coord(-33.87755059238735,151.01137831057133),
@@ -148,34 +66,6 @@ fetch(window.location + "google/places-autocomplete/2 George St", {
   .then(json => console.log(json));
 
 
-function updateSearchSuggestions(suggestions: PlacesAutocompleteResult): void {
-    const searchSuggestions = document.getElementById("search-suggestions")!;
-    searchSuggestions.innerHTML = suggestions
-      .results!
-      .map((s) =>
-          `<p class="suggest parambox click"
-              data-lat="${s.lat}"
-              data-lng="${s.lng}"
-              >${s.description}</p>`
-      )
-      .reduce((s1: string, s2: string) => s1 + "\n" + s2)
-    const suggestElems = searchSuggestions.getElementsByClassName("suggest");
-    for (let i=0; i<suggestElems.length; i++) {
-        suggestElems[i].addEventListener(
-          'click',
-          centreMapOnDestination as any
-        );
-    }
-}
-
-function centreMapOnDestination(ev: MouseEvent): void {
-    const target = ev.target as HTMLParagraphElement;
-    console.log(ev);
-    const lat = parseFloat(target.dataset["lat"]!);
-    const lng = parseFloat(target.dataset["lng"]!);
-    centreMap(new Coord(lat, lng));
-}
-
 setTimeout( () => {
     console.log("Moving centre");
     centreMap(new Coord(-33.874176, 151.201148));
@@ -184,29 +74,6 @@ setTimeout( () => {
         centreMap(new Coord(-33.873176, 151.208148));
     }, 3000);
 }, 3000);
-
-let createMapMarker = (listing: FlatmatesListing) => (map: google.maps.Map) => {
-    return new google.maps.Marker({
-        position: { lat: listing.latitude, lng: listing.longitude },
-        map: map,
-        icon: orangeMarkerIcon(listing.rent[0]),
-    })
-};
-
-async function updateListings() {
-    const req = new ListingsRequest({
-        boundingBox: getBounds().get()
-    });
-    console.log(req);
-
-    const listings = await getFlatmatesListings(req);
-    listings
-      .matches
-      .map( l => createMapMarker(l))
-      .forEach( closure => addMapMarker(closure))
-}
-
-keepMapUpdated(updateListings);
 
 let pageState = new FreeBrowse();
 // user navigates to atlas -> tick
