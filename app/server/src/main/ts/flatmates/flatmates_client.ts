@@ -17,6 +17,8 @@ import {FlatmatesListing, ListingsResponse} from "common/flatmates/listings_resp
 import {setMerge} from "common/set_util";
 import * as Cheerio from "cheerio";
 
+import {RateLimitedHTTPClient} from "../rate_limited_http_client";
+
 export class FlatmatesClient {
   private static readonly BASE_URL: string = "https://flatmates.com.au";
   private static readonly LISTINGS_RESP_LIMIT = 200;
@@ -36,7 +38,13 @@ export class FlatmatesClient {
    * Factory method for a {@link FlatmatesClient}
    */
   static async create(): Promise<FlatmatesClient> {
-    let httpClient: HTTPClient = new FetchHTTPClient(3000, 3, 300, true);
+    let httpClient: HTTPClient = RateLimitedHTTPClient.create({
+      requestTimeoutMs: 3000,
+      maxRetries: 3,
+      backoffDelay: 300,
+      exponentialBackoff: true,
+      maxReqPerSec: 3,
+    });
     let resp = await httpClient.get(FlatmatesClient.BASE_URL);
     let html: string = await resp.text();
 

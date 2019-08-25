@@ -7,14 +7,14 @@ export class FetchHTTPClient implements HTTPClient {
   private readonly RETRY_LIMIT = 1000;
 
   constructor(
-    readonly REQUEST_TIMEOUT_MS: number,
-    readonly MAX_RETRIES: number,
-    readonly BACKOFF_DELAY_MS: number,
-    readonly EXPONENTIAL_BACKOFF: boolean
+    readonly requestTimeoutMs: number,
+    readonly maxRetries: number,
+    readonly backoffDelayMs: number,
+    readonly exponentialBackoff: boolean
   ) {
     // Prevent callers triggering stack overflow
     Preconditions.checkArgument(
-      MAX_RETRIES <= 1000,
+      maxRetries <= 1000,
       `Max retries must be less than or equal to ${this.RETRY_LIMIT}`
     );
   }
@@ -57,20 +57,20 @@ export class FetchHTTPClient implements HTTPClient {
   dispatch(req: Request): Promise<Response> {
     // perform fetch with a timeout deadline for each HTTP request and the
     // selected retry backoff policy
-    if (this.MAX_RETRIES <= 0) {
+    if (this.maxRetries <= 0) {
       return this.fetchWithDeadline(req);
     }
-    else if (!this.EXPONENTIAL_BACKOFF) {
+    else if (!this.exponentialBackoff) {
       return Async.backoff(
         () => this.fetchWithDeadline(req),
-        this.MAX_RETRIES,
-        this.BACKOFF_DELAY_MS
+        this.maxRetries,
+        this.backoffDelayMs
       )
     } else {
       return Async.exponentialBackoff(
         () => this.fetchWithDeadline(req),
-        this.MAX_RETRIES,
-        this.BACKOFF_DELAY_MS
+        this.maxRetries,
+        this.backoffDelayMs
       )
     }
   }
@@ -79,8 +79,8 @@ export class FetchHTTPClient implements HTTPClient {
     // Wrap the fetch API with a timeout
     return Async.timeoutError(
       () => fetch(req),
-      this.REQUEST_TIMEOUT_MS,
-      `HTTP request timed out after ${this.REQUEST_TIMEOUT_MS}ms`
+      this.requestTimeoutMs,
+      `HTTP request timed out after ${this.requestTimeoutMs}ms`
     );
   }
 }

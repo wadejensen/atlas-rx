@@ -1,11 +1,23 @@
 // @ts-ignore
 import { Person } from "common/person"
-
-import { populateMap } from "./maps"
+import {
+    addMapMarker,
+    centreMap,
+    getBounds, keepMapUpdated,
+    orangeMarkerIcon,
+    RGB
+} from "./maps"
 import {ListingsRequest} from "common/flatmates/listings_request";
 import {Coord, Geo} from "common/geo";
 import {BoundingBox} from "../../../../common/src/main/ts/geo";
 import {PropertyType, RoomType} from "../../../../common/src/main/ts/flatmates/listings_request";
+import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
+import {TryCatch} from "../../../../common/src/main/ts/fp/try";
+import {
+    FlatmatesListing,
+    ListingsResponse
+} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {FreeBrowse} from "./page_state";
 
 let x = {
     "helloHello": 1,
