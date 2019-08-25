@@ -64,18 +64,15 @@ html {
     z-index:2;
 }
 
-.search-container {
-    display:flex;
+#search-suggestions {
+    display: flex;
+    width: 100%;
     justify-self: center;
     flex-direction:column;
-    align-content: flex-start;
-    align-items: flex-start;
-    position: relative;
-    padding: 1vh 1.5vw;
-    width:50%;
-    max-width: 400px;
-    text-align: center;
-    z-index:2;
+    /*align-content: flex-start;*/
+    /*align-items: flex-start;*/
+    vertical-align: middle;
+    background-color: #f2f2f2;
 }
 
 input.searchbox, input.parambox, select.parambox, p.parambox {
@@ -111,6 +108,19 @@ p.parambox:hover {
     /*text-align: center;*/
     font-size: small;
     border-radius: 0;
+}
+
+p.suggest {
+  width: 100%;
+  min-height: 4em;
+  margin: 0;
+  align-items: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  border-bottom: 1px solid #505050;
+  color: #505050;
+  background-color: #f2f2f2;
 }
 
 input.searchbox:focus, input.parambox:focus, select.parambox {

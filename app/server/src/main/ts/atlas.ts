@@ -2,7 +2,12 @@ import compression from "compression"
 import express, {Request, Response} from "express";
 import {FlatmatesClient} from "./flatmates/flatmates_client";
 
-import {ClientResponse, DistanceMatrixResponse, GoogleMapsClient} from "google__maps";
+import {
+  ClientResponse,
+  DistanceMatrixResponse,
+  GoogleMapsClient,
+  PlaceAutocompleteResponse, PlaceDetailsResponse
+} from "google__maps";
 import {Try, TryCatch} from "common/fp/try";
 import {sys} from "typescript";
 import * as path from "path";
@@ -11,6 +16,14 @@ import hbs from "hbs"
 import {Preconditions} from "../../../../common/src/main/ts/preconditions";
 import {ListingsRequest} from "common/flatmates/listings_request";
 import bodyParser = require("body-parser");
+import {
+  PlacesAutocompleteEntry,
+  PlacesAutocompleteResult
+} from "../../../../common/src/main/ts/google/places_autocomplete_result";
+import {
+  FlatmatesListing,
+  ListingsResponse
+} from "../../../../common/src/main/ts/flatmates/listings_response";
 
 /**
  * Atlas server instance running on Express middleware
@@ -70,8 +83,11 @@ export class AtlasServer {
     });
 
     app.get('/hello', this.helloHandler);
-    app.get('/autocomplete/:query', this.autocompleteHandler);
+
+    app.get('/flatmates/autocomplete/:query', this.flatmatesAutocompleteHandler);
     app.post('/flatmates/listings', this.flatmatesGetListingsHandler);
+
+    app.get('/google/places-autocomplete/:query', this.googlePlacesAutoCompleteHandler);
 
     app.listen(3000, () => console.log("Listening on port 3000"));
 
@@ -85,11 +101,64 @@ export class AtlasServer {
     res.send('Hello World')
   };
 
-  autocompleteHandler = async (req: Request, res: Response) => {
+  googlePlacesAutoCompleteHandler = async (req: Request, res: Response) => {
+    const MAX_SUGGESTIONS = 5;
+    const SESSION_TOKEN = "googlePlacesAutoCompleteHandler";
+
     const query = req.params.query;
     try {
       Preconditions.checkArgument(AtlasServer.isNonEmptyString(query),
-        "Query param in '/autocomplete/:query' must be a string of non-zero length");
+        "Query param in 'google/places-autocomplete/:query' must be a string of non-zero length");
+    } catch (err) {
+      res.status(400);
+      res.send(err);
+    }
+
+    try {
+      const resp: ClientResponse<PlaceAutocompleteResponse> = await this.googleMapsClient
+        .placesAutoComplete({
+          input: query as string,
+          sessiontoken: SESSION_TOKEN
+        }).asPromise();
+      if (resp.status == 200) {
+        const rawPredictions = resp
+          .json
+          .predictions
+          .slice(0, MAX_SUGGESTIONS);
+//
+        // TODO(wadejensen) find an appropriate monad to model / collapse
+        //  the nested failure case of the placeId lookup.
+        const suggestions: PlacesAutocompleteResult = new PlacesAutocompleteResult(
+          await Promise.all(rawPredictions.map(async (p) => {
+            const rresp: ClientResponse<PlaceDetailsResponse> = await this.googleMapsClient.place({
+              placeid: p.place_id,
+              sessiontoken: SESSION_TOKEN
+            }).asPromise();
+
+            return new PlacesAutocompleteEntry(
+              p.description,
+              rresp.json.result.geometry.location.lat,
+              rresp.json.result.geometry.location.lng
+            );
+          })),
+        );
+        res.send(suggestions);
+      } else {
+        res.status(resp.status);
+        res.send();
+      }
+    } catch (e) {
+      res.status(500);
+      res.send(e);
+      console.log(e);
+    }
+  };
+
+  flatmatesAutocompleteHandler = async (req: Request, res: Response) => {
+    const query = req.params.query;
+    try {
+      Preconditions.checkArgument(AtlasServer.isNonEmptyString(query),
+        "Query param in 'flatmates/autocomplete/:query' must be a string of non-zero length");
     } catch (err) {
       res.status(400);
       res.send(err);
