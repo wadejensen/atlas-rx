@@ -36,7 +36,7 @@ Place Autocomplete accepts a text query returns a list of `place id`s for releva
   This can include residential addresses, businesses, landmarks, train stations and public transit
   locations, or entire suburbs / municipalities.
 
-* **[GET] https://maps.googleapis.com/maps/api/place/details/:id**
+* **[GET] maps.googleapis.com/maps/api/place/details/:id**
 
 [Place Details Documentation](https://developers.google.com/places/web-service/details)
 
