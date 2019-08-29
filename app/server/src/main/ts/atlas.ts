@@ -118,7 +118,14 @@ export class AtlasServer {
       const resp: ClientResponse<PlaceAutocompleteResponse> = await this.googleMapsClient
         .placesAutoComplete({
           input: query as string,
-          sessiontoken: SESSION_TOKEN
+          sessiontoken: SESSION_TOKEN,
+          // approx centroid of Australia
+          location: {
+            lat: -23.867645,
+            lng: 133.328079,
+          },
+          radius: 3000 * 1000,
+          strictbounds: true
         }).asPromise();
       if (resp.status == 200) {
         const rawPredictions = resp
