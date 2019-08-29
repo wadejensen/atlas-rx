@@ -1,6 +1,12 @@
 // creates triggers for user interactions which cause changes in PageState
-import {collapseSearchBox, expandSearchBox} from "./state_transformations";
-import {updateListings, updateSearchSuggestions} from "./content_update";
+import {
+  collapseSearchCriteria, collapseSearchSuggestions, expandSearchCriteria,
+  expandSearchSuggestions,
+  interstitialSearchPlaceholder,
+  resetSearchPlaceholder,
+  updateListings,
+  updateSearchSuggestions,
+} from "./content_update";
 import {HTMLElementLocator} from "./html_elements";
 import {centreMap, keepMapUpdated} from "./maps";
 import {Coord} from "../../../../common/src/main/ts/geo";
@@ -49,9 +55,17 @@ import {Coord} from "../../../../common/src/main/ts/geo";
  **/
 
 export function setupStateChangeListeners(): void {
-  HTMLElementLocator.getSearchBar().addEventListener("focusin", expandSearchBox);
-  HTMLElementLocator.getAlternateSearchBar().addEventListener("focusin", expandSearchBox);
-  HTMLElementLocator.getSearchButton().addEventListener("click", collapseSearchBox);
+  HTMLElementLocator.getSearchBar().addEventListener("focusin", () => {
+    console.log("search focusin");
+    interstitialSearchPlaceholder();
+    expandSearchSuggestions();
+  });
+
+  HTMLElementLocator.getSearchButton().addEventListener("click", () => {
+    resetSearchPlaceholder();
+    collapseSearchSuggestions();
+    collapseSearchCriteria();
+  });
   // TODO add a close button and corresponding listener
   HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
 }
@@ -73,8 +87,6 @@ function setupSearchAutocompleteListeners(): void {
       const lat = parseFloat(topResult.dataset["lat"]!);
       const lng = parseFloat(topResult.dataset["lng"]!);
 
-      // TODO(wadejensen) switch to transitioning to CriteriaRefine state.
-      collapseSearchBox();
       centreMap(new Coord(lat, lng));
     }
   });
@@ -82,9 +94,20 @@ function setupSearchAutocompleteListeners(): void {
 
 export function registerSuggestionListener(suggestion: HTMLParagraphElement): void {
   suggestion.addEventListener('click', (ev: MouseEvent) => {
+    console.log("Suggestion selected");
+
     const target = ev.target as HTMLParagraphElement;
-    const lat = parseFloat(target.dataset["lat"]!);
-    const lng = parseFloat(target.dataset["lng"]!);
+
+    // set search bar content to selected search suggestion
+    const searchBar = HTMLElementLocator.getSearchBar();
+    searchBar.value = target.innerText;
+
+    // parse coords from suggestion and centre Google Map
+    const lat = parseFloat(suggestion.dataset["lat"]!);
+    const lng = parseFloat(suggestion.dataset["lng"]!);
     centreMap(new Coord(lat, lng));
+
+    expandSearchCriteria();
+    collapseSearchSuggestions();
   })
 }

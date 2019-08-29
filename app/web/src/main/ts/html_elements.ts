@@ -1,10 +1,6 @@
 export class HTMLElementLocator {
   static getSearchBar(): HTMLInputElement {
-    return document.getElementById("search1")! as HTMLInputElement
-  }
-
-  static getAlternateSearchBar(): HTMLInputElement {
-    return document.getElementById("search2")! as HTMLInputElement
+    return document.getElementById("search")! as HTMLInputElement
   }
 
   static getSearchSuggestionsContainer(): HTMLDivElement {
@@ -16,8 +12,8 @@ export class HTMLElementLocator {
     return searchSuggestions.getElementsByClassName("suggest")
   }
 
-  static getSearchExpand(): HTMLDivElement {
-    return document.getElementById('search-expand')! as HTMLDivElement
+  static getSearchCriteria(): HTMLDivElement {
+    return document.getElementById('search-criteria')! as HTMLDivElement
   }
 
   static getSearchButton(): HTMLButtonElement {

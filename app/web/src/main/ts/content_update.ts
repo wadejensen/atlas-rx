@@ -26,6 +26,9 @@ export async function updateSearchSuggestions(): Promise<void> {
       const suggestions = await googlePlacesAutocomplete(query);
       console.log(suggestions);
       populateSearchSuggestions(suggestions)
+    } else {
+      // hide the suggestions
+      HTMLElementLocator.getSearchSuggestionsContainer().innerHTML = "";
     }
   })
 }
@@ -45,4 +48,51 @@ function populateSearchSuggestions(suggestions: PlacesAutocompleteResult): void 
   for (let i=0; i<suggestElems.length; i++) {
     registerSuggestionListener(suggestElems[i] as HTMLParagraphElement);
   }
+}
+
+export function expandSearchSuggestions(): void {
+  console.log("expandSearchSuggestions");
+  let searchSuggestions = HTMLElementLocator.getSearchSuggestionsContainer();
+  showElement(searchSuggestions);
+}
+
+export function collapseSearchSuggestions(): void {
+  console.log("collapseSearchSuggestions");
+  let searchSuggestions = HTMLElementLocator.getSearchSuggestionsContainer();
+  hideElement(searchSuggestions);
+}
+
+export function expandSearchCriteria() {
+  console.log("expandSearchCriteria");
+  let searchCriteria = HTMLElementLocator.getSearchCriteria();
+  showElement(searchCriteria);
+}
+
+export function collapseSearchCriteria(): any {
+  console.log("collapseSearchCriteria");
+  let searchCriteria = HTMLElementLocator.getSearchCriteria();
+  hideElement(searchCriteria);
+}
+
+function showElement(element: HTMLElement): void {
+  element.style.display="flex";
+  element.style.zIndex="2";
+}
+
+function hideElement(element: HTMLElement): void {
+  element.style.display = "none";
+  element.style.zIndex = "-1";
+}
+
+export function resetSearchPlaceholder() {
+  updateSearchPlaceholder("Search rooms near: \u00A0\u00A0\u00A0👔\u00A0/\u00A0🏫\u00A0/\u00A0/👪");
+}
+
+export function interstitialSearchPlaceholder() {
+  updateSearchPlaceholder("Where do you commute to?");
+}
+
+function updateSearchPlaceholder(placeholder: string): void {
+  let searchBar = HTMLElementLocator.getSearchBar();
+  searchBar.placeholder = placeholder;
 }

@@ -135,7 +135,7 @@ input.searchbox:focus, input.parambox:focus, select.parambox {
     color: #aaaaaa;
 }
 
-#search-expand {
+#search-criteria {
     width: 100%;
     /** element hidden until element style is set dynamically by js */
     display:none;

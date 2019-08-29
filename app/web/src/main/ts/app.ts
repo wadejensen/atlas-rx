@@ -76,6 +76,7 @@ setTimeout( () => {
 }, 3000);
 
 let pageState = new FreeBrowse();
+
 // user navigates to atlas -> tick
 // google map with a default of sydney -> tick
 // populate with map markers from flatmates.com.au results based on map geo bounds -> tick
