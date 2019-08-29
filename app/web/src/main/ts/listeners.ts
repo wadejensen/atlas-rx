@@ -56,8 +56,8 @@ import {Coord} from "../../../../common/src/main/ts/geo";
 
 export function setupStateChangeListeners(): void {
   HTMLElementLocator.getSearchBar().addEventListener("focusin", () => {
-    console.log("search focusin");
     interstitialSearchPlaceholder();
+    collapseSearchCriteria();
     expandSearchSuggestions();
   });
 
@@ -94,8 +94,6 @@ function setupSearchAutocompleteListeners(): void {
 
 export function registerSuggestionListener(suggestion: HTMLParagraphElement): void {
   suggestion.addEventListener('click', (ev: MouseEvent) => {
-    console.log("Suggestion selected");
-
     const target = ev.target as HTMLParagraphElement;
 
     // set search bar content to selected search suggestion

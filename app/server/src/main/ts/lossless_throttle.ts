@@ -14,8 +14,6 @@ export class LosslessThrottle {
 
   private resetReqCount = async () => {
     if (this.reqCount != 0 && this.queueDepth != 0) {
-      console.debug("Request rate = " + this.reqCount.toString() + " req/s");
-      console.debug("Queue depth  = " + this.queueDepth.toString());
       // We should never exceed reqPerSec, but if we do, bring the server down
       if (this.reqCount > this.reqPerSec) sys.exit(1);
     }

@@ -85,7 +85,6 @@ export class FlatmatesClient {
    */
   getFlatmatesListings: (req: ListingsRequest, i: number) => Promise<Set<FlatmatesListing>> =
     async (req: ListingsRequest, i: number) => {
-      console.log(i);
       // prevent accidental DDoS of flatmates
       if (i > 10) {
         console.warn("getFlatmatesListings method reached recusion depth of 10");
@@ -142,7 +141,6 @@ export class FlatmatesClient {
       return FlatmatesClient.parseListingsResponse(json).get();
   };
 
-
   /**
    * Attempt to parse map_markers response json into a ListingsResponse
    */
@@ -150,7 +148,6 @@ export class FlatmatesClient {
     return TryCatch( () => {
       let matches: Array<any> = obj["matches"];
       let nonMatches: Array<any> = obj["non_matches"];
-
       return new ListingsResponse({
         matches: matches.map(json => new FlatmatesListing({...json})),
         non_matches: nonMatches.map(json => new FlatmatesListing({...json})),

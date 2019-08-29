@@ -1,16 +1,7 @@
 // @ts-ignore
 import {Person} from "common/person"
-import {centreMap, getBounds} from "./maps"
-import {Coord} from "common/geo";
-import {FreeBrowse} from "./page_state";
 import {googlePlacesAutocomplete, hello} from "./endpoints";
 import {setupContentUpdateListeners, setupStateChangeListeners} from "./listeners";
-import {
-    BathroomType,
-    FurnishingType,
-    ListingsRequest, ParkingType,
-    RoomType
-} from "../../../../common/src/main/ts/flatmates/listings_request";
 
 let x = {
     "helloHello": 1,
@@ -71,8 +62,6 @@ fetch(window.location + "google/places-autocomplete/2 George St", {
   .then(resp => resp.json())
   .then(json => console.log(json));
 
-
-let pageState = new FreeBrowse();
 
 // user navigates to atlas -> tick
 // google map with a default of sydney -> tick

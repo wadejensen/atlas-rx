@@ -1,7 +1,7 @@
 import {TryCatch} from "../../../../common/src/main/ts/fp/try";
 import {getFlatmatesListings, googlePlacesAutocomplete} from "./endpoints";
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
-import {addMapMarker, centreMap, createMapMarker, getBounds} from "./maps";
+import {addMapMarker, centreMap, clearMapMarkers, createMapMarker, getBounds} from "./maps";
 import {
   BathroomType,
   FurnishingType,
@@ -13,9 +13,8 @@ import {registerSuggestionListener} from "./listeners";
 
 export async function updateListings(): Promise<void> {
   const req = getFlatmatesCriteria();
-  console.log(req);
-
   const listings = await getFlatmatesListings(req);
+  clearMapMarkers();
   listings
     .matches
     .map( l => createMapMarker(l))
@@ -43,7 +42,6 @@ export async function updateSearchSuggestions(): Promise<void> {
     const query = HTMLElementLocator.getSearchBar().value;
     if (query != "") {
       const suggestions = await googlePlacesAutocomplete(query);
-      console.log(suggestions);
       populateSearchSuggestions(suggestions)
     } else {
       // hide the suggestions
@@ -70,25 +68,21 @@ function populateSearchSuggestions(suggestions: PlacesAutocompleteResult): void 
 }
 
 export function expandSearchSuggestions(): void {
-  console.log("expandSearchSuggestions");
   let searchSuggestions = HTMLElementLocator.getSearchSuggestionsContainer();
   showElement(searchSuggestions);
 }
 
 export function collapseSearchSuggestions(): void {
-  console.log("collapseSearchSuggestions");
   let searchSuggestions = HTMLElementLocator.getSearchSuggestionsContainer();
   hideElement(searchSuggestions);
 }
 
 export function expandSearchCriteria() {
-  console.log("expandSearchCriteria");
   let searchCriteria = HTMLElementLocator.getSearchCriteria();
   showElement(searchCriteria);
 }
 
 export function collapseSearchCriteria(): any {
-  console.log("collapseSearchCriteria");
   let searchCriteria = HTMLElementLocator.getSearchCriteria();
   hideElement(searchCriteria);
 }

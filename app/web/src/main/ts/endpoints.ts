@@ -20,7 +20,6 @@ export async function googlePlacesAutocomplete(
 }
 
 export async function getFlatmatesListings(req: ListingsRequest): Promise<ListingsResponse> {
-  console.debug(JSON.stringify(req));
   return fetch(window.location + "flatmates/listings", {
     method: "POST",
     headers: {
