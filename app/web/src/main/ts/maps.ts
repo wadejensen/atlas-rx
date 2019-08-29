@@ -34,8 +34,16 @@ export function addMapMarker(createMarker: (map: google.maps.Map) => google.maps
   map_markers.push(createMarker(map));
 }
 
-export function removeOffscreenMarkers() {
-  //TODO(wadejensen)
+export function clearMapMarkers() {
+  while (map_markers.length > 0) {
+    // Remove marker from book-keeping array
+    const marker = map_markers.pop();
+    // Remove marker from Google Map
+    marker && marker.setMap(null);
+    if (map_markers.length == 0) {
+      console.log("Removed all map markers");
+    }
+  }
 }
 
 export let createMapMarker = (listing: FlatmatesListing) => (map: google.maps.Map) => {

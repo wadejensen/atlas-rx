@@ -65,6 +65,7 @@ export function setupStateChangeListeners(): void {
     resetSearchPlaceholder();
     collapseSearchSuggestions();
     collapseSearchCriteria();
+    updateListings();
   });
   // TODO add a close button and corresponding listener
   HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
