@@ -72,15 +72,6 @@ fetch(window.location + "google/places-autocomplete/2 George St", {
   .then(json => console.log(json));
 
 
-setTimeout( () => {
-    console.log("Moving centre");
-    centreMap(new Coord(-33.874176, 151.201148));
-    setTimeout( () => {
-        console.log("Moving centre back");
-        centreMap(new Coord(-33.873176, 151.208148));
-    }, 3000);
-}, 3000);
-
 let pageState = new FreeBrowse();
 
 // user navigates to atlas -> tick
@@ -93,7 +84,7 @@ let pageState = new FreeBrowse();
 // user starts typing a destination -> tick
 // autocomplete provides a list of options -> tick
 // user selects one of the options -> tick
-// search bar collapses and turns into a "filters" menu -> TODO
+// search bar collapses and turns into a "filters" menu -> tick
 // centre google map on lat lng of suggestion. zoom level = 15 -> tick
 // user can now click on results to see travel time -> TODO
 

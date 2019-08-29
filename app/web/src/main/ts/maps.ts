@@ -58,7 +58,7 @@ export function getBounds(): Try<BoundingBox> {
   });
 }
 
-export function centreMap(coord: Coord, zoomLevel: number = 15): void {
+export function centreMap(coord: Coord, zoomLevel: number = 16): void {
   map.setCenter(new LatLng(coord.lat, coord.lon));
   map.setZoom(zoomLevel)
 }
