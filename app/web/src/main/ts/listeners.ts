@@ -102,9 +102,14 @@ export function registerSuggestionListener(suggestion: HTMLParagraphElement): vo
     const searchBar = HTMLElementLocator.getSearchBar();
     searchBar.value = target.innerText;
 
-    // parse coords from suggestion and centre Google Map
+    // parse coords from suggestion
     const lat = parseFloat(suggestion.dataset["lat"]!);
     const lng = parseFloat(suggestion.dataset["lng"]!);
+
+    searchBar.setAttribute("data-lat", lat.toString());
+    searchBar.setAttribute("data-lng", lng.toString());
+
+    // and centre Google Map on suggestion
     centreMap(new Coord(lat, lng));
 
     expandSearchCriteria();

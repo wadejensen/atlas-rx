@@ -2,14 +2,17 @@ import {TryCatch} from "../../../../common/src/main/ts/fp/try";
 import {getFlatmatesListings, googlePlacesAutocomplete} from "./endpoints";
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
 import {addMapMarker, centreMap, createMapMarker, getBounds} from "./maps";
-import {ListingsRequest} from "../../../../common/src/main/ts/flatmates/listings_request";
+import {
+  BathroomType,
+  FurnishingType,
+  ListingsRequest, ParkingType,
+  RoomType
+} from "../../../../common/src/main/ts/flatmates/listings_request";
 import {HTMLElementLocator} from "./html_elements";
 import {registerSuggestionListener} from "./listeners";
 
 export async function updateListings(): Promise<void> {
-  const req = new ListingsRequest({
-    boundingBox: getBounds().get()
-  });
+  const req = getFlatmatesCriteria();
   console.log(req);
 
   const listings = await getFlatmatesListings(req);
@@ -17,6 +20,22 @@ export async function updateListings(): Promise<void> {
     .matches
     .map( l => createMapMarker(l))
     .forEach( closure => addMapMarker(closure))
+}
+
+function getFlatmatesCriteria(): ListingsRequest {
+  return new ListingsRequest({
+    boundingBox: getBounds().get(),
+    minBudget: parseInt(getInputFieldValue("min-rent")) || undefined,
+    maxBudget: parseInt(getInputFieldValue("max-rent")) || undefined,
+    roomType: getInputFieldValue("room-type") as RoomType || undefined,
+    furnishingType: getInputFieldValue("furnishing-type") as FurnishingType || undefined,
+    bathroomType: getInputFieldValue("bathroom-type") as BathroomType || undefined,
+    parkingType: getInputFieldValue("parking-type") as ParkingType || undefined,
+  });
+}
+
+function getInputFieldValue(id: string) {
+  return (document.getElementById(id) as HTMLInputElement).value
 }
 
 export async function updateSearchSuggestions(): Promise<void> {

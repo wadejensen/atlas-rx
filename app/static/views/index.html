@@ -45,17 +45,17 @@
                         <div class="search-param" style="width: 50%; padding: 0.35em">
                             <div style="padding:4px; text-align: left; color: lightcoral">Room type</div>
                             <select id="room-type" name="room-type" class="parambox">
-                                <option value="ANY_ROOM" selected>All rooms</option>
-                                <option value="PRIVATE_ROOM">Private room</option>
+                                <option value="" selected>All rooms</option>
+                                <option value="private-room">Private room</option>
                                 <option value="SHARED_ROOM">Room shared with others</option>
                             </select>
                         </div>
                         <div class="search-param" style="width: 50%; padding: 0.35em">
                             <div style="padding:4px; text-align: left; color: lightcoral">Property type</div>
-                            <select id="furnishing" name="furnishing" class="parambox">
-                                <option value="ANY_FURNISHING" selected>Any furnishing</option>
-                                <option value="FURNISHED_ROOM">Furnished room</option>
-                                <option value="UNFURNISHED_ROOM">Unfurnished room</option>
+                            <select id="furnishing-type" name="furnishing" class="parambox">
+                                <option value="" selected>Any furnishing</option>
+                                <option value="furnished">Furnished room</option>
+                                <option value="unfurnished">Unfurnished room</option>
                             </select>
                         </div>
                     </div>
@@ -63,27 +63,21 @@
                         <div class="search-param" style="width: 50%; padding: 0.35em">
                             <div style="padding:4px; text-align: left; color: lightcoral">Bathroom type</div>
                             <select id="bathroom-type" name="bathroom-type" class="parambox">
-                                <option value="ALL_BATHROOM_TYPES" selected>All bathroom types</option>
-                                <option value="ENSUITE_BATHROOM">Ensuite bathroom</option>
-                                <option value="OWN_BATHROOM">Own bathroom</option>
+                                <option value="" selected>All bathroom types</option>
+                                <option value="ensuite">Ensuite bathroom</option>
+                                <option value="ensuite-or-own">Own bathroom</option>
                             </select>
                         </div>
                         <div class="search-param" style="width: 50%; padding: 0.35em">
                             <div style="padding:4px; text-align: left; color: lightcoral">Parking</div>
-                            <select id="parking" name="parking" class="parambox">
-                                <option value="ANY_PARKING" selected>Any parking</option>
-                                <option value="NO_PARKING">No parking</option>
-                                <option value="ON_STREET_PARKING">On-street parking</option>
-                                <option value="OFF_STREET_PARKING">Off-street parking</option>
+                            <select id="parking-type" name="parking" class="parambox">
+                                <option value="" selected>Any parking</option>
+                                <option value="no-parking">No parking</option>
+                                <option value="on-street-parking">On-street parking</option>
+                                <option value="off-street-parking">Off-street parking</option>
                             </select>
                         </div>
                     </div>
-<!--                    <div class="row" style="width: 100%; display: flex; flex-direction: row">-->
-<!--                        <div class="search-param" style="width: 33%; padding: 0.35em">-->
-<!--                            <div style="padding:4px; text-align: left; color: lightcoral">Radius (km)</div>-->
-<!--                            <input type="text" id="radius" class="parambox" autocomplete="off" placeholder="20km" style="color: #333333">-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </div>
                 <div class="row" style="width: 100%; display: flex; flex-direction: row">
                     <button type="button" id="search-button" class="parambox click">

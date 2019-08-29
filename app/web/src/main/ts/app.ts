@@ -1,10 +1,16 @@
 // @ts-ignore
 import {Person} from "common/person"
-import {centreMap} from "./maps"
+import {centreMap, getBounds} from "./maps"
 import {Coord} from "common/geo";
 import {FreeBrowse} from "./page_state";
 import {googlePlacesAutocomplete, hello} from "./endpoints";
 import {setupContentUpdateListeners, setupStateChangeListeners} from "./listeners";
+import {
+    BathroomType,
+    FurnishingType,
+    ListingsRequest, ParkingType,
+    RoomType
+} from "../../../../common/src/main/ts/flatmates/listings_request";
 
 let x = {
     "helloHello": 1,
