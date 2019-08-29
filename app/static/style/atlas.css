@@ -200,7 +200,7 @@ input.parambox:focus, select.parambox:focus {
     text-overflow:clip;
     /*border:none;*/
     /*border-radius: 0.4em;*/
-    /*margin-top: 0.5em;*/
+    margin-top: 0.5em;
     color: #f2f2f2;
     background-color: lightcoral;
     z-index: 3;
@@ -214,9 +214,4 @@ input.parambox:focus, select.parambox:focus {
     filter: brightness(0.95);
 }
 
-/*#search-button {*/
-/*    outline: none;*/
-/*    border: 0.1em solid #F06260;*/
-
-/*}*/
 
