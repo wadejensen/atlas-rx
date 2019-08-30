@@ -6,69 +6,93 @@ import {Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
 import LatLng = google.maps.LatLng;
 import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listings_response";
 import {LossyThrottle} from "./lossy_throttle";
+import Data = google.maps.Data;
+import {getFlatmatesListings} from "./endpoints";
+import {getFlatmatesCriteria} from "./content_update";
 
 declare var map: google.maps.Map;
-var map_markers: google.maps.Marker[] = [];
+var map_markers: google.maps.Data.Feature[] = [];
 
 const throttle = new LossyThrottle(1);
 
-export function keepMapUpdated(updateMap: () => Promise<void>) {
-  map.addListener('bounds_changed', () => throttle.apply(updateMap));
-}
+export class GoogleMap {
+  // a single event listener for info window cards
+  static mapListener?: google.maps.MapsEventListener = undefined;
 
-// export function populateMap() {
-//   map.addListener('bounds_changed', function() {
-//     console.log(getBounds().get());
-//   });
-//   map_markers.push(new google.maps.Marker({
-//     position: { lat: -33.877019, lng: 151.205394 },
-//     map: map,
-//     icon: orangeMarkerIcon(123),
-//   }))
-// }
+  static keepMapUpdated() {
+    map.addListener('bounds_changed', () => throttle.apply(GoogleMap.updateListings));
+  }
 
-// pass in a closure to be executed which creates map markers given a map
-// since otherwise markers will be created without being added to global state
-// and therefore we would be unable to track them
-export function addMapMarker(createMarker: (map: google.maps.Map) => google.maps.Marker) {
-  map_markers.push(createMarker(map));
-}
+  static async updateListings(): Promise<void> {
+    const req = getFlatmatesCriteria();
+    const listings = await getFlatmatesListings(req);
+    GoogleMap.updateMap(listings.matches);
+  }
 
-export function clearMapMarkers() {
-  while (map_markers.length > 0) {
-    // Remove marker from book-keeping array
-    const marker = map_markers.pop();
-    // Remove marker from Google Map
-    marker && marker.setMap(null);
-    if (map_markers.length == 0) {
-      console.log("Removed all map markers");
+  static updateMap(listings: Array<FlatmatesListing>): void {
+    GoogleMap.clearMapMarkers();
+    listings
+      .map(GoogleMap.createMapMarker)
+      .forEach(GoogleMap.addMapMarker);
+
+    GoogleMap.setMapStyle();
+
+    GoogleMap.mapListener = map.data.addListener('click', (event: any) => {
+      console.log(event);
+    });
+  }
+
+  static addMapMarker(marker: Data.Feature): void {
+    map_markers.push(marker);
+    map.data.add(marker);
+  }
+
+  static clearMapMarkers() {
+    while (map_markers.length > 0) {
+      map.data.remove(map_markers.pop()!);
+    }
+    // avoid triggering multiple events when opening info windows
+    if (GoogleMap.mapListener != undefined) {
+      google.maps.event.removeListener(GoogleMap.mapListener);
     }
   }
-}
 
-export let createMapMarker = (listing: FlatmatesListing) => (map: google.maps.Map) => {
-  return new google.maps.Marker({
-    position: { lat: listing.latitude, lng: listing.longitude },
-    map: map,
-    icon: orangeMarkerIcon(listing.rent[0]),
-  })
-};
+  static createMapMarker(listing: FlatmatesListing): Data.Feature {
+    return new Data.Feature({
+      geometry: {
+        lat: listing.latitude,
+        lng: listing.longitude,
+      },
+      properties: listing,
+    });
+  }
 
-export function getBounds(): Try<BoundingBox> {
-  return TryCatch( () => {
-    const bounds = map.getBounds();
-    return Geo.boundingBox(
-      new Coord(bounds!.getNorthEast().lat(), bounds!.getNorthEast().lng()),
-      new Coord(bounds!.getSouthWest().lat(), bounds!.getSouthWest().lng()),
-    );
-  }).recover((error) => {
-    throw new Error(`Failed to get map geo bounding box: ${error}`)
-  });
-}
+  static setMapStyle(): void {
+    map.data.setStyle(feature => {
+      return {
+        icon: {
+          url: `${orangeMarkerIcon(feature.getProperty("rent")[0])}`,
+        }
+      };
+    });
+  }
 
-export function centreMap(coord: Coord, zoomLevel: number = 16): void {
-  map.setCenter(new LatLng(coord.lat, coord.lon));
-  map.setZoom(zoomLevel)
+  static getBounds(): Try<BoundingBox> {
+    return TryCatch( () => {
+      const bounds = map.getBounds();
+      return Geo.boundingBox(
+        new Coord(bounds!.getNorthEast().lat(), bounds!.getNorthEast().lng()),
+        new Coord(bounds!.getSouthWest().lat(), bounds!.getSouthWest().lng()),
+      );
+    }).recover((error) => {
+      throw new Error(`Failed to get map geo bounding box: ${error}`)
+    });
+  }
+
+  static centreMap(coord: Coord, zoomLevel: number = 16): void {
+    map.setCenter(new LatLng(coord.lat, coord.lon));
+    map.setZoom(zoomLevel)
+  }
 }
 
 export class RGB {

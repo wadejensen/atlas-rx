@@ -66,7 +66,7 @@ export function setupStateChangeListeners(): void {
     resetSearchPlaceholder();
     collapseSearchSuggestions();
     collapseSearchCriteria();
-    updateListings();
+    GoogleMap.updateListings();
   });
   // TODO add a close button and corresponding listener
   HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
@@ -78,7 +78,7 @@ export function setupContentUpdateListeners() {
 }
 
 function setupPopulateMapListener(): void {
-  keepMapUpdated(updateListings);
+  GoogleMap.keepMapUpdated();
 }
 
 function setupSearchAutocompleteListeners(): void {
@@ -89,7 +89,7 @@ function setupSearchAutocompleteListeners(): void {
       const lat = parseFloat(topResult.dataset["lat"]!);
       const lng = parseFloat(topResult.dataset["lng"]!);
 
-      centreMap(new Coord(lat, lng));
+      GoogleMap.centreMap(new Coord(lat, lng));
     }
   });
 }
@@ -110,7 +110,7 @@ export function registerSuggestionListener(suggestion: HTMLParagraphElement): vo
     searchBar.setAttribute("data-lng", lng.toString());
 
     // and centre Google Map on suggestion
-    centreMap(new Coord(lat, lng));
+    GoogleMap.centreMap(new Coord(lat, lng));
 
     expandSearchCriteria();
     collapseSearchSuggestions();
