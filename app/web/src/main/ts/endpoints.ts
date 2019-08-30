@@ -1,12 +1,6 @@
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
 import {ListingsResponse} from "../../../../common/src/main/ts/flatmates/listings_response";
-import {
-  BathroomType,
-  FurnishingType,
-  ListingsRequest, ParkingType,
-  RoomType
-} from "../../../../common/src/main/ts/flatmates/listings_request";
-import {getBounds} from "./maps";
+import {ListingsRequest} from "../../../../common/src/main/ts/flatmates/listings_request";
 
 export async function googlePlacesAutocomplete(
   query: string

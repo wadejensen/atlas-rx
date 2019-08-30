@@ -3,6 +3,24 @@ import {Person} from "common/person"
 import {googlePlacesAutocomplete, hello} from "./endpoints";
 import {setupContentUpdateListeners, setupStateChangeListeners} from "./listeners";
 
+/** Page state machine
+ *
+ *      |-> free
+ *      |  browse
+ *      |     |
+ *      |     ▼
+ *      |__ destination <-|
+ *      |   select        |
+ *      |     |           |
+ *      |     ▼           |
+ *      |__ criteria      |
+ *      |   refine        |
+ *      |     |           |
+ *      |     ▼           |
+ *      |__ refined ______|
+ *          browse
+ **/
+
 let x = {
     "helloHello": 1,
     "goodbyeGoodbye": 2,

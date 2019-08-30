@@ -38,7 +38,7 @@ function getInputFieldValue(id: string) {
 }
 
 export async function updateSearchSuggestions(): Promise<void> {
-  TryCatch( async () => {
+  TryCatch(async () => {
     const query = HTMLElementLocator.getSearchBar().value;
     if (query != "") {
       const suggestions = await googlePlacesAutocomplete(query);

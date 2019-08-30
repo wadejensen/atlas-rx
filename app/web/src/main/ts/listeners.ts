@@ -1,15 +1,16 @@
 // creates triggers for user interactions which cause changes in PageState
 import {
-  collapseSearchCriteria, collapseSearchSuggestions, expandSearchCriteria,
+  collapseSearchCriteria,
+  collapseSearchSuggestions,
+  expandSearchCriteria,
   expandSearchSuggestions,
   interstitialSearchPlaceholder,
   resetSearchPlaceholder,
-  updateListings,
   updateSearchSuggestions,
 } from "./content_update";
 import {HTMLElementLocator} from "./html_elements";
-import {centreMap, keepMapUpdated} from "./maps";
 import {Coord} from "../../../../common/src/main/ts/geo";
+import {GoogleMap} from "./maps";
 
 /** Page state machine
  *

@@ -135,4 +135,3 @@ export class Geo {
     return Geo.boundingBox(centroid, boundingBox.bottomRight);
   }
 }
-
