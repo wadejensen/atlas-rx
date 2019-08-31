@@ -8,7 +8,7 @@ import {
   ParkingType,
   RoomType
 } from "../../../../common/src/main/ts/flatmates/listings_request";
-import {HTMLElementLocator} from "./html_elements";
+import {HTMLElementFactory, HTMLElementLocator} from "./html_elements";
 import {registerSuggestionListener} from "./listeners";
 import {GoogleMap} from "./maps";
 
@@ -45,12 +45,7 @@ function populateSearchSuggestions(suggestions: PlacesAutocompleteResult): void 
   const searchSuggestions = HTMLElementLocator.getSearchSuggestionsContainer();
   searchSuggestions.innerHTML = suggestions
     .results!
-    .map((s) =>
-      `<p class="suggest parambox click"
-              data-lat="${s.lat}"
-              data-lng="${s.lng}"
-              >${s.description}</p>`
-    )
+    .map(HTMLElementFactory.searchSuggestion)
     .reduce((s1: string, s2: string) => s1 + "\n" + s2);
   const suggestElems = HTMLElementLocator.getSearchSuggestions();
   for (let i=0; i<suggestElems.length; i++) {

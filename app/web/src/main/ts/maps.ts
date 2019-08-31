@@ -9,6 +9,7 @@ import {LossyThrottle} from "./lossy_throttle";
 import Data = google.maps.Data;
 import {getFlatmatesListings} from "./endpoints";
 import {getFlatmatesCriteria} from "./content_update";
+import {HTMLElementFactory} from "./html_elements";
 
 declare var map: google.maps.Map;
 var map_markers: google.maps.Data.Feature[] = [];
@@ -17,10 +18,12 @@ const throttle = new LossyThrottle(1);
 
 export class GoogleMap {
   // a single event listener for info window cards
-  static mapListener?: google.maps.MapsEventListener = undefined;
+  static infoWindowListener?: google.maps.MapsEventListener = undefined;
+  static infoWindow?: google.maps.InfoWindow = undefined;
 
   static keepMapUpdated() {
-    map.addListener('bounds_changed', () => throttle.apply(GoogleMap.updateListings));
+    map.addListener('bounds_changed',
+      () => throttle.apply(GoogleMap.updateListings));
   }
 
   static async updateListings(): Promise<void> {
@@ -37,9 +40,25 @@ export class GoogleMap {
 
     GoogleMap.setMapStyle();
 
-    GoogleMap.mapListener = map.data.addListener('click', (event: any) => {
-      console.log(event);
+    GoogleMap.infoWindowListener = map.data.addListener('click', GoogleMap.openWindow);
+  }
+
+  static openWindow(event: google.maps.Data.MouseEvent): void {
+    // close an existing info window if open
+    if (GoogleMap.infoWindow != undefined) {
+      GoogleMap.infoWindow.close();
+    }
+
+    const listing: FlatmatesListing = event.feature.getProperty("listing");
+    GoogleMap.infoWindow = new google.maps.InfoWindow({
+      content: HTMLElementFactory.infoWindow(listing, 123),
+      //disableAutoPan: true,
+      position: {
+        lat: listing.latitude,
+        lng: listing.longitude,
+      },
     });
+    GoogleMap.infoWindow.open(map);
   }
 
   static addMapMarker(marker: Data.Feature): void {
@@ -52,8 +71,8 @@ export class GoogleMap {
       map.data.remove(map_markers.pop()!);
     }
     // avoid triggering multiple events when opening info windows
-    if (GoogleMap.mapListener != undefined) {
-      google.maps.event.removeListener(GoogleMap.mapListener);
+    if (GoogleMap.infoWindowListener != undefined) {
+      google.maps.event.removeListener(GoogleMap.infoWindowListener);
     }
   }
 
@@ -63,15 +82,18 @@ export class GoogleMap {
         lat: listing.latitude,
         lng: listing.longitude,
       },
-      properties: listing,
+      properties: {
+        listing: listing,
+      },
     });
   }
 
   static setMapStyle(): void {
     map.data.setStyle(feature => {
+      const listing: FlatmatesListing = feature.getProperty("listing");
       return {
         icon: {
-          url: `${orangeMarkerIcon(feature.getProperty("rent")[0])}`,
+          url: `${orangeMarkerIcon(listing.rent[0])}`,
         }
       };
     });

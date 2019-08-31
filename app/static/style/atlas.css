@@ -5,6 +5,7 @@
 html, body {
     margin:0;
     height: 100%;
+    overflow: hidden;
 }
 
 html {
@@ -24,7 +25,7 @@ html {
     background-color: #333;
 }
 
-.navbar a {
+.branding a {
     float: left;
     display: flex;
     color: #f2f2f2;
@@ -155,7 +156,7 @@ input.searchbox:focus, input.parambox:focus, select.parambox {
 }
 
 #map {
-    height:45%;
+    height:90%;
     width:100%;
 }
 
@@ -215,3 +216,40 @@ input.parambox:focus, select.parambox:focus {
 }
 
 
+.info-window {
+    padding: 0.5em;
+    display:flex;
+    flex-direction:column;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.info-window-title {
+    max-width: 15vw;
+    max-height: 15vh;
+    font-size: 150%;
+    /*text-decoration: none;*/
+    color: coral
+}
+
+.flatmates-photo {
+    max-width: 15vw;
+    max-height: 15vw;
+    padding: 0.5em;
+}
+
+a.info-window-details {
+    margin: 0;
+    padding: 0;
+    font-size: 150%;
+    font-style: italic;
+    color: coral;
+}
+
+p.info-window-details {
+    margin: 0;
+    padding: 0;
+    font-size: 150%;
+    font-style: italic;
+    color: coral;
+}
