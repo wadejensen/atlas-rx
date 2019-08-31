@@ -1,6 +1,4 @@
 // @ts-ignore
-import {Person} from "common/person"
-import {googlePlacesAutocomplete, hello} from "./endpoints";
 import {setupContentUpdateListeners, setupStateChangeListeners} from "./listeners";
 
 /** Page state machine
@@ -21,46 +19,9 @@ import {setupContentUpdateListeners, setupStateChangeListeners} from "./listener
  *          browse
  **/
 
-let x = {
-    "helloHello": 1,
-    "goodbyeGoodbye": 2,
-    "danceyDance": 3,
-    "lamee_paradise": 4
-};
-
-let p = new Person("Wade", 26, "Software Engineer", 100000.0);
-
-console.log(x);
-
-console.log(p);
-
-// test making a request back to the server
-fetch(window.location + "hello")
-  .then( resp => resp.text())
-  .then( text => console.log(text));
-fetch(window.location + "flatmates/autocomplete/redfe")
-  .then( resp => resp.json())
-  .then( json => console.log(json));
-
-
-// testing on application start to keep an eye out for regressions
-hello();
-googlePlacesAutocomplete("redfe").then( json => console.log(json));
-
 // setup web app dynamic content
 setupStateChangeListeners();
 setupContentUpdateListeners();
-
-
-fetch(window.location + "google/places-autocomplete/2 George St", {
-    method: "GET",
-    headers: {
-        "Content-Type": "Accept: application/json",
-    },
-})
-  .then(resp => resp.json())
-  .then(json => console.log(json));
-
 
 // user navigates to atlas -> tick
 // google map with a default of sydney -> tick
@@ -80,7 +41,7 @@ fetch(window.location + "google/places-autocomplete/2 George St", {
 // user enters search criteria -> tick
 // user hits search now button -> tick
 // we update the standing filters state of the users flatmates requests -> tick
-// user clicks on result -> TODO
+// user clicks on result -> tick
 // user gets a flyout of the result with details, including travel time -> TODO
 
 // user can adjust travel settings -> TODO

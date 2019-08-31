@@ -68,7 +68,6 @@ export function setupStateChangeListeners(): void {
     collapseSearchCriteria();
     GoogleMap.updateListings();
   });
-  // TODO add a close button and corresponding listener
   HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
 }
 
