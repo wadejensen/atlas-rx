@@ -1,4 +1,4 @@
-import {TryCatch} from "../../../../common/src/main/ts/fp/try";
+import {Failure, Success, Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
 import {googlePlacesAutocomplete} from "./endpoints";
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
 import {
@@ -11,6 +11,8 @@ import {
 import {HTMLElementFactory, HTMLElementLocator} from "./html_elements";
 import {registerSuggestionListener} from "./listeners";
 import {GoogleMap} from "./maps";
+import {LatLng} from "@google/maps";
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 export function getFlatmatesCriteria(): ListingsRequest {
   return new ListingsRequest({
@@ -22,6 +24,22 @@ export function getFlatmatesCriteria(): ListingsRequest {
     bathroomType: getInputFieldValue("bathroom-type") as BathroomType || undefined,
     parkingType: getInputFieldValue("parking-type") as ParkingType || undefined,
   });
+}
+
+export function getDestination(): Promise<LatLngLiteral> {
+  const searchBar = HTMLElementLocator.getSearchBar()!;
+
+  const lat = parseFloat(searchBar.dataset["lat"]!);
+  const lng = parseFloat(searchBar.dataset["lng"]!);
+
+  if (lat === undefined || Number.isNaN(lat) || lng === undefined || Number.isNaN(lng)) {
+    return Promise.reject(Error("Could not parse destination from search bar"))
+  } else {
+    return Promise.resolve({
+      lat: lat,
+      lng: lng,
+    });
+  }
 }
 
 function getInputFieldValue(id: string) {

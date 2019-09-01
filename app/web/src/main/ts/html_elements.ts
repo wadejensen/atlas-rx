@@ -1,5 +1,7 @@
 import {PlacesAutocompleteEntry} from "../../../../common/src/main/ts/google/places_autocomplete_result";
 import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {TravelTimeResponse} from "../../../../common/src/main/ts/google/distance_matrix";
+import {LatLngLiteral} from "@google/maps";
 
 export class HTMLElementLocator {
   static getSearchBar(): HTMLInputElement {
@@ -32,9 +34,13 @@ export class HTMLElementFactory {
             >${suggestion.description}</p>`;
   }
 
-  static infoWindow(listing: FlatmatesListing, travelTime: number) {
+  static infoWindow(
+      listing: FlatmatesListing,
+      destination: LatLngLiteral,
+      travelTime: TravelTimeResponse
+  ): string {
     const listingUrl = `https://flatmates.com.au${listing.listing_link}`;
-    const directionsUrl = "https://www.google.com/maps/dir/-33.883339,151.206724/-33.88152,151.220843";
+    const directionsUrl = `https://www.google.com/maps/dir/${listing.latitude},${listing.longitude}/${destination.lat},${destination.lng}`;
     return `
 <div class="info-window">
   <a class="info-window-title" href="${listingUrl}" target="_blank">${listing.subheading}</a>
@@ -42,7 +48,7 @@ export class HTMLElementFactory {
     <img class="flatmates-photo" src="${listing.photo}">
   </a>
   <p class="info-window-details">Rent: <span>$${listing.rent[0]}</span></p>
-  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime} mins</span></a>
+  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime.duration} ${travelTime.travelMode}</span></a>
 </div>
 `;
   }

@@ -88,7 +88,7 @@ function setupSearchAutocompleteListeners(): void {
       const lat = parseFloat(topResult.dataset["lat"]!);
       const lng = parseFloat(topResult.dataset["lng"]!);
 
-      GoogleMap.centreMap(new Coord(lat, lng));
+      GoogleMap.setDestination(new Coord(lat, lng));
     }
   });
 }
@@ -109,7 +109,7 @@ export function registerSuggestionListener(suggestion: HTMLParagraphElement): vo
     searchBar.setAttribute("data-lng", lng.toString());
 
     // and centre Google Map on suggestion
-    GoogleMap.centreMap(new Coord(lat, lng));
+    GoogleMap.setDestination(new Coord(lat, lng));
 
     expandSearchCriteria();
     collapseSearchSuggestions();

@@ -7,9 +7,14 @@ import LatLng = google.maps.LatLng;
 import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listings_response";
 import {LossyThrottle} from "./lossy_throttle";
 import Data = google.maps.Data;
-import {getFlatmatesListings} from "./endpoints";
-import {getFlatmatesCriteria} from "./content_update";
+import {getFlatmatesListings, googleDistanceMatrix} from "./endpoints";
+import {getDestination, getFlatmatesCriteria} from "./content_update";
 import {HTMLElementFactory} from "./html_elements";
+import {
+  TravelTimeRequest,
+  TravelTimeResponse
+} from "../../../../common/src/main/ts/google/distance_matrix";
+import {LatLngLiteral} from "@google/maps";
 
 declare var map: google.maps.Map;
 var map_markers: google.maps.Data.Feature[] = [];
@@ -20,6 +25,7 @@ export class GoogleMap {
   // a single event listener for info window cards
   static infoWindowListener?: google.maps.MapsEventListener = undefined;
   static infoWindow?: google.maps.InfoWindow = undefined;
+  static destinationMarker?: google.maps.Marker = undefined;
 
   static keepMapUpdated() {
     map.addListener('bounds_changed',
@@ -39,19 +45,38 @@ export class GoogleMap {
       .forEach(GoogleMap.addMapMarker);
 
     GoogleMap.setMapStyle();
-
     GoogleMap.infoWindowListener = map.data.addListener('click', GoogleMap.openWindow);
   }
 
-  static openWindow(event: google.maps.Data.MouseEvent): void {
+  static openWindow = async (event: google.maps.Data.MouseEvent) => {
     // close an existing info window if open
     if (GoogleMap.infoWindow != undefined) {
       GoogleMap.infoWindow.close();
     }
 
     const listing: FlatmatesListing = event.feature.getProperty("listing");
+    // getTravelOptions
+    const travelMode = "transit";
+    const transitMode = "bus";
+
+    const dest: Promise<LatLngLiteral> = getDestination();
+    const travelTimeReq: Promise<TravelTimeRequest> = dest.then(d => new TravelTimeRequest({
+      travelMode: travelMode,
+      transitMode: transitMode,
+      lat1: listing.latitude,
+      lng1: listing.longitude,
+      lat2: d.lat,
+      lng2: d.lng,
+    }));
+    const travelTime = await travelTimeReq
+      .then(googleDistanceMatrix)
+      .catch((err) => new TravelTimeResponse({
+        duration: "Requires destination",
+        travelMode: travelMode,
+      }));
+
     GoogleMap.infoWindow = new google.maps.InfoWindow({
-      content: HTMLElementFactory.infoWindow(listing, 123),
+      content: HTMLElementFactory.infoWindow(listing, await getDestination(), travelTime),
       //disableAutoPan: true,
       position: {
         lat: listing.latitude,
@@ -59,7 +84,7 @@ export class GoogleMap {
       },
     });
     GoogleMap.infoWindow.open(map);
-  }
+  };
 
   static addMapMarker(marker: Data.Feature): void {
     map_markers.push(marker);
@@ -111,7 +136,19 @@ export class GoogleMap {
     });
   }
 
-  static centreMap(coord: Coord, zoomLevel: number = 16): void {
+  static setDestination(coord: Coord, zoomLevel: number = 16): void {
+    if (GoogleMap.destinationMarker !== undefined) {
+      GoogleMap.destinationMarker.setMap(null);
+    }
+    GoogleMap.destinationMarker = new google.maps.Marker({
+      position: {
+        lat: coord.lat,
+        lng: coord.lon,
+      },
+      map: map,
+      icon: "destination.svg",
+    });
+
     map.setCenter(new LatLng(coord.lat, coord.lon));
     map.setZoom(zoomLevel)
   }
