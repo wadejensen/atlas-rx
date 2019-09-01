@@ -29,6 +29,18 @@ export class HTMLElementLocator {
   static getRefineButton() {
     return document.getElementById("refine-button")! as HTMLImageElement
   }
+
+  static getExpensiveRefineButton() {
+    return document.getElementById("expensive-refine-button")! as HTMLDivElement
+  }
+
+  static getExpensiveSearchCriteria() {
+    return document.getElementById("expensive-search-criteria")! as HTMLDivElement
+  }
+
+  static getExpensiveSearchButton() {
+    return document.getElementById("expensive-search-button")! as HTMLButtonElement
+  }
 }
 
 export class HTMLElementFactory {
@@ -61,7 +73,7 @@ export class HTMLElementFactory {
     <img class="flatmates-photo" src="${listing.photo}">
   </a>
   <p class="info-window-details">Rent: <span>$${listing.rent[0]}</span></p>
-  <p class="info-window-details">Travel time: <span>Requires destination</span></p>
+  <p class="info-window-details">Travel time: <span>???</span></p>
 </div>
 `;
   }

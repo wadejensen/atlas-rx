@@ -1,7 +1,8 @@
 // creates triggers for user interactions which cause changes in PageState
 import {
+  collapseExpensiveSearchCriteria,
   collapseSearchCriteria,
-  collapseSearchSuggestions,
+  collapseSearchSuggestions, expandExpensiveSearchCriteria,
   expandSearchCriteria,
   expandSearchSuggestions,
   hideRefineButton,
@@ -61,6 +62,7 @@ export function setupStateChangeListeners(): void {
   HTMLElementLocator.getSearchBar().addEventListener("focusin", () => {
     interstitialSearchPlaceholder();
     collapseSearchCriteria();
+    collapseExpensiveSearchCriteria();
     expandSearchSuggestions();
   });
 
@@ -68,16 +70,17 @@ export function setupStateChangeListeners(): void {
     resetSearchPlaceholder();
     collapseSearchSuggestions();
     collapseSearchCriteria();
-    showRefineButton();
     GoogleMap.updateListings();
   });
 
   HTMLElementLocator.getRefineButton().addEventListener("click", () => {
-    hideRefineButton();
     expandSearchCriteria();
   });
 
   HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
+
+  HTMLElementLocator.getExpensiveRefineButton().addEventListener("click", expandExpensiveSearchCriteria);
+  HTMLElementLocator.getExpensiveSearchButton().addEventListener("click", collapseExpensiveSearchCriteria);
 }
 
 export function setupContentUpdateListeners() {
@@ -119,8 +122,6 @@ export function registerSuggestionListener(suggestion: HTMLParagraphElement): vo
 
     // and centre Google Map on suggestion
     GoogleMap.setDestination(new Coord(lat, lng));
-
-    expandSearchCriteria();
     collapseSearchSuggestions();
   })
 }

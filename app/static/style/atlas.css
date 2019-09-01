@@ -136,8 +136,28 @@ input.searchbox:focus, input.parambox:focus, select.parambox {
     color: #aaaaaa;
 }
 
-#search-criteria {
+.search-container-hidden {
+    width: 10%;
+}
+
+.expensive-search-container-hidden {
+    width: 20%;
+}
+
+.search-criteria {
     width: 100%;
+    /** element hidden until element style is set dynamically by js */
+    display:flex;
+    position: relative;
+    align-items:flex-start;
+    flex-direction:column;
+    background-color: #464646;
+    border-radius: 0.4em;
+    z-index: 2;
+}
+
+.search-criteria-hidden {
+    width: 0;
     /** element hidden until element style is set dynamically by js */
     display:none;
     position: relative;
@@ -192,7 +212,7 @@ input.parambox:focus, select.parambox:focus {
     box-shadow: 0 0 0.15em 0 #5a5a5a;
 }
 
-#search-button {
+.search-button {
     font-size: x-large;
     height: 7vh;
     width:100%;
@@ -216,23 +236,19 @@ input.parambox:focus, select.parambox:focus {
 
 
 .info-window {
-    padding: 0.5em;
     display:flex;
     flex-direction:column;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
 .info-window-title {
-    max-width: 15vw;
-    max-height: 15vh;
-    font-size: 150%;
-    /*text-decoration: none;*/
+    max-width: 25vw;
+    font-size: 125%;
+    text-decoration: none;
     color: coral
 }
 
 .flatmates-photo {
-    max-width: 15vw;
+    max-width: 25vw;
     max-height: 15vw;
     padding: 0.5em;
 }
@@ -240,7 +256,7 @@ input.parambox:focus, select.parambox:focus {
 a.info-window-details {
     margin: 0;
     padding: 0;
-    font-size: 150%;
+    font-size: 125%;
     font-style: italic;
     color: coral;
 }
@@ -248,7 +264,7 @@ a.info-window-details {
 p.info-window-details {
     margin: 0;
     padding: 0;
-    font-size: 150%;
+    font-size: 125%;
     font-style: italic;
     color: coral;
 }

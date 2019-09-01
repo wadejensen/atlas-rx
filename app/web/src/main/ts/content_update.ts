@@ -82,13 +82,18 @@ export function collapseSearchSuggestions(): void {
 }
 
 export function expandSearchCriteria() {
+  collapseExpensiveSearchCriteria();
+  hideRefineButton();
   let searchCriteria = HTMLElementLocator.getSearchCriteria();
-  showElement(searchCriteria);
+  searchCriteria.className = "search-criteria";
+  searchCriteria.parentElement!.classList.remove("search-container-hidden");
 }
 
 export function collapseSearchCriteria(): any {
   let searchCriteria = HTMLElementLocator.getSearchCriteria();
-  hideElement(searchCriteria);
+  searchCriteria.className = "search-criteria-hidden";
+  searchCriteria.parentElement!.classList.add("search-container-hidden")
+  showRefineButton();
 }
 
 function showElement(element: HTMLElement): void {
@@ -120,4 +125,33 @@ export function showRefineButton() {
 
 export function hideRefineButton() {
   HTMLElementLocator.getRefineButton().className = "refine-hidden";
+}
+
+export function expandExpensiveSearchCriteria() {
+  collapseSearchCriteria();
+  hideExpensiveRefineButton();
+  let searchCriteria = HTMLElementLocator.getExpensiveSearchCriteria();
+  searchCriteria.className = "search-criteria";
+  searchCriteria.parentElement!.classList.remove("expensive-search-container-hidden");
+}
+
+export function collapseExpensiveSearchCriteria(): any {
+  let searchCriteria = HTMLElementLocator.getExpensiveSearchCriteria();
+  searchCriteria.className = "search-criteria-hidden";
+  searchCriteria.parentElement!.classList.add("expensive-search-container-hidden");
+  showExpensiveRefineButton()
+}
+
+export function showExpensiveRefineButton() {
+  HTMLElementLocator.getExpensiveRefineButton().className = "refine";
+}
+
+export function hideExpensiveRefineButton() {
+  HTMLElementLocator.getExpensiveRefineButton().className = "refine-hidden";
+}
+
+export function collapseAll() {
+  collapseSearchSuggestions();
+  collapseSearchCriteria();
+  collapseExpensiveSearchCriteria();
 }

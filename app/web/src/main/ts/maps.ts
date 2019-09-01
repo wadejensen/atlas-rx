@@ -8,7 +8,7 @@ import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listing
 import {LossyThrottle} from "./lossy_throttle";
 import Data = google.maps.Data;
 import {getFlatmatesListings, googleDistanceMatrix} from "./endpoints";
-import {getDestination, getFlatmatesCriteria} from "./content_update";
+import {collapseAll, getDestination, getFlatmatesCriteria} from "./content_update";
 import {HTMLElementFactory} from "./html_elements";
 import {
   TravelTimeRequest,
@@ -50,6 +50,9 @@ export class GoogleMap {
   }
 
   static openWindow = async (event: google.maps.Data.MouseEvent) => {
+    // collapse any expanded search panes
+    collapseAll();
+
     // close an existing info window if open
     if (GoogleMap.infoWindow != undefined) {
       GoogleMap.infoWindow.close();
