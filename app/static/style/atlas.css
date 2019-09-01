@@ -76,7 +76,7 @@ html {
     background-color: #f2f2f2;
 }
 
-input.searchbox, input.parambox, select.parambox, p.parambox {
+.searchbox, input.parambox, select.parambox, p.parambox {
     font-size: large;
     height: 5vh;
     width:100%;
@@ -251,4 +251,18 @@ p.info-window-details {
     font-size: 150%;
     font-style: italic;
     color: coral;
+}
+
+.refine {
+    height: 5vh;
+    width: auto;
+}
+
+.refine:hover {
+    filter: brightness(0.80);
+}
+
+.refine-hidden {
+    height: 0;
+    width: 0;
 }

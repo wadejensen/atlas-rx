@@ -4,8 +4,10 @@ import {
   collapseSearchSuggestions,
   expandSearchCriteria,
   expandSearchSuggestions,
+  hideRefineButton,
   interstitialSearchPlaceholder,
   resetSearchPlaceholder,
+  showRefineButton,
   updateSearchSuggestions,
 } from "./content_update";
 import {HTMLElementLocator} from "./html_elements";
@@ -66,8 +68,15 @@ export function setupStateChangeListeners(): void {
     resetSearchPlaceholder();
     collapseSearchSuggestions();
     collapseSearchCriteria();
+    showRefineButton();
     GoogleMap.updateListings();
   });
+
+  HTMLElementLocator.getRefineButton().addEventListener("click", () => {
+    hideRefineButton();
+    expandSearchCriteria();
+  });
+
   HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
 }
 

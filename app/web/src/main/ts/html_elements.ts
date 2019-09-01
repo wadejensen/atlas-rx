@@ -25,6 +25,10 @@ export class HTMLElementLocator {
   static getSearchButton(): HTMLButtonElement {
     return document.getElementById("search-button")! as HTMLButtonElement
   }
+
+  static getRefineButton() {
+    return document.getElementById("refine-button")! as HTMLImageElement
+  }
 }
 
 export class HTMLElementFactory {
@@ -81,5 +85,6 @@ export class HTMLElementFactory {
 </div>
 `;
   }
+
 }
 

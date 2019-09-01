@@ -1,4 +1,4 @@
-import {Failure, Success, Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
+import {TryCatch} from "../../../../common/src/main/ts/fp/try";
 import {googlePlacesAutocomplete} from "./endpoints";
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
 import {
@@ -11,9 +11,8 @@ import {
 import {HTMLElementFactory, HTMLElementLocator} from "./html_elements";
 import {registerSuggestionListener} from "./listeners";
 import {GoogleMap} from "./maps";
-import {LatLng} from "@google/maps";
-import LatLngLiteral = google.maps.LatLngLiteral;
 import {None, Option, Some} from "../../../../common/src/main/ts/fp/option";
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 export function getFlatmatesCriteria(): ListingsRequest {
   return new ListingsRequest({
@@ -113,4 +112,12 @@ export function interstitialSearchPlaceholder() {
 function updateSearchPlaceholder(placeholder: string): void {
   let searchBar = HTMLElementLocator.getSearchBar();
   searchBar.placeholder = placeholder;
+}
+
+export function showRefineButton() {
+  HTMLElementLocator.getRefineButton().className = "refine";
+}
+
+export function hideRefineButton() {
+  HTMLElementLocator.getRefineButton().className = "refine-hidden";
 }

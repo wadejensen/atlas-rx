@@ -25,18 +25,6 @@ import {TravelTimeRequest} from "../../../../common/src/main/ts/google/distance_
 setupStateChangeListeners();
 setupContentUpdateListeners();
 
-googleDistanceMatrix(
-  new TravelTimeRequest({
-    travelMode: "transit",
-    transitMode: "bus",
-    lat1: -33.883339,
-    lng1: 151.206724,
-    lat2: -33.88152,
-    lng2: 151.220843,
-  })
-).then(r => console.log(r));
-
-console.log("EOF");
 // user navigates to atlas -> tick
 // google map with a default of sydney -> tick
 // populate with map markers from flatmates.com.au results based on map geo bounds -> tick
