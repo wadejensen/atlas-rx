@@ -2,6 +2,7 @@ import {PlacesAutocompleteEntry} from "../../../../common/src/main/ts/google/pla
 import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listings_response";
 import {TravelTimeResponse} from "../../../../common/src/main/ts/google/distance_matrix";
 import {LatLngLiteral} from "@google/maps";
+import {Option} from "../../../../common/src/main/ts/fp/option";
 
 export class HTMLElementLocator {
   static getSearchBar(): HTMLInputElement {
@@ -36,11 +37,19 @@ export class HTMLElementFactory {
 
   static infoWindow(
       listing: FlatmatesListing,
-      destination: LatLngLiteral,
-      travelTime: TravelTimeResponse
+      destination: Option<LatLngLiteral>,
+      travelTime: TravelTimeResponse,
   ): string {
+    if (destination.isEmpty()) {
+      return HTMLElementFactory.infoWindowContent(listing);
+    } else {
+      return HTMLElementFactory.infoWindowContentWithDestination(listing,
+        destination.get(), travelTime);
+    }
+  }
+
+  private static infoWindowContent(listing: FlatmatesListing) {
     const listingUrl = `https://flatmates.com.au${listing.listing_link}`;
-    const directionsUrl = `https://www.google.com/maps/dir/${listing.latitude},${listing.longitude}/${destination.lat},${destination.lng}`;
     return `
 <div class="info-window">
   <a class="info-window-title" href="${listingUrl}" target="_blank">${listing.subheading}</a>
@@ -48,7 +57,27 @@ export class HTMLElementFactory {
     <img class="flatmates-photo" src="${listing.photo}">
   </a>
   <p class="info-window-details">Rent: <span>$${listing.rent[0]}</span></p>
-  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime.duration} ${travelTime.travelMode}</span></a>
+  <p class="info-window-details">Travel time: <span>Requires destination</span></p>
+</div>
+`;
+  }
+
+  private static infoWindowContentWithDestination(
+    listing: FlatmatesListing,
+    destination: LatLngLiteral,
+    travelTime: TravelTimeResponse
+  ) {
+    const listingUrl = `https://flatmates.com.au${listing.listing_link}`;
+    const directionsUrl = `https://www.google.com/maps/dir/${listing.latitude},${listing.longitude}/${destination.lat},${destination.lng}`;
+
+    return `
+<div class="info-window">
+  <a class="info-window-title" href="${listingUrl}" target="_blank">${listing.subheading}</a>
+  <a href="${listingUrl}" target="_blank">
+    <img class="flatmates-photo" src="${listing.photo}">
+  </a>
+  <p class="info-window-details">Rent: <span>$${listing.rent[0]}</span></p>
+  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime.duration} (${travelTime.travelMode})</span></a>
 </div>
 `;
   }

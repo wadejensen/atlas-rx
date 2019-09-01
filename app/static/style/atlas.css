@@ -144,8 +144,7 @@ input.searchbox:focus, input.parambox:focus, select.parambox {
     align-items:flex-start;
     flex-direction:column;
     background-color: #464646;
-    border-radius: 0 0 0.4em 0.4em;
-    margin-top: 0.4em;
+    border-radius: 0.4em;
     z-index: -1;
 }
 

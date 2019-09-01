@@ -15,6 +15,7 @@ import {
   TravelTimeResponse
 } from "../../../../common/src/main/ts/google/distance_matrix";
 import {LatLngLiteral} from "@google/maps";
+import {Option} from "../../../../common/src/main/ts/fp/option";
 
 declare var map: google.maps.Map;
 var map_markers: google.maps.Data.Feature[] = [];
@@ -59,8 +60,9 @@ export class GoogleMap {
     const travelMode = "transit";
     const transitMode = "bus";
 
-    const dest: Promise<LatLngLiteral> = getDestination();
-    const travelTimeReq: Promise<TravelTimeRequest> = dest.then(d => new TravelTimeRequest({
+    // a destination may not be available
+    const dest: Option<LatLngLiteral> = getDestination();
+    const travelTimeReq: Option<TravelTimeRequest> = dest.map(d => new TravelTimeRequest({
       travelMode: travelMode,
       transitMode: transitMode,
       lat1: listing.latitude,
@@ -68,15 +70,19 @@ export class GoogleMap {
       lat2: d.lat,
       lng2: d.lng,
     }));
-    const travelTime = await travelTimeReq
-      .then(googleDistanceMatrix)
-      .catch((err) => new TravelTimeResponse({
+
+    const travelTime = !travelTimeReq.isEmpty()
+      ? googleDistanceMatrix(travelTimeReq.get())
+      : Promise.resolve(new TravelTimeResponse({
         duration: "Requires destination",
         travelMode: travelMode,
       }));
 
+    // const content = "";
+    // if ()
+
     GoogleMap.infoWindow = new google.maps.InfoWindow({
-      content: HTMLElementFactory.infoWindow(listing, await getDestination(), travelTime),
+      content: HTMLElementFactory.infoWindow(listing, dest, await travelTime),
       //disableAutoPan: true,
       position: {
         lat: listing.latitude,

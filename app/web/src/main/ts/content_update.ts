@@ -13,6 +13,7 @@ import {registerSuggestionListener} from "./listeners";
 import {GoogleMap} from "./maps";
 import {LatLng} from "@google/maps";
 import LatLngLiteral = google.maps.LatLngLiteral;
+import {None, Option, Some} from "../../../../common/src/main/ts/fp/option";
 
 export function getFlatmatesCriteria(): ListingsRequest {
   return new ListingsRequest({
@@ -26,16 +27,16 @@ export function getFlatmatesCriteria(): ListingsRequest {
   });
 }
 
-export function getDestination(): Promise<LatLngLiteral> {
+export function getDestination(): Option<LatLngLiteral> {
   const searchBar = HTMLElementLocator.getSearchBar()!;
 
   const lat = parseFloat(searchBar.dataset["lat"]!);
   const lng = parseFloat(searchBar.dataset["lng"]!);
 
   if (lat === undefined || Number.isNaN(lat) || lng === undefined || Number.isNaN(lng)) {
-    return Promise.reject(Error("Could not parse destination from search bar"))
+    return new None<LatLngLiteral>();
   } else {
-    return Promise.resolve({
+    return new Some({
       lat: lat,
       lng: lng,
     });
