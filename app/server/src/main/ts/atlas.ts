@@ -5,8 +5,12 @@ import {FlatmatesClient} from "./flatmates/flatmates_client";
 import {
   ClientResponse,
   DistanceMatrixResponse,
+  DistanceMatrixRowElement,
   GoogleMapsClient,
-  PlaceAutocompleteResponse, PlaceDetailsResponse
+  PlaceAutocompleteResponse,
+  PlaceDetailsResponse,
+  TransitMode,
+  TravelMode
 } from "google__maps";
 import {Try, TryCatch} from "common/fp/try";
 import {sys} from "typescript";
@@ -15,15 +19,16 @@ import * as path from "path";
 import hbs from "hbs"
 import {Preconditions} from "../../../../common/src/main/ts/preconditions";
 import {ListingsRequest} from "common/flatmates/listings_request";
-import bodyParser = require("body-parser");
 import {
   PlacesAutocompleteEntry,
   PlacesAutocompleteResult
 } from "../../../../common/src/main/ts/google/places_autocomplete_result";
+import {ListingsResponse} from "../../../../common/src/main/ts/flatmates/listings_response";
 import {
-  FlatmatesListing,
-  ListingsResponse
-} from "../../../../common/src/main/ts/flatmates/listings_response";
+  TravelTimeRequest,
+  TravelTimeResponse
+} from "../../../../common/src/main/ts/google/distance_matrix";
+import bodyParser = require("body-parser");
 
 /**
  * Atlas server instance running on Express middleware
@@ -75,13 +80,6 @@ export class AtlasServer {
       });
     });
 
-    app.get('/gmap', function(req, res){
-      // inject Google Maps Javascript API key into html
-      res.render('gmap', {
-        API_KEY: process.env.MAPS_JAVASCRIPT_API_KEY
-      });
-    });
-
     app.get('/hello', this.helloHandler);
 
     app.get('/flatmates/autocomplete/:query', this.flatmatesAutocompleteHandler);
@@ -89,6 +87,7 @@ export class AtlasServer {
 
     app.get('/google/places-autocomplete/:query', this.googlePlacesAutoCompleteHandler);
 
+    app.post('/google/distance-matrix', this.googleDistanceMatrixHandler)
     app.listen(3000, () => console.log("Listening on port 3000"));
 
     let query = FlatmatesClient.buildAutocompleteRequest("redfer");
@@ -112,6 +111,7 @@ export class AtlasServer {
     } catch (err) {
       res.status(400);
       res.send(err);
+      return;
     }
 
     try {
@@ -161,6 +161,51 @@ export class AtlasServer {
     }
   };
 
+  googleDistanceMatrixHandler = async (req: Request, res: Response) => {
+    let travelTimeRequest: TravelTimeRequest = {} as any;
+    try {
+      travelTimeRequest = new TravelTimeRequest({ ...req.body});
+    } catch (err) {
+      console.error(err);
+      res.status(400);
+      res.send(err);
+      return;
+    }
+    try {
+      const resp = await this.googleMapsClient
+        .distanceMatrix({
+          origins: [{lat: travelTimeRequest.lat1, lng: travelTimeRequest.lng1}],
+          destinations: [{lat: travelTimeRequest.lat2, lng: travelTimeRequest.lng2}],
+          mode: travelTimeRequest.travelMode as TravelMode,
+          transit_mode: [travelTimeRequest.transitMode as TransitMode],
+        }).asPromise();
+      const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
+      if (resp.status == 200) {
+        res.send(
+          new TravelTimeResponse({
+            duration: this.getDuration(result, req.params.travelMode),
+            travelMode: travelTimeRequest.transitMode || travelTimeRequest.travelMode,
+          })
+        );
+      } else {
+        res.status(resp.status);
+        res.send();
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500);
+      res.send(err);
+    }
+  };
+
+  getDuration(travelPlan: DistanceMatrixRowElement, travelMode: string): string {
+    if (travelMode == "driving") {
+      return travelPlan.duration_in_traffic.text
+    } else {
+      return travelPlan.duration.text
+    }
+  }
+
   flatmatesAutocompleteHandler = async (req: Request, res: Response) => {
     const query = req.params.query;
     try {
@@ -189,9 +234,31 @@ export class AtlasServer {
   static isNonEmptyString(val: any): boolean {
     return val !== undefined &&
       val !== null &&
-      typeof(val) == "string" &&
+      typeof(val) === "string" &&
       val.length > 0
   }
+
+  static isLatOrLngCoord(val: any): boolean {
+    return AtlasServer.isNumber(val) && val >= -180 && val <= 180;
+  }
+
+  static isNumber(val: any): boolean {
+    return val !== undefined &&
+      val !== null &&
+      typeof(val) === "number"
+  }
+
+  static isTransitMode(val: any): boolean {
+    return AtlasServer.isNonEmptyString(val) && (val === "bus" || val === "rail");
+  }
+
+  static isTravelMode(val: any): boolean {
+    return AtlasServer.isNonEmptyString(val) &&
+      new Set(['driving', 'walking', 'bicycling', 'transit']).has(val);
+  }
+
+
+
 
   async moveToUnitTest() {
     // TODO(wadejensen) move to unit tests

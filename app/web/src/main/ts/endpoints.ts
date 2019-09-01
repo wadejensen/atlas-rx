@@ -1,6 +1,10 @@
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
 import {ListingsResponse} from "../../../../common/src/main/ts/flatmates/listings_response";
 import {ListingsRequest} from "../../../../common/src/main/ts/flatmates/listings_request";
+import {
+  TravelTimeRequest,
+  TravelTimeResponse
+} from "../../../../common/src/main/ts/google/distance_matrix";
 
 export async function googlePlacesAutocomplete(
   query: string
@@ -10,6 +14,17 @@ export async function googlePlacesAutocomplete(
     headers: {
       "Content-Type": "Accept: application/json",
     },
+  }).then(resp => resp.json());
+}
+
+export async function googleDistanceMatrix(req: TravelTimeRequest): Promise<TravelTimeResponse> {
+  console.warn("Distance matrix request");
+  return fetch(`${window.location}google/distance-matrix`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(req),
   }).then(resp => resp.json());
 }
 
