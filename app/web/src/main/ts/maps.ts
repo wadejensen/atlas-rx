@@ -20,17 +20,14 @@ import {Option} from "../../../../common/src/main/ts/fp/option";
 declare var map: google.maps.Map;
 var map_markers: google.maps.Data.Feature[] = [];
 
-const throttle = new LossyThrottle(1);
-
 export class GoogleMap {
   // a single event listener for info window cards
   static infoWindowListener?: google.maps.MapsEventListener = undefined;
   static infoWindow?: google.maps.InfoWindow = undefined;
   static destinationMarker?: google.maps.Marker = undefined;
 
-  static keepMapUpdated() {
-    map.addListener('bounds_changed',
-      () => throttle.apply(GoogleMap.updateListings));
+  static addEventListener(eventName: string, handler: () => any) {
+    map.addListener(eventName, handler);
   }
 
   static async updateListings(): Promise<void> {

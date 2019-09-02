@@ -1,5 +1,6 @@
 // creates triggers for user interactions which cause changes in PageState
 import {
+  collapseAll,
   collapseExpensiveSearchCriteria,
   collapseSearchCriteria,
   collapseSearchSuggestions, expandExpensiveSearchCriteria,
@@ -14,6 +15,7 @@ import {
 import {HTMLElementLocator} from "./html_elements";
 import {Coord} from "../../../../common/src/main/ts/geo";
 import {GoogleMap} from "./maps";
+import {LossyThrottle} from "./lossy_throttle";
 
 /** Page state machine
  *
@@ -81,6 +83,9 @@ export function setupStateChangeListeners(): void {
 
   HTMLElementLocator.getExpensiveRefineButton().addEventListener("click", expandExpensiveSearchCriteria);
   HTMLElementLocator.getExpensiveSearchButton().addEventListener("click", collapseExpensiveSearchCriteria);
+
+  // when the map is clicked, close all expanded input menus
+  GoogleMap.addEventListener("click", collapseAll);
 }
 
 export function setupContentUpdateListeners() {
@@ -89,7 +94,9 @@ export function setupContentUpdateListeners() {
 }
 
 function setupPopulateMapListener(): void {
-  GoogleMap.keepMapUpdated();
+  const throttle = new LossyThrottle(1);
+  GoogleMap.addEventListener('bounds_changed',
+    () => throttle.apply(GoogleMap.updateListings));
 }
 
 function setupSearchAutocompleteListeners(): void {
