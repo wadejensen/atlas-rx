@@ -1,21 +1,25 @@
-// creates triggers for user interactions which cause changes in PageState
+import {Coord} from "../../../../common/src/main/ts/geo";
+import {GoogleMap} from "./maps";
+import {LossyThrottle} from "./lossy_throttle";
 import {
   collapseAll,
   collapseExpensiveSearchCriteria,
   collapseSearchCriteria,
-  collapseSearchSuggestions, expandExpensiveSearchCriteria,
+  collapseSearchSuggestions,
+  expandExpensiveSearchCriteria,
   expandSearchCriteria,
   expandSearchSuggestions,
-  hideRefineButton,
   interstitialSearchPlaceholder,
   resetSearchPlaceholder,
-  showRefineButton,
-  updateSearchSuggestions,
-} from "./content_update";
-import {HTMLElementLocator} from "./html_elements";
-import {Coord} from "../../../../common/src/main/ts/geo";
-import {GoogleMap} from "./maps";
-import {LossyThrottle} from "./lossy_throttle";
+  updateSearchSuggestions
+} from "./dom/dom_mutation";
+import {
+  getExpensiveRefineButton,
+  getExpensiveSearchButton,
+  getRefineButton,
+  getSearchBar,
+  getSearchButton, getSearchSuggestions
+} from "./dom/dom_element_locator";
 
 /** Page state machine
  *
@@ -23,15 +27,15 @@ import {LossyThrottle} from "./lossy_throttle";
  *      |   browse
  *      |     |
  *      |     ▼
- *      |__ Destination
- *      |   select
- *      |     |
- *      |     ▼
- *      |__ Criteria <-
- *      |   refine    |
- *      |     |       |
- *      |     ▼       |
- *      |__ Refined __|
+ *      |__ Destination <-
+ *      |   select       |
+ *      |     |          |
+ *      |     ▼          |
+ *      |__ Criteria <-  |
+ *      |   refine    |  |
+ *      |     |       |  |
+ *      |     ▼       |  |
+ *      |__ Refined __|__|
  *          browse
  *
  *       Free browse
@@ -61,28 +65,28 @@ import {LossyThrottle} from "./lossy_throttle";
  **/
 
 export function setupStateChangeListeners(): void {
-  HTMLElementLocator.getSearchBar().addEventListener("focusin", () => {
+  getSearchBar().addEventListener("focusin", () => {
     interstitialSearchPlaceholder();
     collapseSearchCriteria();
     collapseExpensiveSearchCriteria();
     expandSearchSuggestions();
   });
 
-  HTMLElementLocator.getSearchButton().addEventListener("click", () => {
+  getSearchButton().addEventListener("click", () => {
     resetSearchPlaceholder();
     collapseSearchSuggestions();
     collapseSearchCriteria();
     GoogleMap.updateListings();
   });
 
-  HTMLElementLocator.getRefineButton().addEventListener("click", () => {
+  getRefineButton().addEventListener("click", () => {
     expandSearchCriteria();
   });
 
-  HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
+  getSearchBar().addEventListener("keyup", updateSearchSuggestions);
 
-  HTMLElementLocator.getExpensiveRefineButton().addEventListener("click", expandExpensiveSearchCriteria);
-  HTMLElementLocator.getExpensiveSearchButton().addEventListener("click", collapseExpensiveSearchCriteria);
+  getExpensiveRefineButton().addEventListener("click", expandExpensiveSearchCriteria);
+  getExpensiveSearchButton().addEventListener("click", collapseExpensiveSearchCriteria);
 
   // when the map is clicked, close all expanded input menus
   GoogleMap.addEventListener("click", collapseAll);
@@ -100,10 +104,10 @@ function setupPopulateMapListener(): void {
 }
 
 function setupSearchAutocompleteListeners(): void {
-  HTMLElementLocator.getSearchBar().addEventListener("keyup", updateSearchSuggestions);
-  HTMLElementLocator.getSearchBar().addEventListener("keyup", (ev: KeyboardEvent) => {
+  getSearchBar().addEventListener("keyup", updateSearchSuggestions);
+  getSearchBar().addEventListener("keyup", (ev: KeyboardEvent) => {
     if (ev.key == "Enter") {
-      const topResult = HTMLElementLocator.getSearchSuggestions()[0] as HTMLParagraphElement;
+      const topResult = getSearchSuggestions()[0] as HTMLParagraphElement;
       const lat = parseFloat(topResult.dataset["lat"]!);
       const lng = parseFloat(topResult.dataset["lng"]!);
 
@@ -117,7 +121,7 @@ export function registerSuggestionListener(suggestion: HTMLParagraphElement): vo
     const target = ev.target as HTMLParagraphElement;
 
     // set search bar content to selected search suggestion
-    const searchBar = HTMLElementLocator.getSearchBar();
+    const searchBar = getSearchBar();
     searchBar.value = target.innerText;
 
     // parse coords from suggestion
