@@ -22,28 +22,28 @@
         <div id="refine-container" class="search-container search-container-hidden">
             <img id="refine-button" class="dark-click refine" src="filter.svg">
             <div id="search-criteria" class="search-criteria-hidden">
-                <div id="search-options" style="padding: 0.35em 1em 0.35em 1em;">
-                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Min Rent ($/w)</div>
+                <div id="search-options" class="search-options">
+                    <div class="form-row">
+                        <div class="search-param">
+                            <div class="param-label">Min Rent</div>
                             <input type="text" id="min-rent" class="parambox" autocomplete="off" placeholder="100" style="color: #333333">
                         </div>
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Max Rent ($/w)</div>
+                        <div class="search-param">
+                            <div class="param-label">Max Rent</div>
                             <input type="text" id="max-rent" class="parambox" autocomplete="off" placeholder="400" style="color: #333333">
                         </div>
                     </div>
-                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Room</div>
+                    <div class="form-row">
+                        <div class="search-param">
+                            <div class="param-label">Room</div>
                             <select id="room-type" name="room-type" class="parambox">
                                 <option value="" selected>All rooms</option>
                                 <option value="private-room">Private room</option>
                                 <option value="shared-room">Room shared with others</option>
                             </select>
                         </div>
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Property</div>
+                        <div class="search-param">
+                            <div class="param-label">Property</div>
                             <select id="furnishing-type" name="furnishing" class="parambox">
                                 <option value="" selected>Any furnishing</option>
                                 <option value="furnished">Furnished room</option>
@@ -51,17 +51,17 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Bathroom</div>
+                    <div class="form-row">
+                        <div class="search-param">
+                            <div class="param-label">Bathroom</div>
                             <select id="bathroom-type" name="bathroom-type" class="parambox">
                                 <option value="" selected>All bathroom types</option>
                                 <option value="ensuite">Ensuite bathroom</option>
                                 <option value="ensuite-or-own">Own bathroom</option>
                             </select>
                         </div>
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Parking</div>
+                        <div class="search-param">
+                            <div class="param-label">Parking</div>
                             <select id="parking-type" name="parking" class="parambox">
                                 <option value="" selected>Any parking</option>
                                 <option value="no-parking">No parking</option>
@@ -71,7 +71,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="search-button-container" style="width: 100%; display: flex; flex-direction: row">
+                <div class="form-row">
                     <button type="button" id="search-button" class="click search-button">
                         Refine search
                     </button>
@@ -84,10 +84,10 @@
                 <img src="filter.svg" style="height: 5vh">
             </div>
             <div id="expensive-search-criteria" class="search-criteria-hidden">
-                <div id="search-options" style="padding: 0.35em 1em 0.35em 1em;">
-                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Travel mode</div>
+                <div id="search-options" class="search-options">
+                    <div class="form-row">
+                        <div class="search-param">
+                            <div class="param-label">Travel mode</div>
                             <select id="travel-mode" name="travel-mode" class="parambox">
                                 <option value="driving" selected>🚗 Driving</option>
                                 <option value="bicycling">🚲 Cycling</option>
@@ -95,8 +95,8 @@
                                 <option value="transit">Public transit️</option>
                             </select>
                         </div>
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Transit mode</div>
+                        <div class="search-param">
+                            <div class="param-label">Transit mode</div>
                             <select id="transit-mode" name="transit-mode" class="parambox">
                                 <option value="" selected>Any</option>
                                 <option value="bus">🚌 Bus</option>
@@ -104,18 +104,18 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row" style="width: 100%; display: flex; flex-direction: row">
-                        <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Min Time (mins) 👑</div>
+                    <div class="form-row">
+                        <div class="search-param">
+                            <div class="param-label">Min Time (mins) 👑</div>
                             <input type="text" id="min-time" class="parambox" autocomplete="off" placeholder="0" style="color: #333333">
                         </div>
                         <div class="search-param" style="width: 50%; padding: 0.35em">
-                            <div style="padding:4px; text-align: left; color: lightcoral">Max Time (mins) 👑 </div>
+                            <div class="param-label">Max Time (mins) 👑 </div>
                             <input type="text" id="max-time" class="parambox" autocomplete="off" placeholder="30" style="color: #333333">
                         </div>
                     </div>
                 </div>
-                <div class="search-button-container" style="width: 100%; display: flex; flex-direction: row">
+                <div class="form-row">
                     <button type="button" id="expensive-search-button" class="click search-button">
                         Refine search
                     </button>
