@@ -37,9 +37,18 @@ html, body {
     text-decoration: none;
 }
 
+#logo-img-wrapper {
+    padding: 0;
+}
+
 .logo {
     height: 4vh;
     width: auto;
+}
+
+#logo-text-wrapper {
+    font-size: xx-large;
+    color: lightcoral;
 }
 
 #navbar-margin {
