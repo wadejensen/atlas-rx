@@ -120,11 +120,12 @@ function updateSearchPlaceholder(placeholder: string): void {
 }
 
 export function showRefineButton() {
-  HTMLElementLocator.getRefineButton().className = "refine";
-}
+  HTMLElementLocator.getRefineButton().classList.remove("refine-hidden");
+  HTMLElementLocator.getRefineButton().classList.add("refine");}
 
 export function hideRefineButton() {
-  HTMLElementLocator.getRefineButton().className = "refine-hidden";
+  HTMLElementLocator.getRefineButton().classList.remove("refine");
+  HTMLElementLocator.getRefineButton().classList.add("refine-hidden");
 }
 
 export function expandExpensiveSearchCriteria() {
@@ -143,11 +144,13 @@ export function collapseExpensiveSearchCriteria(): any {
 }
 
 export function showExpensiveRefineButton() {
-  HTMLElementLocator.getExpensiveRefineButton().className = "refine";
+  HTMLElementLocator.getExpensiveRefineButton().classList.remove("refine-hidden");
+  HTMLElementLocator.getExpensiveRefineButton().classList.add("refine");
 }
 
 export function hideExpensiveRefineButton() {
-  HTMLElementLocator.getExpensiveRefineButton().className = "refine-hidden";
+  HTMLElementLocator.getExpensiveRefineButton().classList.remove("refine");
+  HTMLElementLocator.getExpensiveRefineButton().classList.add("refine-hidden");
 }
 
 export function collapseAll() {

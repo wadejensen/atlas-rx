@@ -6,9 +6,6 @@ html, body {
     margin:0;
     height: 100%;
     overflow: hidden;
-}
-
-html {
     font: 100% Verdana, sans-serif;
 }
 
@@ -25,6 +22,12 @@ html {
     background-color: #333;
 }
 
+.branding {
+    display:flex;
+    align-items:center;
+    width: 25%;
+}
+
 .branding a {
     float: left;
     display: flex;
@@ -34,21 +37,15 @@ html {
     text-decoration: none;
 }
 
+.logo {
+    height: 4vh;
+    width: auto;
+}
+
 #navbar-margin {
     margin-top: 8vh;
     margin-left:8vh;
     margin-right:8vh;
-}
-
-.branding {
-  display:flex;
-  align-items:center;
-  width: 25%;
-}
-
-.logo {
-    height: 4vh;
-    width: auto;
 }
 
 .search-container {
@@ -70,8 +67,6 @@ html {
     width: 100%;
     justify-self: center;
     flex-direction:column;
-    /*align-content: flex-start;*/
-    /*align-items: flex-start;*/
     vertical-align: middle;
     background-color: #f2f2f2;
 }
@@ -218,22 +213,24 @@ input.parambox:focus, select.parambox:focus {
     width:100%;
     white-space:nowrap;
     text-overflow:clip;
-    /*border:none;*/
-    /*border-radius: 0.4em;*/
     margin-top: 0.5em;
     color: #f2f2f2;
     background-color: lightcoral;
     z-index: 3;
     outline: none;
     border: 0.1em solid #F06260;
-    /*border-radius: 0 0 0.4em 0.4em;*/
     box-shadow: 0 0 0.15em 0 #F06260;
 }
 
+/** apply a darker tint to clickable elements on hover **/
 .click:hover {
     filter: brightness(0.95);
 }
 
+/** apply an even darker tint to clickable elements on hover (useful for lig**/
+.dark-click:hover {
+    filter: brightness(0.80);
+}
 
 .info-window {
     display:flex;
@@ -272,10 +269,6 @@ p.info-window-details {
 .refine {
     height: 5vh;
     width: auto;
-}
-
-.refine:hover {
-    filter: brightness(0.80);
 }
 
 .refine-hidden {
