@@ -106,7 +106,7 @@ html, body {
     padding:0.8em;
     border:none;
     border-radius: 0.4em;
-    color: #aaaaaa;
+    color: #646464;
     background-color: #464646;
     z-index: 2;
 }
@@ -154,7 +154,7 @@ input.searchbox:focus, input.parambox:focus, select.parambox {
 
 ::placeholder {
     /*border: 4px solid #646464;*/
-    color: #aaaaaa;
+    color: #8c8c8c;
 }
 
 .search-container-hidden {
