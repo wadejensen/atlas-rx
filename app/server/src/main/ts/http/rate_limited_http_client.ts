@@ -1,7 +1,7 @@
 import {Headers, HTTPClient} from "./http_client";
 import {Request, Response} from "node-fetch";
-import {LosslessThrottle} from "./lossless_throttle";
 import {FetchHTTPClient} from "./fetch_http_client";
+import {LosslessThrottle} from "../lossless_throttle";
 
 export class RateLimitedHTTPClient implements HTTPClient{
   static create({

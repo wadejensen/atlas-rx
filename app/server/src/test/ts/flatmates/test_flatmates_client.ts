@@ -1,26 +1,26 @@
 import {FlatmatesClient} from "../../../main/ts/flatmates/flatmates_client";
 import {Try} from "../../../../../common/src/main/ts/fp/try";
-import {Coord, Geo} from "../../../main/ts/geo";
-import {
-  FlatmatesListingsRequest,
-  ListingsRequest, ListingsRequestBuilder,
-  mapListingsRequest,
-  RoomType,
-  Search
-} from "../../../main/ts/flatmates/listings_request";
-import {FetchHTTPClient} from "../../../main/ts/fetch_http_client";
-import {FlatmatesListing, ListingsResponse} from "../../../main/ts/flatmates/listings_response";
-import {
-  AutocompleteRequest,
-  Completion,
-  Contexts,
-  Fuzzy,
-  LocationSuggest
-} from "../../../main/ts/flatmates/autocomplete_request";
+
 import {
   AutocompleteResponse,
   AutocompleteResult
-} from "../../../main/ts/flatmates/autocomplete_result";
+} from "../../../../../common/src/main/ts/flatmates/autocomplete_result";
+import {
+  FlatmatesListingsRequest,
+  ListingsRequest, mapListingsRequest,
+  RoomType, Search
+} from "../../../../../common/src/main/ts/flatmates/listings_request";
+import {Coord, Geo} from "../../../../../common/src/main/ts/geo";
+import {
+  FlatmatesListing,
+  ListingsResponse
+} from "../../../../../common/src/main/ts/flatmates/listings_response";
+import {
+  AutocompleteRequest,
+  Completion, Contexts, Fuzzy, LocationSuggest
+} from "../../../../../common/src/main/ts/flatmates/autocomplete_request";
+import {FetchHTTPClient} from "../../../main/ts/http/fetch_http_client";
+
 
 const nock = require("nock");
 
@@ -337,17 +337,15 @@ describe("FlatmatesClient", () => {
       maxBudget: 500,
     });
     const flatmatesReq = mapListingsRequest(req);
-    const expected = new FlatmatesListingsRequest(
-      new Search(
-        "rooms",
-        "private-room",
-        null,
-        10,
-        500,
-        "-33.874322,151.194749",
-        "-33.883343,151.209044"
-      )
-    );
+    const expected = new FlatmatesListingsRequest({
+      mode: "rooms",
+      room: "private-room",
+      min_budget: 10,
+      max_budget: 500,
+      top_left: "-33.874322,151.194749",
+      bottom_right: "-33.883343,151.209044",
+    } as any);
+
     expect(flatmatesReq).toStrictEqual(expected);
   });
 

@@ -1,8 +1,9 @@
 //@ts-ignore
+import {FetchHTTPClient} from "../../../main/ts/http/fetch_http_client";
+
 const nock = require("nock");
 
 import fetch, {Request} from "node-fetch";
-import {FetchHTTPClient} from "../../main/ts/fetch_http_client";
 
 describe("FetchHTTPClient", () => {
 

@@ -4,7 +4,6 @@ import {FlatmatesClient} from "./flatmates/flatmates_client";
 
 import {
   ClientResponse,
-  DistanceMatrixResponse,
   DistanceMatrixRowElement,
   GoogleMapsClient,
   PlaceAutocompleteResponse,
@@ -58,13 +57,12 @@ export class AtlasServer {
     // Enable gzip compression of bundles
     app.use(compression());
 
-
     // parse application/x-www-form-urlencoded
     app.use(bodyParser.urlencoded({ extended: false }));
     // parse application/json
     app.use(bodyParser.json());
 
-    // Setup view engine for API key templating
+    // Setup view engine for Google Maps API key templating into HTML
     app.set('view engine', 'html');
     app.engine('html', hbs.__express);
 
@@ -84,16 +82,10 @@ export class AtlasServer {
 
     app.get('/flatmates/autocomplete/:query', this.flatmatesAutocompleteHandler);
     app.post('/flatmates/listings', this.flatmatesGetListingsHandler);
-
     app.get('/google/places-autocomplete/:query', this.googlePlacesAutoCompleteHandler);
+    app.post('/google/distance-matrix', this.googleDistanceMatrixHandler);
 
-    app.post('/google/distance-matrix', this.googleDistanceMatrixHandler)
     app.listen(3000, () => console.log("Listening on port 3000"));
-
-    let query = FlatmatesClient.buildAutocompleteRequest("redfer");
-    let suggestions = await this.flatmatesClient!.autocomplete(query);
-    console.dir(suggestions.query);
-    console.dir(suggestions.results[0]);
   }
 
   helloHandler = (req: Request, res: Response) => {
@@ -255,22 +247,6 @@ export class AtlasServer {
   static isTravelMode(val: any): boolean {
     return AtlasServer.isNonEmptyString(val) &&
       new Set(['driving', 'walking', 'bicycling', 'transit']).has(val);
-  }
-
-
-
-
-  async moveToUnitTest() {
-    // TODO(wadejensen) move to unit tests
-    let resp: ClientResponse<DistanceMatrixResponse> = await this.googleMapsClient
-      .distanceMatrix({
-        origins: [{lat: -33.929988, lng: 151.154641}],
-        destinations: [{lat: -33.885358, lng: 151.211228}],
-        mode: 'transit',
-      })
-      .asPromise();
-
-    console.dir(resp.json.rows[0].elements[0]);
   }
 
   createGoogleMapsClient(apiKey: string): Try<GoogleMapsClient> {

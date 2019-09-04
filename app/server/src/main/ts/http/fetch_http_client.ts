@@ -1,7 +1,7 @@
-import { Preconditions} from "../../../../common/src/main/ts/preconditions";
-import { Async} from "./async";
 import { Headers, HTTPClient} from "./http_client";
 import fetch, { Request, Response } from "node-fetch"
+import {Preconditions} from "../../../../../common/src/main/ts/preconditions";
+import {Async} from "../async";
 
 export class FetchHTTPClient implements HTTPClient {
   private readonly RETRY_LIMIT = 1000;

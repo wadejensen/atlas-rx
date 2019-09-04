@@ -1,23 +1,28 @@
 import {Try, TryCatch} from "../../../../../common/src/main/ts/fp/try";
-import {BoundingBox, Geo} from "common/geo";
-import {HTTPClient} from "../http_client";
 import {Request} from "node-fetch"
 
-import {FetchHTTPClient} from "../fetch_http_client";
-import {AutocompleteResponse, AutocompleteResult} from "common/flatmates/autocomplete_result";
-import {ListingsRequest, ListingsRequestBuilder, mapListingsRequest,} from "common/flatmates/listings_request";
-import {
-  AutocompleteRequest,
-  Completion,
-  Contexts,
-  Fuzzy,
-  LocationSuggest
-} from "common/flatmates/autocomplete_request";
-import {FlatmatesListing, ListingsResponse} from "common/flatmates/listings_response";
-import {setMerge} from "common/set_util";
 import * as Cheerio from "cheerio";
 
-import {RateLimitedHTTPClient} from "../rate_limited_http_client";
+import {HTTPClient} from "../http/http_client";
+import {
+  AutocompleteRequest, Completion, Contexts, Fuzzy,
+  LocationSuggest
+} from "../../../../../common/src/main/ts/flatmates/autocomplete_request";
+import {
+  FlatmatesListing,
+  ListingsResponse
+} from "../../../../../common/src/main/ts/flatmates/listings_response";
+import {BoundingBox, Geo} from "../../../../../common/src/main/ts/geo";
+import {setMerge} from "../../../../../common/src/main/ts/set_util";
+import {RateLimitedHTTPClient} from "../http/rate_limited_http_client";
+import {
+  AutocompleteResponse,
+  AutocompleteResult
+} from "../../../../../common/src/main/ts/flatmates/autocomplete_result";
+import {
+  ListingsRequest,
+  ListingsRequestBuilder, mapListingsRequest
+} from "../../../../../common/src/main/ts/flatmates/listings_request";
 
 export class FlatmatesClient {
   private static readonly BASE_URL: string = "https://flatmates.com.au";
