@@ -1,3 +1,7 @@
+export function getMap(): HTMLDivElement {
+  return document.getElementById('map') as HTMLDivElement;
+}
+
 export function getSearchBar(): HTMLInputElement {
   return document.getElementById("search")! as HTMLInputElement
 }

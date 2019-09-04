@@ -8,12 +8,7 @@
  * Typescript.
  */
 
-function initMap() {
-    /** accesses global declared in index.html */
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -33.873176, lng: 151.208148},
-        zoom: 16,
-        gestureHandling: "cooperative",
-        streetViewControl: false,
-    });
-}
+// declare global map reference to be used across init.js and
+var map;
+
+

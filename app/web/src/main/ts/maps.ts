@@ -16,29 +16,41 @@ import {Option} from "../../../../common/src/main/ts/fp/option";
 import {infoWindow} from "./dom/dom_element_factory";
 import {getDestination, getFlatmatesCriteria} from "./dom/dom_element_reader";
 import {collapseAll} from "./dom/dom_mutation";
+import {getMap} from "./dom/dom_element_locator";
 
-declare var map: google.maps.Map;
-var map_markers: google.maps.Data.Feature[] = [];
-
+// Singleton encapsulating mutations to the state of the Google Map
 export class GoogleMap {
+  private static map: google.maps.Map;
+  // a list of all currently displayed map markers
+  private static map_markers: google.maps.Data.Feature[] = [];
   // state of the event listener for opening info window cards
-  static infoWindowListener?: google.maps.MapsEventListener = undefined;
+  private static infoWindowListener?: google.maps.MapsEventListener = undefined;
   // state of the only allowed info window
-  static infoWindow?: google.maps.InfoWindow = undefined;
+  private static infoWindow?: google.maps.InfoWindow = undefined;
   // state of a single special map marker for the destination
-  static destinationMarker?: google.maps.Marker = undefined;
+  private static destinationMarker?: google.maps.Marker = undefined;
 
-  static addEventListener(eventName: string, handler: () => any) {
-    map.addListener(eventName, handler);
+  static initMap() {
+    GoogleMap.map = new google.maps.Map(getMap(), {
+      center: {lat: -33.873176, lng: 151.208148},
+      zoom: 16,
+      gestureHandling: "cooperative",
+      streetViewControl: false,
+    });
   }
 
+  static addEventListener(eventName: string, handler: () => any) {
+    GoogleMap.map.addListener(eventName, handler);
+  }
+
+  // clear map of markers and replace with fresh flatmates listings
   static async updateListings(): Promise<void> {
     const req = getFlatmatesCriteria();
     const listings = await getFlatmatesListings(req);
     GoogleMap.updateMap(listings.matches);
   }
 
-  // centre map on specified location and place a waypoint to mark coordinate
+  // centre map on specified location and place a waypoint to mark a coordinate
   // as the user's destination
   static setDestination(coord: Coord, zoomLevel: number = 16): void {
     if (GoogleMap.destinationMarker !== undefined) {
@@ -49,14 +61,15 @@ export class GoogleMap {
         lat: coord.lat,
         lng: coord.lon,
       },
-      map: map,
+      map: GoogleMap.map,
       icon: "destination.svg",
     });
 
-    map.setCenter(new LatLng(coord.lat, coord.lon));
-    map.setZoom(zoomLevel)
+    GoogleMap.map.setCenter(new LatLng(coord.lat, coord.lon));
+    GoogleMap.map.setZoom(zoomLevel)
   }
 
+  // replace map markers with new ones based on provided flatmates listings
   private static updateMap(listings: Array<FlatmatesListing>): void {
     GoogleMap.clearMapMarkers();
     listings
@@ -64,12 +77,13 @@ export class GoogleMap {
       .forEach(GoogleMap.addMapMarker);
 
     GoogleMap.setMapMarkerStyle();
-    GoogleMap.infoWindowListener = map.data.addListener('click', GoogleMap.openInfoWindow);
+    GoogleMap.infoWindowListener = GoogleMap.map.data
+      .addListener('click', GoogleMap.openInfoWindow);
   }
 
   private static addMapMarker(marker: Data.Feature): void {
-    map_markers.push(marker);
-    map.data.add(marker);
+    GoogleMap.map_markers.push(marker);
+    GoogleMap.map.data.add(marker);
   }
 
   static createMapMarker(listing: FlatmatesListing): Data.Feature {
@@ -85,8 +99,8 @@ export class GoogleMap {
   }
 
   private static clearMapMarkers() {
-    while (map_markers.length > 0) {
-      map.data.remove(map_markers.pop()!);
+    while (GoogleMap.map_markers.length > 0) {
+      GoogleMap.map.data.remove(GoogleMap.map_markers.pop()!);
     }
     // avoid triggering multiple events when opening info windows
     if (GoogleMap.infoWindowListener != undefined) {
@@ -136,12 +150,12 @@ export class GoogleMap {
         lng: listing.longitude,
       },
     });
-    GoogleMap.infoWindow.open(map);
+    GoogleMap.infoWindow.open(GoogleMap.map);
   };
 
   // bulk apply styling to all existing map markers
   private static setMapMarkerStyle(): void {
-    map.data.setStyle(feature => {
+    GoogleMap.map.data.setStyle(feature => {
       const listing: FlatmatesListing = feature.getProperty("listing");
       return {
         icon: {
@@ -154,7 +168,7 @@ export class GoogleMap {
   // returns the geo bounding box of the current extents of the Google Map
   static getBounds(): Try<BoundingBox> {
     return TryCatch( () => {
-      const bounds = map.getBounds();
+      const bounds = GoogleMap.map.getBounds();
       return Geo.boundingBox(
         new Coord(bounds!.getNorthEast().lat(), bounds!.getNorthEast().lng()),
         new Coord(bounds!.getSouthWest().lat(), bounds!.getSouthWest().lng()),

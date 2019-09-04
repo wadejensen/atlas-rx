@@ -1,27 +1,8 @@
 // @ts-ignore
 import {setupContentUpdateListeners, setupStateChangeListeners} from "./listeners";
-import {googleDistanceMatrix} from "./endpoints";
-import {TravelTimeRequest} from "../../../../common/src/main/ts/google/distance_matrix";
+import {GoogleMap} from "./maps";
 
-/** Page state machine
- *
- *      |-> free
- *      |  browse
- *      |     |
- *      |     ▼
- *      |__ destination <-|
- *      |   select        |
- *      |     |           |
- *      |     ▼           |
- *      |__ criteria      |
- *      |   refine        |
- *      |     |           |
- *      |     ▼           |
- *      |__ refined ______|
- *          browse
- **/
-
-// setup web app dynamic content
+GoogleMap.initMap();
 setupStateChangeListeners();
 setupContentUpdateListeners();
 
