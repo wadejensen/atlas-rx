@@ -38,6 +38,6 @@ export async function getFlatmatesListings(req: ListingsRequest): Promise<Listin
   }).then(resp => resp.json())
 }
 
-export async function hello(): Promise<string> {
-  return fetch(window.location + "hello").then( resp => resp.text())
+export async function health(): Promise<string> {
+  return fetch(window.location + "healthz").then( resp => resp.text())
 }

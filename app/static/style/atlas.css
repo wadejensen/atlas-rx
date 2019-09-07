@@ -111,6 +111,10 @@ html, body {
     z-index: 2;
 }
 
+input.searchbox{
+    color: #aaaaaa;
+}
+
 p.parambox {
     height: auto;
     align-items: center;
