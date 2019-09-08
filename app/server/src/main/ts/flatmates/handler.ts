@@ -8,10 +8,10 @@ import {ListingsRequest} from "../../../../../common/src/main/ts/flatmates/listi
 /**
  * Proxy autocomplete request to flatmates.com.au autocomplete API
  */
-export let flatmatesAutocompleteHandler = async (
+export async function flatmatesAutocompleteHandler (
   flatmatesClient: FlatmatesClient,
   req: Request, res: Response
-) => {
+): Promise<void> {
   const query = req.params.query;
   try {
     Preconditions.checkArgument(isNonEmptyString(query),
@@ -36,11 +36,11 @@ export let flatmatesAutocompleteHandler = async (
  * Chunks up the proxied flatmates request into many smaller requests,
  * with very conservative rate-limiting, and normalise the results.
  */
-export let flatmatesGetListingsHandler = async (
+export async function flatmatesGetListingsHandler(
   flatmatesClient: FlatmatesClient,
   req: Request,
   res: Response
-) => {
+): Promise<void> {
   try {
     // attempt to parse request body
     const flatmatesListingsReq = new ListingsRequest({ ...req.body });
@@ -50,4 +50,4 @@ export let flatmatesGetListingsHandler = async (
     res.status(500);
     res.send(err);
   }
-};
+}

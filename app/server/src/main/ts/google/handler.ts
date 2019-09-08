@@ -20,11 +20,11 @@ import {
 import {Failure, TryCatch} from "../../../../../common/src/main/ts/fp/try";
 import {placeDetails, placesAutocomplete} from "./google_client";
 
-export let googlePlacesAutoCompleteHandler = async (
+export async function googlePlacesAutoCompleteHandler (
   googleMapsClient: GoogleMapsClient,
   req: Request,
   res: Response
-) => {
+): Promise<void> {
   const MAX_SUGGESTIONS = 5;
   const SESSION_TOKEN = "googlePlacesAutoCompleteHandler";
 
@@ -52,14 +52,12 @@ export let googlePlacesAutoCompleteHandler = async (
       strictbounds: true,
     })).slice(0, MAX_SUGGESTIONS);
 
-    //console.warn(autocompleteResults);
-
     const autocompleteEntries = autocompleteResults.map(async (p) => {
       const placeDetailsResp = await placeDetails(googleMapsClient, {
         placeid: p.place_id,
         sessiontoken: SESSION_TOKEN,
       });
-      //console.warn(placeDetailsResp);
+
       return new PlacesAutocompleteEntry(
         p.description,
         placeDetailsResp.result.geometry.location.lat,
@@ -74,13 +72,13 @@ export let googlePlacesAutoCompleteHandler = async (
     res.send(err);
     console.log(err);
   }
-};
+}
 
-export let googleDistanceMatrixHandler = async (
+export async function googleDistanceMatrixHandler (
   googleMapsClient: GoogleMapsClient,
   req: Request,
   res: Response
-) => {
+): Promise<void> {
   let travelTimeRequest: TravelTimeRequest = {} as any;
   try {
     travelTimeRequest = new TravelTimeRequest({ ...req.body});
@@ -115,7 +113,7 @@ export let googleDistanceMatrixHandler = async (
     res.status(500);
     res.send(err);
   }
-};
+}
 
 function getDuration(travelPlan: DistanceMatrixRowElement, travelMode: string): string {
   if (travelMode == "driving") {
