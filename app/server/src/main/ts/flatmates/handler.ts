@@ -8,7 +8,7 @@ import {ListingsRequest} from "../../../../../common/src/main/ts/flatmates/listi
 /**
  * Proxy autocomplete request to flatmates.com.au autocomplete API
  */
-export async function flatmatesAutocompleteHandler (
+export async function flatmatesAutocompleteHandler(
   flatmatesClient: FlatmatesClient,
   req: Request, res: Response
 ): Promise<void> {
