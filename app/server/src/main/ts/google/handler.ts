@@ -1,10 +1,11 @@
 import {Preconditions} from "../../../../../common/src/main/ts/preconditions";
 import {isNonEmptyString} from "../util";
 import {
-  ClientResponse, DistanceMatrixRowElement,
+  DistanceMatrixRowElement,
   GoogleMapsClient,
-  PlaceAutocompleteResponse,
-  PlaceDetailsResponse, TransitMode, TravelMode
+  PlaceAutocompleteResult,
+  TransitMode,
+  TravelMode
 } from "@google/maps";
 import {
   PlacesAutocompleteEntry,
@@ -16,6 +17,8 @@ import {
   TravelTimeRequest,
   TravelTimeResponse
 } from "../../../../../common/src/main/ts/google/distance_matrix";
+import {Failure, TryCatch} from "../../../../../common/src/main/ts/fp/try";
+import {placeDetails, placesAutocomplete} from "./google_client";
 
 export let googlePlacesAutoCompleteHandler = async (
   googleMapsClient: GoogleMapsClient,
@@ -25,63 +28,53 @@ export let googlePlacesAutoCompleteHandler = async (
   const MAX_SUGGESTIONS = 5;
   const SESSION_TOKEN = "googlePlacesAutoCompleteHandler";
 
-  const query = req.params.query;
-  try {
+  const validatedQuery = TryCatch(() => {
+    const query = req.params.query;
     Preconditions.checkArgument(isNonEmptyString(query),
-      "Query param in 'google/places-autocomplete/:query' must be a string of non-zero length");
-  } catch (err) {
+      `Query param in '${req.baseUrl}/:query' must be a string of non-zero length`);
+    return query as string;
+  }).recoverWith((err: Error) => {
     res.status(400);
     res.send(err);
-    return;
-  }
+    return new Failure<string>(err);
+  });
 
   try {
-    const resp: ClientResponse<PlaceAutocompleteResponse> = await googleMapsClient
-      .placesAutoComplete({
-        input: query as string,
+    const autocompleteResults: PlaceAutocompleteResult[] = (await placesAutocomplete(googleMapsClient, {
+      input: validatedQuery.get() as string,
+      sessiontoken: SESSION_TOKEN,
+      // approx centroid of Australia
+      location: {
+        lat: -23.867645,
+        lng: 133.328079,
+      },
+      radius: 3000 * 1000,
+      strictbounds: true,
+    })).slice(0, MAX_SUGGESTIONS);
+
+    //console.warn(autocompleteResults);
+
+    const autocompleteEntries = autocompleteResults.map(async (p) => {
+      const placeDetailsResp = await placeDetails(googleMapsClient, {
+        placeid: p.place_id,
         sessiontoken: SESSION_TOKEN,
-        // approx centroid of Australia
-        location: {
-          lat: -23.867645,
-          lng: 133.328079,
-        },
-        radius: 3000 * 1000,
-        strictbounds: true
-      }).asPromise();
-    if (resp.status == 200) {
-      const rawPredictions = resp
-        .json
-        .predictions
-        .slice(0, MAX_SUGGESTIONS);
-
-      // TODO(wadejensen) find an appropriate monad to model / collapse
-      //  the nested failure case of the placeId lookup.
-      const suggestions: PlacesAutocompleteResult = new PlacesAutocompleteResult(
-        await Promise.all(rawPredictions.map(async (p) => {
-          const rresp: ClientResponse<PlaceDetailsResponse> = await googleMapsClient.place({
-            placeid: p.place_id,
-            sessiontoken: SESSION_TOKEN
-          }).asPromise();
-
-          return new PlacesAutocompleteEntry(
-            p.description,
-            rresp.json.result.geometry.location.lat,
-            rresp.json.result.geometry.location.lng
-          );
-        })),
+      });
+      //console.warn(placeDetailsResp);
+      return new PlacesAutocompleteEntry(
+        p.description,
+        placeDetailsResp.result.geometry.location.lat,
+        placeDetailsResp.result.geometry.location.lng,
       );
-      res.send(suggestions);
-    } else {
-      res.status(resp.status);
-      res.send();
-    }
-  } catch (e) {
+    });
+    res.send(new PlacesAutocompleteResult(
+      await Promise.all(autocompleteEntries))
+    );
+  } catch (err) {
     res.status(500);
-    res.send(e);
-    console.log(e);
+    res.send(err);
+    console.log(err);
   }
 };
-
 
 export let googleDistanceMatrixHandler = async (
   googleMapsClient: GoogleMapsClient,

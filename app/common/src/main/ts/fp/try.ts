@@ -96,6 +96,11 @@ export abstract class Try<T> {
    * This is like `flatMap` for the exception.
    */
   abstract recoverWith(f: (error: Error) => Try<T>): Try<T>;
+
+  /**
+   * Convert Try<T> to Promise<T>
+   */
+  abstract promise(): Promise<T>
 }
 
 export class Success<T> extends Try<T> {
@@ -158,6 +163,10 @@ export class Success<T> extends Try<T> {
   recoverWith(fn: (error: Error) => Try<T>): Try<T> {
     return this;
   }
+
+  promise(): Promise<T> {
+    return Promise.resolve(this.value);
+  }
 }
 
 export class Failure<T> extends Try<T> {
@@ -216,5 +225,9 @@ export class Failure<T> extends Try<T> {
     catch (e) {
       return new Failure<T>(this.error);
     }
+  }
+
+  promise(): Promise<T> {
+    return Promise.reject(this.error);
   }
 }
