@@ -1,5 +1,5 @@
 terraform {
-  required_version = "0.11.7"
+  required_version = "0.12.6"
 }
 
 variable "region" {}
@@ -8,14 +8,19 @@ variable "az" {}
 
 provider "aws" {
   region = "${var.region}"
+  version = "2.21.1"
 }
 
 variable "enabled" {
-  default = 0
+  default = false
+}
+
+locals {
+  count = "${var.enabled ? 1 : 0}"
 }
 
 resource "aws_vpc" "main" {
-  count = "${var.enabled}"
+  count = local.count
   cidr_block = "10.0.0.0/16"
   enable_dns_hostnames = true
   tags = {
@@ -24,44 +29,44 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_internet_gateway" "gw" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[count.index].id}"
 }
 
 resource "aws_route_table" "public" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[count.index].id}"
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.gw.id}"
+    gateway_id = "${aws_internet_gateway.gw[count.index].id}"
   }
 }
 
 resource "aws_eip" "nat" {
-  count = "${var.enabled}"
+  count = local.count
   vpc = "true"
 }
 
 resource "aws_nat_gateway" "nat" {
-  count = "${var.enabled}"
-  allocation_id = "${aws_eip.nat.id}"
-  subnet_id = "${aws_subnet.public.id}"
+  count = local.count
+  allocation_id = "${aws_eip.nat[count.index].id}"
+  subnet_id = "${aws_subnet.public[count.index].id}"
 }
 
 resource "aws_route_table" "private" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[count.index].id}"
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = "${aws_nat_gateway.nat.id}"
+    nat_gateway_id = "${aws_nat_gateway.nat[count.index].id}"
   }
 }
 
 resource "aws_subnet" "public" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[local.count -1].id}"
   cidr_block = "10.0.0.0/24"
   availability_zone = "${var.az}"
   map_public_ip_on_launch = true
@@ -71,14 +76,14 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = "${var.enabled}"
-  subnet_id = "${aws_subnet.public.id}"
-  route_table_id = "${aws_route_table.public.id}"
+  count = local.count
+  subnet_id = "${aws_subnet.public[count.index].id}"
+  route_table_id = "${aws_route_table.public[count.index].id}"
 }
 
 resource "aws_subnet" "private" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[count.index].id}"
   cidr_block = "10.0.1.0/24"
   availability_zone = "${var.az}"
   tags = {
@@ -87,14 +92,14 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_route_table_association" "private_aa" {
-  count = "${var.enabled}"
-  subnet_id = "${aws_subnet.private.id}"
-  route_table_id = "${aws_route_table.private.id}"
+  count = local.count
+  subnet_id = "${aws_subnet.private[count.index].id}"
+  route_table_id = "${aws_route_table.private[local.count -1].id}"
 }
 
 resource "aws_security_group" "atlas_public" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[local.count -1].id}"
   name = "atlas.public"
   description = "atlas public subnet access"
 
@@ -132,8 +137,8 @@ resource "aws_security_group" "atlas_public" {
 }
 
 resource "aws_security_group" "atlas_private" {
-  count = "${var.enabled}"
-  vpc_id = "${aws_vpc.main.id}"
+  count = local.count
+  vpc_id = "${aws_vpc.main[local.count -1].id}"
   name = "atlas"
   description = "atlas private subnet access"
 
@@ -151,7 +156,7 @@ resource "aws_security_group" "atlas_private" {
     to_port = 3000
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.atlas_public.id}"
+      "${aws_security_group.atlas_public[local.count -1].id}"
     ]
   }
 

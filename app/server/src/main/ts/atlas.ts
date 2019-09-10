@@ -19,6 +19,7 @@ export class AtlasServer {
   constructor() {}
   private flatmatesClient!: FlatmatesClient;
   private googleMapsClient!: GoogleMapsClient;
+  private mapsJavascriptAPIKey!: string;
 
   async start() {
     // Create API clients
@@ -26,9 +27,14 @@ export class AtlasServer {
       this.flatmatesClient = await FlatmatesClient.create();
       console.info("flatmates.com.au API client created successfully");
       this.googleMapsClient = createGoogleMapsClient(
-        process.env.DISTANCE_MATRIX_API_KEY as string
+        process.env.MAPS_SERVER_API_KEY as string
       ).get();
       console.info("Google Maps API client created successfully");
+      if (process.env.MAPS_JAVASCRIPT_API_KEY) {
+        this.mapsJavascriptAPIKey = process.env.MAPS_JAVASCRIPT_API_KEY;
+      } else {
+        throw new Error("MAPS_JAVASCRIPT_API_KEY environment variable not defined")
+      }
     } catch (e) {
       console.error("Failed to initialize API clients: " + e);
       sys.exit(1);
@@ -54,10 +60,10 @@ export class AtlasServer {
     app.use('/', express.static(path.join(__dirname + '/static')));
     app.set('views', path.join(__dirname + '/static/views'));
 
-    app.get('/', function(req, res){
+    app.get('/', (req: Request, res: Response) => {
       // inject Google Maps Javascript API key into html
       res.render('index', {
-        API_KEY: process.env.MAPS_JAVASCRIPT_API_KEY
+        API_KEY: this.mapsJavascriptAPIKey,
       });
     });
 

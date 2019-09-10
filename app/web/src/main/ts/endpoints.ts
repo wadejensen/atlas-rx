@@ -14,7 +14,8 @@ export async function googlePlacesAutocomplete(
     headers: {
       "Content-Type": "Accept: application/json",
     },
-  }).then(resp => resp.json());
+  }).then(resp => resp.json())
+    .catch(err => console.error(err));
 }
 
 export async function googleDistanceMatrix(req: TravelTimeRequest): Promise<TravelTimeResponse> {
@@ -25,7 +26,8 @@ export async function googleDistanceMatrix(req: TravelTimeRequest): Promise<Trav
       "Content-Type": "application/json",
     },
     body: JSON.stringify(req),
-  }).then(resp => resp.json());
+  }).then(resp => resp.json())
+    .catch(err => console.error(err));
 }
 
 export async function getFlatmatesListings(req: ListingsRequest): Promise<ListingsResponse> {
@@ -36,8 +38,9 @@ export async function getFlatmatesListings(req: ListingsRequest): Promise<Listin
     },
     body: JSON.stringify(req),
   }).then(resp => resp.json())
+    .catch(err => console.error(err));
 }
 
 export async function health(): Promise<string> {
-  return fetch(window.location + "healthz").then( resp => resp.text())
+  return fetch(window.location + "healthz").then( resp => resp.text());
 }

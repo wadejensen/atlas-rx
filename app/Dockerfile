@@ -6,8 +6,7 @@ COPY . /work/
 RUN npm install
 RUN npm run package
 
-FROM node:12-alpine
-COPY --from=BUILD_ENV /work/dist/ /app/dist
-COPY --from=BUILD_ENV /work/static/ /app/static
+#FROM gcr.io/distroless/nodejs
+#COPY --from=BUILD_ENV /work/dist /app
 
-CMD ["node", "/app/dist/index.js"]
+CMD ["node", "/app/index.js"]

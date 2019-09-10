@@ -20,6 +20,12 @@ import {
 import {Failure, TryCatch} from "../../../../../common/src/main/ts/fp/try";
 import {placeDetails, placesAutocomplete} from "./google_client";
 
+/**
+ * Combines places autocomplete API and
+ * @param googleMapsClient
+ * @param req
+ * @param res
+ */
 export async function googlePlacesAutoCompleteHandler (
   googleMapsClient: GoogleMapsClient,
   req: Request,
