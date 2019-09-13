@@ -6,7 +6,7 @@ COPY . /work/
 RUN npm install
 RUN npm run package
 
-#FROM gcr.io/distroless/nodejs
-#COPY --from=BUILD_ENV /work/dist /app
+FROM gcr.io/distroless/nodejs
+COPY --from=BUILD_ENV /work/dist /app
 
-CMD ["node", "/app/index.js"]
+CMD ["/app/index.js"]
