@@ -13,7 +13,7 @@ import {
 import {Coord, Geo} from "../../../../../common/src/main/ts/geo";
 import {
   FlatmatesListing,
-  ListingsResponse
+  FlatmatesListingsResponse
 } from "../../../../../common/src/main/ts/flatmates/listings_response";
 import {
   AutocompleteRequest,
@@ -279,7 +279,7 @@ describe("FlatmatesClient", () => {
         'non_matches': [],
       });
 
-    const expected = new ListingsResponse({
+    const expected = new FlatmatesListingsResponse({
       matches: [new FlatmatesListing({
         head: 'Sydney, Sydney',
         subheading: 'Furnished room with own bathroom',
@@ -298,7 +298,7 @@ describe("FlatmatesClient", () => {
     try {
       // dynamically retrieve private method
       let doGetFlatmatesListings = (flatmatesClient as any).doGetFlatmatesListings
-      const resp: ListingsResponse = await doGetFlatmatesListings(req);
+      const resp: FlatmatesListingsResponse = await doGetFlatmatesListings(req);
       expect(resp).toStrictEqual(expected);
     } catch (e) {
       console.error(e);

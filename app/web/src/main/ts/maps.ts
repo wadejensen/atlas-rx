@@ -4,12 +4,15 @@ import {} from "googlemaps";
 import {BoundingBox, Coord, Geo} from "../../../../common/src/main/ts/geo";
 import {Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
 import LatLng = google.maps.LatLng;
-import {FlatmatesListing} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {
+  FlatmatesListing,
+  Listing
+} from "../../../../common/src/main/ts/flatmates/listings_response";
 import Data = google.maps.Data;
 import {getFlatmatesListings, googleDistanceMatrix} from "./endpoints";
 import {
   TravelTimeRequest,
-  TravelTimeResponse
+  TravelTime
 } from "../../../../common/src/main/ts/google/distance_matrix";
 import {LatLngLiteral} from "@google/maps";
 import {Option} from "../../../../common/src/main/ts/fp/option";
@@ -70,7 +73,7 @@ export class GoogleMap {
   }
 
   // replace map markers with new ones based on provided flatmates listings
-  private static updateMap(listings: Array<FlatmatesListing>): void {
+  private static updateMap(listings: Array<Listing>): void {
     GoogleMap.clearMapMarkers();
     listings
       .map(GoogleMap.createMapMarker)
@@ -86,11 +89,11 @@ export class GoogleMap {
     GoogleMap.map.data.add(marker);
   }
 
-  static createMapMarker(listing: FlatmatesListing): Data.Feature {
+  static createMapMarker(listing: Listing): Data.Feature {
     return new Data.Feature({
       geometry: {
-        lat: listing.latitude,
-        lng: listing.longitude,
+        lat: listing.location.latitude,
+        lng: listing.location.longitude,
       },
       properties: {
         listing: listing,
@@ -117,7 +120,7 @@ export class GoogleMap {
       GoogleMap.infoWindow.close();
     }
 
-    const listing: FlatmatesListing = event.feature.getProperty("listing");
+    const listing: Listing = event.feature.getProperty("listing");
     //TODO(wadejensen) getTravelCriteria
     const travelMode = "transit";
     const transitMode = "bus";
@@ -128,26 +131,23 @@ export class GoogleMap {
     const travelTimeReq: Option<TravelTimeRequest> = dest.map(d => new TravelTimeRequest({
       travelMode: travelMode,
       transitMode: transitMode,
-      lat1: listing.latitude,
-      lng1: listing.longitude,
+      lat1: listing.location.latitude,
+      lng1: listing.location.longitude,
       lat2: d.lat,
       lng2: d.lng,
     }));
 
     // switching from Option to Promise monad to handle async distance matrix request
-    const travelTime = !travelTimeReq.isEmpty()
+    const travelTime: Promise<TravelTime | undefined> = !travelTimeReq.isEmpty()
       ? googleDistanceMatrix(travelTimeReq.get())
-      : Promise.resolve(new TravelTimeResponse({
-        duration: "Requires destination",
-        travelMode: travelMode,
-      }));
+      : Promise.resolve(undefined);
 
     GoogleMap.infoWindow = new google.maps.InfoWindow({
       content: infoWindow(listing, dest, await travelTime),
       //disableAutoPan: true,
       position: {
-        lat: listing.latitude,
-        lng: listing.longitude,
+        lat: listing.location.latitude,
+        lng: listing.location.longitude,
       },
     });
     GoogleMap.infoWindow.open(GoogleMap.map);
@@ -156,10 +156,10 @@ export class GoogleMap {
   // bulk apply styling to all existing map markers
   private static setMapMarkerStyle(): void {
     GoogleMap.map.data.setStyle(feature => {
-      const listing: FlatmatesListing = feature.getProperty("listing");
+      const listing: Listing = feature.getProperty("listing");
       return {
         icon: {
-          url: `${orangeMarkerIcon(listing.rent[0])}`,
+          url: `${orangeMarkerIcon(listing.location.rent)}`,
         }
       };
     });

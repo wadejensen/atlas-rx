@@ -30,18 +30,26 @@ export class TravelTimeRequest {
   }
 }
 
-export class TravelTimeResponse {
-  readonly duration: string;
+export class TravelTime {
+  readonly duration: number;
+  readonly durationDisplay: string;
   readonly travelMode: string;
+  readonly transitMode?: string;
 
   constructor({
       duration,
+      durationDisplay,
       travelMode,
+      transitMode,
   }: {
-      duration: string,
-      travelMode: string,
+    duration: number,
+    durationDisplay: string,
+    travelMode: string,
+    transitMode?: string,
   }) {
     this.duration = duration;
+    this.durationDisplay = durationDisplay;
     this.travelMode = travelMode;
+    this.transitMode = transitMode;
   }
 }

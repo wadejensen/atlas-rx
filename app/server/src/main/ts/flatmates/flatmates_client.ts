@@ -10,7 +10,7 @@ import {
 } from "../../../../../common/src/main/ts/flatmates/autocomplete_request";
 import {
   FlatmatesListing,
-  ListingsResponse
+  FlatmatesListingsResponse
 } from "../../../../../common/src/main/ts/flatmates/listings_response";
 import {BoundingBox, Geo} from "../../../../../common/src/main/ts/geo";
 import {setMerge} from "../../../../../common/src/main/ts/set_util";
@@ -120,7 +120,7 @@ export class FlatmatesClient {
       }
   };
 
-  private doGetFlatmatesListings: (req: ListingsRequest) => Promise<ListingsResponse> =
+  private doGetFlatmatesListings: (req: ListingsRequest) => Promise<FlatmatesListingsResponse> =
     async (req: ListingsRequest) => {
       const flatmatesReq = mapListingsRequest(req);
       let request = new Request(FlatmatesClient.BASE_URL + "/map_markers",
@@ -149,11 +149,11 @@ export class FlatmatesClient {
   /**
    * Attempt to parse map_markers response json into a ListingsResponse
    */
-  private static parseListingsResponse(obj: any): Try<ListingsResponse> {
+  private static parseListingsResponse(obj: any): Try<FlatmatesListingsResponse> {
     return TryCatch( () => {
       let matches: Array<any> = obj["matches"];
       let nonMatches: Array<any> = obj["non_matches"];
-      return new ListingsResponse({
+      return new FlatmatesListingsResponse({
         matches: matches.map(json => new FlatmatesListing({...json})),
         non_matches: nonMatches.map(json => new FlatmatesListing({...json})),
       });

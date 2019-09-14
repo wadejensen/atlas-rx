@@ -15,7 +15,7 @@ import {
 import {Request, Response} from "express";
 import {
   TravelTimeRequest,
-  TravelTimeResponse
+  TravelTime
 } from "../../../../../common/src/main/ts/google/distance_matrix";
 import {Failure, TryCatch} from "../../../../../common/src/main/ts/fp/try";
 import {placeDetails, placesAutocomplete} from "./google_client";
@@ -105,9 +105,11 @@ export async function googleDistanceMatrixHandler (
     const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
     if (resp.status == 200) {
       res.send(
-        new TravelTimeResponse({
-          duration: getDuration(result, req.params.travelMode),
-          travelMode: travelTimeRequest.transitMode || travelTimeRequest.travelMode,
+        new TravelTime({
+          duration: getDurationValue(result, req.params.travelMode),
+          durationDisplay: getDurationDisplay(result, req.params.travelMode),
+          travelMode: travelTimeRequest.travelMode,
+          transitMode: travelTimeRequest.transitMode,
         })
       );
     } else {
@@ -121,7 +123,15 @@ export async function googleDistanceMatrixHandler (
   }
 }
 
-function getDuration(travelPlan: DistanceMatrixRowElement, travelMode: string): string {
+function getDurationValue(travelPlan: DistanceMatrixRowElement, travelMode: string): number {
+  if (travelMode == "driving") {
+    return travelPlan.duration_in_traffic.value
+  } else {
+    return travelPlan.duration.value
+  }
+}
+
+function getDurationDisplay(travelPlan: DistanceMatrixRowElement, travelMode: string): string {
   if (travelMode == "driving") {
     return travelPlan.duration_in_traffic.text
   } else {

@@ -2,8 +2,13 @@ import {Request, Response} from "express";
 import {Preconditions} from "../../../../../common/src/main/ts/preconditions";
 import {FlatmatesClient} from "./flatmates_client";
 import {isNonEmptyString} from "../util";
-import {ListingsResponse} from "../../../../../common/src/main/ts/flatmates/listings_response";
+import {
+  FlatmatesListing,
+  Listing, ListingLocation,
+  ListingsResponse
+} from "../../../../../common/src/main/ts/flatmates/listings_response";
 import {ListingsRequest} from "../../../../../common/src/main/ts/flatmates/listings_request";
+import {TravelTime} from "../../../../../common/src/main/ts/google/distance_matrix";
 
 /**
  * Proxy autocomplete request to flatmates.com.au autocomplete API
@@ -44,10 +49,30 @@ export async function flatmatesGetListingsHandler(
   try {
     // attempt to parse request body
     const flatmatesListingsReq = new ListingsRequest({ ...req.body });
-    const listings = await flatmatesClient.getFlatmatesListings(flatmatesListingsReq, 0);
-    res.send(new ListingsResponse({ matches: Array.from(listings), non_matches: [] }));
+    const flatmatesListings = await flatmatesClient.getFlatmatesListings(flatmatesListingsReq, 0);
+
+    const travelTime: TravelTime | undefined = undefined;
+    const listings = Array.from(flatmatesListings).map(fml => toListing(fml, travelTime));
+    res.send(new ListingsResponse(listings));
   } catch (err) {
     res.status(500);
     res.send(err);
   }
+}
+
+function toListing(
+  fml: FlatmatesListing,
+  travelTime?: TravelTime
+): Listing {
+  return new Listing({
+    listingLocation: new ListingLocation({
+      latitude: fml.latitude,
+      longitude: fml.longitude,
+      rent: fml.rent[0],
+      subheading: fml.subheading,
+      listingLink: fml.listing_link,
+      photo: fml.photo,
+    }),
+    travelTime,
+  });
 }

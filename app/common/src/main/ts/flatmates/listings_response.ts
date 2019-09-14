@@ -1,4 +1,48 @@
+import {TravelTime} from "../google/distance_matrix";
+
 export class ListingsResponse {
+  constructor(readonly matches: Array<Listing>) {}
+}
+
+export class Listing {
+  readonly location: ListingLocation;
+  readonly traveTime?: TravelTime;
+
+  constructor(opts: {
+    listingLocation: ListingLocation,
+    travelTime?: TravelTime,
+  }) {
+    this.location = opts.listingLocation;
+    this.traveTime = opts.travelTime;
+  }
+}
+
+export class ListingLocation {
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly rent: number;
+  readonly subheading: string;
+  readonly listingLink: string;
+  readonly photo: string;
+
+  constructor(opts: {
+    latitude: number,
+    longitude: number,
+    rent: number,
+    subheading: string,
+    listingLink: string,
+    photo: string,
+  }) {
+    this.latitude = opts.latitude;
+    this.longitude = opts.longitude;
+    this.rent = opts.rent;
+    this.subheading = opts.subheading;
+    this.listingLink = opts.listingLink;
+    this.photo = opts.photo;
+  }
+}
+
+export class FlatmatesListingsResponse {
   readonly matches: Array<FlatmatesListing>;
   readonly non_matches: Array<FlatmatesListing>;
 
