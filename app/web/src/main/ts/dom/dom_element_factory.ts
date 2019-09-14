@@ -65,18 +65,18 @@ function travelModeIcon(
   transitMode: TransitMode | undefined
 ): string {
   if (travelMode === undefined || travelMode == "driving") {
-    return "car emoji";
-  } else if (travelMode === "walking") {
-    return "walking emoji";
+    return "🚗";
   } else if (travelMode === "bicycling") {
-    return "cycling emoji";
+    return "🚲";
+  } else if (travelMode === "walking") {
+    return "🚶";
   } else if (travelMode === "transit") {
     if (transitMode === undefined) {
-      return "bus train ferry emojis"
+      return "🚈🚌⛴"
     } else if (transitMode === "rail") {
-        return "rail emoji";
+        return "🚈";
     } else if (transitMode === "bus") {
-        return "bus emoji";
+        return "🚌";
     } else {
       throw new Error(`Unrecognised transit mode: ${transitMode}`);
     }
