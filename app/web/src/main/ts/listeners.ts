@@ -12,7 +12,7 @@ import {
   interstitialSearchPlaceholder,
   resetSearchPlaceholder,
   updateSearchSuggestions
-} from "./dom/dom_mutation";
+} from "./dom/dom_mutator";
 import {
   getExpensiveRefineButton,
   getExpensiveSearchButton,
@@ -74,8 +74,7 @@ export function setupStateChangeListeners(): void {
 
   getSearchButton().addEventListener("click", () => {
     resetSearchPlaceholder();
-    collapseSearchSuggestions();
-    collapseSearchCriteria();
+    collapseAll();
     GoogleMap.updateListings();
   });
 
@@ -86,7 +85,10 @@ export function setupStateChangeListeners(): void {
   getSearchBar().addEventListener("keyup", updateSearchSuggestions);
 
   getExpensiveRefineButton().addEventListener("click", expandExpensiveSearchCriteria);
-  getExpensiveSearchButton().addEventListener("click", collapseExpensiveSearchCriteria);
+  getExpensiveSearchButton().addEventListener("click", () => {
+    collapseAll();
+    GoogleMap.updateListings();
+  });
 
   // when the map is clicked, close all expanded input menus
   GoogleMap.addEventListener("click", collapseAll);

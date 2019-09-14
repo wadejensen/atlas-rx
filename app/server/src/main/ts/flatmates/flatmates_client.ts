@@ -5,7 +5,10 @@ import * as Cheerio from "cheerio";
 
 import {HTTPClient} from "../http/http_client";
 import {
-  AutocompleteRequest, Completion, Contexts, Fuzzy,
+  AutocompleteRequest,
+  Completion,
+  Contexts,
+  Fuzzy,
   LocationSuggest
 } from "../../../../../common/src/main/ts/flatmates/autocomplete_request";
 import {
@@ -21,8 +24,9 @@ import {
 } from "../../../../../common/src/main/ts/flatmates/autocomplete_result";
 import {
   ListingsRequest,
-  ListingsRequestBuilder, mapListingsRequest
-} from "../../../../../common/src/main/ts/flatmates/listings_request";
+  ListingsRequestBuilder,
+  mapListingsRequest
+} from "../../../../../common/src/main/ts/listing";
 
 export class FlatmatesClient {
   private static readonly BASE_URL: string = "https://flatmates.com.au";

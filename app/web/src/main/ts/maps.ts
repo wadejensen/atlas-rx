@@ -1,25 +1,22 @@
-import { Preconditions } from "common/preconditions";
+import {Preconditions} from "common/preconditions";
 
 import {} from "googlemaps";
 import {BoundingBox, Coord, Geo} from "../../../../common/src/main/ts/geo";
 import {Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
-import LatLng = google.maps.LatLng;
-import {
-  FlatmatesListing,
-  Listing
-} from "../../../../common/src/main/ts/flatmates/listings_response";
-import Data = google.maps.Data;
-import {getFlatmatesListings, googleDistanceMatrix} from "./endpoints";
-import {
-  TravelTimeRequest,
-  TravelTime
-} from "../../../../common/src/main/ts/google/distance_matrix";
+import {Listing} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {getListings, googleDistanceMatrix} from "./endpoints";
+import {TravelTime, TravelTimeRequest} from "../../../../common/src/main/ts/google/distance_matrix";
 import {LatLngLiteral} from "@google/maps";
 import {Option} from "../../../../common/src/main/ts/fp/option";
 import {infoWindow} from "./dom/dom_element_factory";
-import {getDestination, getFlatmatesCriteria} from "./dom/dom_element_reader";
-import {collapseAll} from "./dom/dom_mutation";
+import {getDestination, getExpensiveCriteria, getFreeCriteria} from "./dom/dom_element_reader";
+import {collapseAll} from "./dom/dom_mutator";
 import {getMap} from "./dom/dom_element_locator";
+import {ListingsRequest} from "../../../../common/src/main/ts/listing";
+import LatLng = google.maps.LatLng;
+import Data = google.maps.Data;
+
+const DISTANCE_MATRIX_REQUEST_COST = 0.01;
 
 // Singleton encapsulating mutations to the state of the Google Map
 export class GoogleMap {
@@ -48,9 +45,24 @@ export class GoogleMap {
 
   // clear map of markers and replace with fresh flatmates listings
   static async updateListings(): Promise<void> {
-    const req = getFlatmatesCriteria();
-    const listings = await getFlatmatesListings(req);
+    const freeReq: ListingsRequest = getFreeCriteria();
+    const listings = await getListings(freeReq);
     GoogleMap.updateMap(listings.matches);
+
+    // check if user has specified any expensive criteria and warn them before proceeding
+    const expensiveReq: ListingsRequest = getExpensiveCriteria();
+    if (expensiveReq.minTime !== undefined || expensiveReq.maxTime !== undefined) {
+      const numDestinations = GoogleMap.map_markers.length;
+      const cost = (numDestinations * DISTANCE_MATRIX_REQUEST_COST).toFixed(2);
+      if (window.confirm(`
+You are about to trigger an API request that will cost $${cost}.
+Are you sure you wish to proceed?
+`)) {
+        GoogleMap.map_markers.forEach(() => console.warn("Distance matrix request"));
+        const filteredListings = await getListings(expensiveReq);
+        GoogleMap.updateMap(filteredListings.matches);
+      }
+    }
   }
 
   // centre map on specified location and place a waypoint to mark a coordinate

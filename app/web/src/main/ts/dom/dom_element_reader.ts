@@ -1,15 +1,16 @@
-import {LatLngLiteral} from "@google/maps";
+import {LatLngLiteral, TransitMode, TravelMode} from "@google/maps";
 import {
   BathroomType,
   FurnishingType,
-  ListingsRequest, ParkingType,
+  ParkingType,
   RoomType
 } from "../../../../../common/src/main/ts/flatmates/listings_request";
 import {getSearchBar} from "./dom_element_locator";
 import {None, Option, Some} from "../../../../../common/src/main/ts/fp/option";
 import {GoogleMap} from "../maps";
+import {ListingsRequest} from "../../../../../common/src/main/ts/listing";
 
-export function getFlatmatesCriteria(): ListingsRequest {
+export function getFreeCriteria(): ListingsRequest {
   return new ListingsRequest({
     boundingBox: GoogleMap.getBounds().get(),
     minBudget: parseInt(getInputFieldValue("min-rent")) || undefined,
@@ -18,6 +19,22 @@ export function getFlatmatesCriteria(): ListingsRequest {
     furnishingType: getInputFieldValue("furnishing-type") as FurnishingType || undefined,
     bathroomType: getInputFieldValue("bathroom-type") as BathroomType || undefined,
     parkingType: getInputFieldValue("parking-type") as ParkingType || undefined,
+  });
+}
+
+export function getExpensiveCriteria(): ListingsRequest {
+  return new ListingsRequest({
+    boundingBox: GoogleMap.getBounds().get(),
+    minBudget: parseInt(getInputFieldValue("min-rent")) || undefined,
+    maxBudget: parseInt(getInputFieldValue("max-rent")) || undefined,
+    roomType: getInputFieldValue("room-type") as RoomType || undefined,
+    furnishingType: getInputFieldValue("furnishing-type") as FurnishingType || undefined,
+    bathroomType: getInputFieldValue("bathroom-type") as BathroomType || undefined,
+    parkingType: getInputFieldValue("parking-type") as ParkingType || undefined,
+    travelMode: getInputFieldValue("travel-mode") as TravelMode || undefined,
+    transitMode: getInputFieldValue("transit-mode") as TransitMode || undefined,
+    minTime: parseInt(getInputFieldValue("min-time")) || undefined,
+    maxTime: parseInt(getInputFieldValue("max-time")) || undefined,
   });
 }
 
