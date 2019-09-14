@@ -58,8 +58,9 @@ export function expandSearchCriteria() {
 export function collapseSearchCriteria(): any {
   let searchCriteria = getSearchCriteria();
   searchCriteria.className = "search-criteria-hidden";
-  searchCriteria.parentElement!.classList.add("search-container-hidden")
+  searchCriteria.parentElement!.classList.add("search-container-hidden");
   showRefineButton();
+  resetSearchPlaceholder();
 }
 
 function showElement(element: HTMLElement): void {
@@ -73,7 +74,7 @@ function hideElement(element: HTMLElement): void {
 }
 
 export function resetSearchPlaceholder() {
-  updateSearchPlaceholder("Search rooms near: \u00A0\u00A0\u00A0👔\u00A0/\u00A0🏫\u00A0/\u00A0/👪");
+  updateSearchPlaceholder("Search rooms near: \u00A0\u00A0\u00A0👔\u00A0/\u00A0🏫\u00A0/\u00A0👪");
 }
 
 export function interstitialSearchPlaceholder() {
@@ -106,7 +107,8 @@ export function collapseExpensiveSearchCriteria(): any {
   let searchCriteria = getExpensiveSearchCriteria();
   searchCriteria.className = "search-criteria-hidden";
   searchCriteria.parentElement!.classList.add("expensive-search-container-hidden");
-  showExpensiveRefineButton()
+  showExpensiveRefineButton();
+  resetSearchPlaceholder();
 }
 
 export function showExpensiveRefineButton() {

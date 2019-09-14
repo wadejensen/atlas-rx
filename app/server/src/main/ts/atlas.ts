@@ -7,10 +7,11 @@ import {sys} from "typescript";
 import * as path from "path";
 
 import hbs from "hbs"
-import {flatmatesAutocompleteHandler, flatmatesGetListingsHandler} from "./flatmates/handler";
+import {flatmatesAutocompleteHandler} from "./flatmates/handler";
 import {googleDistanceMatrixHandler, googlePlacesAutoCompleteHandler} from "./google/handler";
 import bodyParser = require("body-parser");
 import {createGoogleMapsClient} from "./google/google_client";
+import {getListingsHandler} from "./atlas_handler";
 
 /**
  * Atlas server instance running on Express middleware
@@ -73,20 +74,19 @@ export class AtlasServer {
       res.send(new Date().getTime());
     });
 
-    /** -------------------- flatmates.com.au endpoints ------------------- **/
     app.get('/flatmates/autocomplete/:query', (req: Request, res: Response) => {
       return flatmatesAutocompleteHandler(this.flatmatesClient, req, res);
     });
-    app.post('/flatmates/listings', (req: Request, res: Response) => {
-      return flatmatesGetListingsHandler(this.flatmatesClient, req, res);
-    });
 
-    /** ------------------------- Google endpoints ------------------------ **/
     app.get('/google/places-autocomplete/:query', (req: Request, res: Response) => {
       return googlePlacesAutoCompleteHandler(this.googleMapsClient, req, res);
     });
     app.post('/google/distance-matrix',  (req: Request, res: Response) => {
       return googleDistanceMatrixHandler(this.googleMapsClient, req, res);
+    });
+
+    app.post('/listings', (req: Request, res: Response) => {
+      return getListingsHandler(this.flatmatesClient, req, res);
     });
 
     app.listen(3000, () => console.log("Listening on port 3000"));

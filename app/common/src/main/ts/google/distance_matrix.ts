@@ -1,6 +1,8 @@
+import {TransitMode, TravelMode} from "@google/maps";
+
 export class TravelTimeRequest {
-  readonly travelMode: string;
-  readonly transitMode?: string;
+  readonly travelMode: TravelMode;
+  readonly transitMode?: TransitMode;
   readonly lat1: number;
   readonly lng1: number;
   readonly lat2: number;
@@ -14,8 +16,8 @@ export class TravelTimeRequest {
       lat2,
       lng2,
   }: {
-      travelMode: string,
-      transitMode?: string,
+      travelMode: TravelMode,
+      transitMode?: TransitMode,
       lat1: number,
       lng1: number,
       lat2: number,
@@ -33,8 +35,8 @@ export class TravelTimeRequest {
 export class TravelTime {
   readonly duration: number;
   readonly durationDisplay: string;
-  readonly travelMode: string;
-  readonly transitMode?: string;
+  readonly travelMode: TravelMode;
+  readonly transitMode?: TransitMode;
 
   constructor({
       duration,
@@ -44,8 +46,8 @@ export class TravelTime {
   }: {
     duration: number,
     durationDisplay: string,
-    travelMode: string,
-    transitMode?: string,
+    travelMode: TravelMode,
+    transitMode?: TransitMode,
   }) {
     this.duration = duration;
     this.durationDisplay = durationDisplay;

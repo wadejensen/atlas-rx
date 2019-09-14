@@ -34,45 +34,4 @@ export async function flatmatesAutocompleteHandler(
     res.status(500);
     res.send(err);
   }
-};
-
-/**
- * Proxy listings request to flatmates.com.au
- * Chunks up the proxied flatmates request into many smaller requests,
- * with very conservative rate-limiting, and normalise the results.
- */
-export async function flatmatesGetListingsHandler(
-  flatmatesClient: FlatmatesClient,
-  req: Request,
-  res: Response
-): Promise<void> {
-  try {
-    // attempt to parse request body
-    const flatmatesListingsReq = new ListingsRequest({ ...req.body });
-    const flatmatesListings = await flatmatesClient.getFlatmatesListings(flatmatesListingsReq, 0);
-
-    const travelTime: TravelTime | undefined = undefined;
-    const listings = Array.from(flatmatesListings).map(fml => toListing(fml, travelTime));
-    res.send(new ListingsResponse(listings));
-  } catch (err) {
-    res.status(500);
-    res.send(err);
-  }
-}
-
-function toListing(
-  fml: FlatmatesListing,
-  travelTime?: TravelTime
-): Listing {
-  return new Listing({
-    listingLocation: new ListingLocation({
-      latitude: fml.latitude,
-      longitude: fml.longitude,
-      rent: fml.rent[0],
-      subheading: fml.subheading,
-      listingLink: fml.listing_link,
-      photo: fml.photo,
-    }),
-    travelTime,
-  });
 }

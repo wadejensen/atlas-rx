@@ -80,6 +80,9 @@ export async function googlePlacesAutoCompleteHandler (
   }
 }
 
+/**
+ * Handler for DistanceMatrix requests with a single origin - destination pair
+ */
 export async function googleDistanceMatrixHandler (
   googleMapsClient: GoogleMapsClient,
   req: Request,
@@ -99,8 +102,10 @@ export async function googleDistanceMatrixHandler (
       .distanceMatrix({
         origins: [{lat: travelTimeRequest.lat1, lng: travelTimeRequest.lng1}],
         destinations: [{lat: travelTimeRequest.lat2, lng: travelTimeRequest.lng2}],
-        mode: travelTimeRequest.travelMode as TravelMode,
-        transit_mode: [travelTimeRequest.transitMode as TransitMode],
+        mode: travelTimeRequest.travelMode,
+        transit_mode: travelTimeRequest.transitMode
+          ? [travelTimeRequest.transitMode as TransitMode]
+          : undefined,
       }).asPromise();
     const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
     if (resp.status == 200) {

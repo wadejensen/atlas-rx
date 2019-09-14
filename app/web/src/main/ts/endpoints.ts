@@ -11,7 +11,8 @@ export async function googlePlacesAutocomplete(
     headers: {
       "Content-Type": "Accept: application/json",
     },
-  }).then(resp => resp.json())
+  }).then(handleFailure)
+    .then(resp => resp.json())
     .catch(err => console.error(err));
 }
 
@@ -23,21 +24,31 @@ export async function googleDistanceMatrix(req: TravelTimeRequest): Promise<Trav
       "Content-Type": "application/json",
     },
     body: JSON.stringify(req),
-  }).then(resp => resp.json())
+  }).then(handleFailure)
+    .then(resp => resp.json())
     .catch(err => console.error(err));
 }
 
 export async function getListings(req: ListingsRequest): Promise<ListingsResponse> {
-  return fetch(window.location + "flatmates/listings", {
+  return fetch(window.location + "listings", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(req),
-  }).then(resp => resp.json())
+  }).then(handleFailure)
+    .then(resp => resp.json())
     .catch(err => console.error(err));
 }
 
 export async function health(): Promise<string> {
   return fetch(window.location + "healthz").then( resp => resp.text());
+}
+
+async function handleFailure(resp: Response): Promise<Response> {
+  if (resp.status !== 200) {
+    throw new Error(await resp.text())
+  } else {
+    return resp
+  }
 }

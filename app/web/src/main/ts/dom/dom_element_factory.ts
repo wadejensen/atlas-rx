@@ -1,7 +1,7 @@
 import {PlacesAutocompleteEntry} from "../../../../../common/src/main/ts/google/places_autocomplete_result";
 import {Listing} from "../../../../../common/src/main/ts/flatmates/listings_response";
 import {Option} from "../../../../../common/src/main/ts/fp/option";
-import {LatLngLiteral} from "@google/maps";
+import {LatLngLiteral, TransitMode, TravelMode} from "@google/maps";
 import {TravelTime} from "../../../../../common/src/main/ts/google/distance_matrix";
 
 export function searchSuggestion(suggestion: PlacesAutocompleteEntry) {
@@ -55,7 +55,32 @@ function infoWindowContentWithDestination(
     <img class="flatmates-photo" src="${listingLocation.photo}">
   </a>
   <p class="info-window-details">Rent: <span>$${listingLocation.rent}</span></p>
-  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime.durationDisplay} (${travelTime.travelMode})</span></a>
+  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime.durationDisplay} ${travelModeIcon(travelTime.travelMode, travelTime.transitMode)}</span></a>
 </div>
 `;
+}
+
+function travelModeIcon(
+  travelMode: TravelMode | undefined,
+  transitMode: TransitMode | undefined
+): string {
+  if (travelMode === undefined || travelMode == "driving") {
+    return "car emoji";
+  } else if (travelMode === "walking") {
+    return "walking emoji";
+  } else if (travelMode === "bicycling") {
+    return "cycling emoji";
+  } else if (travelMode === "transit") {
+    if (transitMode === undefined) {
+      return "bus train ferry emojis"
+    } else if (transitMode === "rail") {
+        return "rail emoji";
+    } else if (transitMode === "bus") {
+        return "bus emoji";
+    } else {
+      throw new Error(`Unrecognised transit mode: ${transitMode}`);
+    }
+  } else {
+    throw new Error(`Unrecognised travel mode: ${travelMode}`);
+  }
 }

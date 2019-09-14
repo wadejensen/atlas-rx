@@ -133,16 +133,14 @@ Are you sure you wish to proceed?
     }
 
     const listing: Listing = event.feature.getProperty("listing");
-    //TODO(wadejensen) getTravelCriteria
-    const travelMode = "transit";
-    const transitMode = "bus";
+    const criteria = getExpensiveCriteria();
 
     // a user may not have specified a destination yet,
     // but we still need to show them an info card about a listing
     const dest: Option<LatLngLiteral> = getDestination();
     const travelTimeReq: Option<TravelTimeRequest> = dest.map(d => new TravelTimeRequest({
-      travelMode: travelMode,
-      transitMode: transitMode,
+      travelMode: criteria.travelMode!,
+      transitMode: criteria.transitMode,
       lat1: listing.location.latitude,
       lng1: listing.location.longitude,
       lat2: d.lat,

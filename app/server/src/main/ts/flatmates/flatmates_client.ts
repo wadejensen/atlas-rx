@@ -90,7 +90,9 @@ export class FlatmatesClient {
   }
 
   /**
-   * List residential rooms for rent on flatmates.com.au
+   * Proxy listings request to list residential rooms for rent on flatmates.com.au
+   * Chunks up the proxied flatmates request into many smaller requests,
+   * with very conservative rate-limiting, and normalise the results.
    */
   getFlatmatesListings: (req: ListingsRequest, i: number) => Promise<Set<FlatmatesListing>> =
     async (req: ListingsRequest, i: number) => {
