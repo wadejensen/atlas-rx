@@ -1,13 +1,7 @@
 import {PlacesAutocompleteResult} from "../../../../common/src/main/ts/google/places_autocomplete_result";
-import {
-  FlatmatesListingsResponse,
-  ListingsResponse
-} from "../../../../common/src/main/ts/flatmates/listings_response";
-import {ListingsRequest} from "../../../../common/src/main/ts/flatmates/listings_request";
-import {
-  TravelTimeRequest,
-  TravelTime
-} from "../../../../common/src/main/ts/google/distance_matrix";
+import {ListingsResponse} from "../../../../common/src/main/ts/flatmates/listings_response";
+import {TravelTime, TravelTimeRequest} from "../../../../common/src/main/ts/google/distance_matrix";
+import {ListingsRequest} from "../../../../common/src/main/ts/listing";
 
 export async function googlePlacesAutocomplete(
   query: string
@@ -33,7 +27,7 @@ export async function googleDistanceMatrix(req: TravelTimeRequest): Promise<Trav
     .catch(err => console.error(err));
 }
 
-export async function getFlatmatesListings(req: ListingsRequest): Promise<ListingsResponse> {
+export async function getListings(req: ListingsRequest): Promise<ListingsResponse> {
   return fetch(window.location + "flatmates/listings", {
     method: "POST",
     headers: {
