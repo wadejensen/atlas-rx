@@ -51,7 +51,8 @@ export class GoogleMap {
 
     // check if user has specified any expensive criteria and warn them before proceeding
     const expensiveReq: ListingsRequest = getExpensiveCriteria();
-    if (expensiveReq.minTime !== undefined || expensiveReq.maxTime !== undefined) {
+    if (expensiveReq.destination !== undefined &&
+      (expensiveReq.minTime !== undefined || expensiveReq.maxTime !== undefined)) {
       const numDestinations = GoogleMap.map_markers.length;
       const cost = (numDestinations * DISTANCE_MATRIX_REQUEST_COST).toFixed(2);
       if (window.confirm(`

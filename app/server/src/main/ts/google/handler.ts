@@ -18,7 +18,12 @@ import {
   TravelTime
 } from "../../../../../common/src/main/ts/google/distance_matrix";
 import {Failure, TryCatch} from "../../../../../common/src/main/ts/fp/try";
-import {placeDetails, placesAutocomplete} from "./google_client";
+import {
+  getDurationDisplay,
+  getDurationValue,
+  placeDetails,
+  placesAutocomplete
+} from "./google_client";
 
 /**
  * Combines places autocomplete API and
@@ -107,8 +112,8 @@ export async function googleDistanceMatrixHandler (
           ? [travelTimeRequest.transitMode as TransitMode]
           : undefined,
       }).asPromise();
-    const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
     if (resp.status == 200) {
+      const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
       res.send(
         new TravelTime({
           duration: getDurationValue(result, req.params.travelMode),
@@ -128,18 +133,3 @@ export async function googleDistanceMatrixHandler (
   }
 }
 
-function getDurationValue(travelPlan: DistanceMatrixRowElement, travelMode: string): number {
-  if (travelMode == "driving") {
-    return travelPlan.duration_in_traffic.value
-  } else {
-    return travelPlan.duration.value
-  }
-}
-
-function getDurationDisplay(travelPlan: DistanceMatrixRowElement, travelMode: string): string {
-  if (travelMode == "driving") {
-    return travelPlan.duration_in_traffic.text
-  } else {
-    return travelPlan.duration.text
-  }
-}

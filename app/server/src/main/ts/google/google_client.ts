@@ -1,4 +1,5 @@
 import {
+  DistanceMatrixRowElement,
   GoogleMapsClient,
   PlaceAutocompleteRequest,
   PlaceAutocompleteResult,
@@ -36,5 +37,21 @@ export async function placeDetails(googleMapsClient: GoogleMapsClient, req: Plac
     return Promise.reject();
   } else {
     return resp.json
+  }
+}
+
+export function getDurationValue(travelPlan: DistanceMatrixRowElement, travelMode: string): number {
+  if (travelMode == "driving") {
+    return travelPlan.duration_in_traffic.value
+  } else {
+    return travelPlan.duration.value
+  }
+}
+
+export function getDurationDisplay(travelPlan: DistanceMatrixRowElement, travelMode: string): string {
+  if (travelMode == "driving") {
+    return travelPlan.duration_in_traffic.text
+  } else {
+    return travelPlan.duration.text
   }
 }

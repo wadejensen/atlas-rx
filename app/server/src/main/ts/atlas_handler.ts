@@ -6,11 +6,20 @@ import {
   FlatmatesListing, Listing, ListingLocation,
   ListingsResponse
 } from "../../../../common/src/main/ts/flatmates/listings_response";
+import {
+  DistanceMatrixRowElement,
+  GoogleMapsClient,
+  TransitMode,
+  TravelMode
+} from "@google/maps";
+import LatLngLiteral = google.maps.LatLngLiteral;
+import {getDurationDisplay, getDurationValue} from "./google/google_client";
 
 const MAX_DISTANCE_MATRIX_API_ITEMS = 350;
 
 export async function getListingsHandler(
   flatmatesClient: FlatmatesClient,
+  googleMapsClient: GoogleMapsClient,
   req: Request,
   res: Response
 ): Promise<void> {
@@ -19,70 +28,112 @@ export async function getListingsHandler(
     const listingsReq = new ListingsRequest({ ...req.body });
     const flatmatesListings = await flatmatesClient.getFlatmatesListings(listingsReq, 0);
 
-    if (listingsReq.minTime !== undefined || listingsReq.maxTime !== undefined) {
+    // has the user refined enough to use expensive search?
+    if (useExpensiveSearch(listingsReq)) {
       // fail the request if user attempts to breach limits
       if (Array.from(flatmatesListings).length > MAX_DISTANCE_MATRIX_API_ITEMS) {
         res.status(400);
-        res.send(`
-Too many listings returned for travel time filtering.
-Max Distance Matrix items per request: ${MAX_DISTANCE_MATRIX_API_ITEMS}.
-`)
+        const msg = `Too many listings returned for travel time filtering.
+        Max Distance Matrix items per request: ${MAX_DISTANCE_MATRIX_API_ITEMS}.`
+        res.send(msg);
+        throw new Error(msg);
       }
-      else {
-        // enforce sensible limits for undefined min or max travel time
-        const min = listingsReq.minTime || 0;
-        const max = listingsReq.maxTime || 10000;
-      }
-    }
 
-    const travelTime: TravelTime | undefined = undefined;
-    const listings = Array.from(flatmatesListings).map(fml => toListing(fml, travelTime));
-    res.send(new ListingsResponse(listings));
+      const compatibleListings = await filterListingsByTravelTime(
+        googleMapsClient,
+        Array.from(flatmatesListings),
+        listingsReq.destination!,
+        listingsReq.minTime!,
+        listingsReq.maxTime!,
+        listingsReq.travelMode!,
+        listingsReq.transitMode,
+      );
+      res.send(new ListingsResponse(compatibleListings));
+    } else {
+      // no travel time criteria available for refinement
+      const travelTime: TravelTime | undefined = undefined;
+      const listings = Array.from(flatmatesListings).map(fml => toListing(fml, travelTime));
+      res.send(new ListingsResponse(listings));
+    }
   } catch (err) {
     res.status(500);
     res.send(err);
   }
 }
 
-// async function distanceMatrix(minTime: number, maxTime: number) {
-//   let travelTimeRequest: TravelTimeRequest = {} as any;
-//   try {
-//     travelTimeRequest = new TravelTimeRequest({ ...req.body});
-//   } catch (err) {
-//     console.error(err);
-//     res.status(400);
-//     res.send(err);
-//     return;
-//   }
-//   try {
-//     const resp = await googleMapsClient
-//       .distanceMatrix({
-//         origins: [{lat: travelTimeRequest.lat1, lng: travelTimeRequest.lng1}],
-//         destinations: [{lat: travelTimeRequest.lat2, lng: travelTimeRequest.lng2}],
-//         mode: travelTimeRequest.travelMode as TravelMode,
-//         transit_mode: [travelTimeRequest.transitMode as TransitMode],
-//       }).asPromise();
-//     const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
-//     if (resp.status == 200) {
-//       res.send(
-//         new TravelTime({
-//           duration: getDurationValue(result, req.params.travelMode),
-//           durationDisplay: getDurationDisplay(result, req.params.travelMode),
-//           travelMode: travelTimeRequest.travelMode,
-//           transitMode: travelTimeRequest.transitMode,
-//         })
-//       );
-//     } else {
-//       res.status(resp.status);
-//       res.send();
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500);
-//     res.send(err);
-//   }
-// }
-// }
+function useExpensiveSearch(listingsRequest: ListingsRequest): boolean {
+  return listingsRequest.destination !== undefined &&
+    (listingsRequest.minTime !== undefined || listingsRequest.maxTime !== undefined)
+}
+
+async function filterListingsByTravelTime(
+  googleMapsClient: GoogleMapsClient,
+  flatmatesListings: Array<FlatmatesListing>,
+  destination: LatLngLiteral,
+  minTime: number,
+  maxTime: number,
+  travelMode: TravelMode,
+  transitMode?: TransitMode
+) {
+    // enforce sensible limits for undefined min or max travel time
+    const min = minTime || 0;
+    const max = maxTime || 10000;
+
+    const listings: Array<Listing> = await flatmatesListingsDistanceMatrix(
+      googleMapsClient,
+      Array.from(flatmatesListings),
+      destination,
+      travelMode,
+      transitMode,
+    );
+
+    // filter out listings which are too close or too far away based on the
+    // user's chosen method of transport
+    return listings.filter(l => {
+      const timeMins = l.traveTime!.duration / 60;
+      return min <= timeMins && timeMins <= max
+    });
+  }
+
+async function flatmatesListingsDistanceMatrix(
+  googleMapsClient: GoogleMapsClient,
+  listings: Array<FlatmatesListing>,
+  destination: LatLngLiteral,
+  travelMode: TravelMode,
+  transitMode?: TransitMode
+): Promise<Array<Listing>> {
+  const origins: Array<LatLngLiteral> = listings.map(l => {
+    return {
+      lat: l.latitude,
+      lng: l.longitude,
+    }
+  });
+
+  const resp = await googleMapsClient.distanceMatrix({
+    origins: origins,
+    destinations: [destination],
+    mode: travelMode,
+    transit_mode: transitMode
+      ? [transitMode as TransitMode]
+      : undefined,
+  }).asPromise();
+  console.warn(resp);
+  if (resp.status == 200) {
+    const distanceRow: DistanceMatrixRowElement[] = resp.json.rows[0].elements;
+    console.warn(distanceRow);
+    const travelTimes = distanceRow.map(elem => new TravelTime({
+      duration: getDurationValue(elem, travelMode),
+      durationDisplay: getDurationDisplay(elem, travelMode),
+      travelMode: travelMode,
+      transitMode: transitMode,
+    }));
+    console.warn(travelTimes);
+    return listings.map((fml: FlatmatesListing, i: number) =>
+      toListing(fml, travelTimes[i]))
+  } else {
+    throw Error(`Distance matrix request failed with status code: ${resp.status}`)
+  }
+}
 
 function toListing(
   fml: FlatmatesListing,

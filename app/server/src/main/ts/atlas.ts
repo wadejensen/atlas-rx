@@ -86,7 +86,7 @@ export class AtlasServer {
     });
 
     app.post('/listings', (req: Request, res: Response) => {
-      return getListingsHandler(this.flatmatesClient, req, res);
+      return getListingsHandler(this.flatmatesClient, this.googleMapsClient, req, res);
     });
 
     app.listen(3000, () => console.log("Listening on port 3000"));

@@ -7,6 +7,7 @@ import {
   RoomType, Search
 } from "./flatmates/listings_request";
 import {TransitMode, TravelMode} from "@google/maps";
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 export class ListingsRequest {
   readonly boundingBox: BoundingBox;
@@ -17,6 +18,7 @@ export class ListingsRequest {
   readonly furnishingType?: FurnishingType;
   readonly bathroomType?: BathroomType;
   readonly parkingType?: ParkingType;
+  readonly destination?: LatLngLiteral;
   readonly minTime?: number;
   readonly maxTime?: number;
   readonly travelMode?: TravelMode;
@@ -31,6 +33,7 @@ export class ListingsRequest {
     furnishingType,
     bathroomType,
     parkingType,
+    destination,
     minTime,
     maxTime,
     travelMode,
@@ -44,6 +47,7 @@ export class ListingsRequest {
     furnishingType?: FurnishingType,
     bathroomType?: BathroomType,
     parkingType?: ParkingType,
+    destination?: LatLngLiteral,
     minTime?: number,
     maxTime?: number,
     travelMode?: TravelMode,
@@ -57,6 +61,7 @@ export class ListingsRequest {
     this.furnishingType = furnishingType;
     this.bathroomType = bathroomType;
     this.parkingType = parkingType;
+    this.destination = destination;
     this.minTime = minTime;
     this.maxTime = maxTime;
     this.travelMode = travelMode;
@@ -73,6 +78,7 @@ export class ListingsRequestBuilder {
   private furnishingType?: FurnishingType;
   private bathroomType?: BathroomType;
   private parkingType?: ParkingType;
+  private destination?: LatLngLiteral;
   private readonly minTime?: number;
   private readonly maxTime?: number;
   private readonly travelMode?: TravelMode;
@@ -87,6 +93,7 @@ export class ListingsRequestBuilder {
     furnishingType,
     bathroomType,
     parkingType,
+    destination,
     minTime,
     maxTime,
     travelMode,
@@ -100,6 +107,7 @@ export class ListingsRequestBuilder {
     furnishingType?: FurnishingType,
     bathroomType?: BathroomType,
     parkingType?: ParkingType,
+    destination?: LatLngLiteral,
     minTime?: number,
     maxTime?: number,
     travelMode?: TravelMode,
@@ -113,6 +121,7 @@ export class ListingsRequestBuilder {
     this.furnishingType = furnishingType;
     this.bathroomType = bathroomType;
     this.parkingType = parkingType;
+    this.destination = destination;
     this.minTime = minTime;
     this.maxTime = maxTime;
     this.travelMode = travelMode;

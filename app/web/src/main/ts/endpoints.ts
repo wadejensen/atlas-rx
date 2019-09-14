@@ -47,8 +47,8 @@ export async function health(): Promise<string> {
 
 async function handleFailure(resp: Response): Promise<Response> {
   if (resp.status !== 200) {
-    throw new Error(await resp.text())
+    throw new Error(await resp.text());
   } else {
-    return resp
+    return resp;
   }
 }
