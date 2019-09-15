@@ -20,6 +20,7 @@ import {
   getSearchBar,
   getSearchButton, getSearchSuggestions
 } from "./dom/dom_element_locator";
+import {Debouncer} from "./debouncer";
 
 /** Page state machine
  *
@@ -100,9 +101,9 @@ export function setupContentUpdateListeners() {
 }
 
 function setupPopulateMapListener(): void {
-  const throttle = new LossyThrottle(1);
+  const debouncer = new Debouncer(1000);
   GoogleMap.addEventListener('bounds_changed',
-    () => throttle.apply(GoogleMap.updateListings));
+    () => debouncer.apply(GoogleMap.updateListings));
 }
 
 function setupSearchAutocompleteListeners(): void {

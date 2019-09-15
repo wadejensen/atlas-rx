@@ -6,8 +6,7 @@ import {
   PropertyType,
   RoomType, Search
 } from "./flatmates/listings_request";
-import {TransitMode, TravelMode} from "@google/maps";
-import LatLngLiteral = google.maps.LatLngLiteral;
+import {LatLngLiteral, TransitMode, TravelMode} from "@google/maps";
 
 export class ListingsRequest {
   readonly boundingBox: BoundingBox;

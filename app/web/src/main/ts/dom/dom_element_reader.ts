@@ -31,7 +31,7 @@ export function getExpensiveCriteria(): ListingsRequest {
     furnishingType: getInputFieldValue("furnishing-type") as FurnishingType || undefined,
     bathroomType: getInputFieldValue("bathroom-type") as BathroomType || undefined,
     parkingType: getInputFieldValue("parking-type") as ParkingType || undefined,
-    destination: getDestination().getOrElse(() => undefined),
+    destination: !getDestination().isEmpty() ? getDestination().get() : undefined,
     minTime: parseInt(getInputFieldValue("min-time")) || undefined,
     maxTime: parseInt(getInputFieldValue("max-time")) || undefined,
     travelMode: getInputFieldValue("travel-mode") as TravelMode || undefined,
