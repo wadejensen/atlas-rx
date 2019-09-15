@@ -270,9 +270,16 @@ input.parambox:focus, select.parambox:focus {
 .info-window-details {
     margin: 0;
     padding: 0;
+    max-width: 25vw;
+    max-height: 15vw;
     font-size: 125%;
     font-style: italic;
     color: coral;
+}
+
+.info-window-details span {
+    font-size: 75%;
+    color: #5a5a5a;
 }
 
 .refine {

@@ -42,7 +42,7 @@ function infoWindowContent(listing: Listing) {
 function infoWindowContentWithDestination(
   listing: Listing,
   destination: LatLngLiteral,
-  travelTime: TravelInfo
+  travelInfo: TravelInfo
 ) {
   const listingLocation = listing.location;
   const listingUrl = `https://flatmates.com.au${listingLocation.listingLink}`;
@@ -54,8 +54,10 @@ function infoWindowContentWithDestination(
   <a href="${listingUrl}" target="_blank">
     <img class="flatmates-photo" src="${listingLocation.photo}">
   </a>
+  <p class="info-window-details">Approx address: <span>${travelInfo.originApproxAddress}</span></p>
   <p class="info-window-details">Rent: <span>$${listingLocation.rent}</span></p>
-  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelTime.durationDisplay} ${travelModeIcon(travelTime.travelMode, travelTime.transitMode)}</span></a>
+  <a href="${directionsUrl}" target="_blank" class="info-window-details">Travel time: <span>${travelInfo.durationDisplay} ${travelModeIcon(travelInfo.travelMode, travelInfo.transitMode)}</span></a>
+  <p class="info-window-details">Distance: <span>${travelInfo.distance}</span></p>
 </div>
 `;
 }
