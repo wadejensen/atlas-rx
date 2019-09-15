@@ -44,20 +44,28 @@ export class GoogleMap {
   }
 
   // clear map of markers and replace with fresh flatmates listings
-  static async updateListings(): Promise<void> {
+  static async updateFreeListings(): Promise<void> {
+    // Expensive queries should only be triggered by directly clicking the search button
+    const req: ListingsRequest = getExpensiveCriteria();
+    if (!containsPremiumSearchCriteria(req)) {
+      const freeReq: ListingsRequest = getFreeCriteria();
+      const listings = await getListings(freeReq);
+      GoogleMap.updateMap(listings.matches);
+    }
+  }
+
+  static async updateExpensiveListings() {
     const freeReq: ListingsRequest = getFreeCriteria();
     const listings = await getListings(freeReq);
 
-    // check if user has specified any expensive criteria and warn them before proceeding
-    const expensiveReq: ListingsRequest = getExpensiveCriteria();
-    if (expensiveReq.destination !== undefined &&
-      (expensiveReq.minTime !== undefined || expensiveReq.maxTime !== undefined)) {
+    const expensiveReq = getExpensiveCriteria();
+    if (containsPremiumSearchCriteria(expensiveReq)) {
       const numDestinations = listings.matches.length;
       const cost = (numDestinations * DISTANCE_MATRIX_REQUEST_COST).toFixed(2);
       if (window.confirm(`
-You are about to trigger an API request that will cost $${cost}.
-Are you sure you wish to proceed?
-`)) {
+  You are about to trigger an API request that will cost $${cost}.
+  Are you sure you wish to proceed?
+  `)) {
         GoogleMap.map_markers.forEach(() => console.warn("Distance matrix request"));
         const filteredListings = await getListings(expensiveReq);
         GoogleMap.updateMap(filteredListings.matches);
@@ -189,6 +197,11 @@ Are you sure you wish to proceed?
       throw new Error(`Failed to get map geo bounding box: ${error}`)
     });
   }
+}
+
+function containsPremiumSearchCriteria(criteria: ListingsRequest): boolean {
+  return criteria.destination !== undefined &&
+    (criteria.minTime !== undefined || criteria.maxTime !== undefined)
 }
 
 class RGB {

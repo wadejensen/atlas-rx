@@ -1,6 +1,5 @@
 import {Coord} from "../../../../common/src/main/ts/geo";
 import {GoogleMap} from "./maps";
-import {LossyThrottle} from "./lossy_throttle";
 import {
   collapseAll,
   collapseExpensiveSearchCriteria,
@@ -76,7 +75,7 @@ export function setupStateChangeListeners(): void {
   getSearchButton().addEventListener("click", () => {
     resetSearchPlaceholder();
     collapseAll();
-    GoogleMap.updateListings();
+    GoogleMap.updateExpensiveListings();
   });
 
   getRefineButton().addEventListener("click", () => {
@@ -86,10 +85,6 @@ export function setupStateChangeListeners(): void {
   getSearchBar().addEventListener("keyup", updateSearchSuggestions);
 
   getExpensiveRefineButton().addEventListener("click", expandExpensiveSearchCriteria);
-  getExpensiveSearchButton().addEventListener("click", () => {
-    collapseAll();
-    GoogleMap.updateListings();
-  });
 
   // when the map is clicked, close all expanded input menus
   GoogleMap.addEventListener("click", collapseAll);
@@ -103,7 +98,7 @@ export function setupContentUpdateListeners() {
 function setupPopulateMapListener(): void {
   const debouncer = new Debouncer(1000);
   GoogleMap.addEventListener('bounds_changed',
-    () => debouncer.apply(GoogleMap.updateListings));
+    () => debouncer.apply(GoogleMap.updateFreeListings));
 }
 
 function setupSearchAutocompleteListeners(): void {
