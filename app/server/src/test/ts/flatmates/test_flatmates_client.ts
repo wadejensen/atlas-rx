@@ -6,9 +6,7 @@ import {
   AutocompleteResult
 } from "../../../../../common/src/main/ts/flatmates/autocomplete_result";
 import {
-  FlatmatesListingsRequest,
-  ListingsRequest, mapListingsRequest,
-  RoomType, Search
+  FlatmatesListingsRequest, RoomType,
 } from "../../../../../common/src/main/ts/flatmates/listings_request";
 import {Coord, Geo} from "../../../../../common/src/main/ts/geo";
 import {
@@ -20,6 +18,7 @@ import {
   Completion, Contexts, Fuzzy, LocationSuggest
 } from "../../../../../common/src/main/ts/flatmates/autocomplete_request";
 import {FetchHTTPClient} from "../../../main/ts/http/fetch_http_client";
+import {ListingsRequest, mapListingsRequest} from "../../../../../common/src/main/ts/listing";
 
 
 const nock = require("nock");
