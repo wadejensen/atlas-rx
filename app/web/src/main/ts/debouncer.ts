@@ -1,4 +1,3 @@
-import {Async} from "../../../../server/src/main/ts/async";
 import Timeout = NodeJS.Timeout;
 
 export class Debouncer {
@@ -26,7 +25,6 @@ export class Debouncer {
     async (fn: () => void) => {
       this.lastBounceTime = new Date().getTime();
       this.lastInputLambda = fn;
-      console.log("Dropping previous input");
       clearTimeout(this.lastTimeoutId);
       this.lastTimeoutId = setTimeout(this.doApply, this.intervalMs);
   };
@@ -36,8 +34,6 @@ export class Debouncer {
       // ensure `intervalMs` has elapsed since last user input
       const now = new Date().getTime();
       if (now - this.lastBounceTime >= this.intervalMs) {
-        console.log(`User input ceased ${this.intervalMs}ms ago`);
-        console.log("Firing debounced function");
         return this.lastInputLambda();
       }
     }
