@@ -107,7 +107,9 @@ function setupPopulateMapListener(): void {
 }
 
 function setupSearchAutocompleteListeners(): void {
-  getSearchBar().addEventListener("keyup", updateSearchSuggestions);
+  const debouncer = new Debouncer(1000);
+  getSearchBar().addEventListener("keyup",
+    () => debouncer.apply(updateSearchSuggestions));
   getSearchBar().addEventListener("keyup", (ev: KeyboardEvent) => {
     if (ev.key == "Enter") {
       const topResult = getSearchSuggestions()[0] as HTMLParagraphElement;
@@ -115,6 +117,7 @@ function setupSearchAutocompleteListeners(): void {
       const lng = parseFloat(topResult.dataset["lng"]!);
 
       GoogleMap.setDestination(new Coord(lat, lng));
+      collapseSearchSuggestions();
     }
   });
 }

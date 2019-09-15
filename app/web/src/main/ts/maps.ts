@@ -5,7 +5,7 @@ import {BoundingBox, Coord, Geo} from "../../../../common/src/main/ts/geo";
 import {Try, TryCatch} from "../../../../common/src/main/ts/fp/try";
 import {Listing} from "../../../../common/src/main/ts/flatmates/listings_response";
 import {getListings, googleDistanceMatrix} from "./endpoints";
-import {TravelTime, TravelTimeRequest} from "../../../../common/src/main/ts/google/distance_matrix";
+import {TravelInfo, TravelTimeRequest} from "../../../../common/src/main/ts/google/distance_matrix";
 import {LatLngLiteral} from "@google/maps";
 import {Option} from "../../../../common/src/main/ts/fp/option";
 import {infoWindow} from "./dom/dom_element_factory";
@@ -47,13 +47,12 @@ export class GoogleMap {
   static async updateListings(): Promise<void> {
     const freeReq: ListingsRequest = getFreeCriteria();
     const listings = await getListings(freeReq);
-    GoogleMap.updateMap(listings.matches);
 
     // check if user has specified any expensive criteria and warn them before proceeding
     const expensiveReq: ListingsRequest = getExpensiveCriteria();
     if (expensiveReq.destination !== undefined &&
       (expensiveReq.minTime !== undefined || expensiveReq.maxTime !== undefined)) {
-      const numDestinations = GoogleMap.map_markers.length;
+      const numDestinations = listings.matches.length;
       const cost = (numDestinations * DISTANCE_MATRIX_REQUEST_COST).toFixed(2);
       if (window.confirm(`
 You are about to trigger an API request that will cost $${cost}.
@@ -63,6 +62,8 @@ Are you sure you wish to proceed?
         const filteredListings = await getListings(expensiveReq);
         GoogleMap.updateMap(filteredListings.matches);
       }
+    } else {
+      GoogleMap.updateMap(listings.matches);
     }
   }
 
@@ -149,7 +150,7 @@ Are you sure you wish to proceed?
     }));
 
     // switching from Option to Promise monad to handle async distance matrix request
-    const travelTime: Promise<TravelTime | undefined> = !travelTimeReq.isEmpty()
+    const travelTime: Promise<TravelInfo | undefined> = !travelTimeReq.isEmpty()
       ? googleDistanceMatrix(travelTimeReq.get())
       : Promise.resolve(undefined);
 

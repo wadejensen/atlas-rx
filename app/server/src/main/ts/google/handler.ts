@@ -15,7 +15,7 @@ import {
 import {Request, Response} from "express";
 import {
   TravelTimeRequest,
-  TravelTime
+  TravelInfo
 } from "../../../../../common/src/main/ts/google/distance_matrix";
 import {Failure, TryCatch} from "../../../../../common/src/main/ts/fp/try";
 import {
@@ -115,11 +115,13 @@ export async function googleDistanceMatrixHandler (
     if (resp.status == 200) {
       const result: DistanceMatrixRowElement = resp.json.rows[0].elements[0];
       res.send(
-        new TravelTime({
+        new TravelInfo({
           duration: getDurationValue(result, req.params.travelMode),
           durationDisplay: getDurationDisplay(result, req.params.travelMode),
           travelMode: travelTimeRequest.travelMode,
           transitMode: travelTimeRequest.transitMode,
+          distance: result.distance.text,
+          originApproxAddress: resp.json.origin_addresses[0],
         })
       );
     } else {

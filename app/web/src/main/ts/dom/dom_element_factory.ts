@@ -2,7 +2,7 @@ import {PlacesAutocompleteEntry} from "../../../../../common/src/main/ts/google/
 import {Listing} from "../../../../../common/src/main/ts/flatmates/listings_response";
 import {Option} from "../../../../../common/src/main/ts/fp/option";
 import {LatLngLiteral, TransitMode, TravelMode} from "@google/maps";
-import {TravelTime} from "../../../../../common/src/main/ts/google/distance_matrix";
+import {TravelInfo} from "../../../../../common/src/main/ts/google/distance_matrix";
 
 export function searchSuggestion(suggestion: PlacesAutocompleteEntry) {
   return `<p class="suggest parambox click"
@@ -14,7 +14,7 @@ export function searchSuggestion(suggestion: PlacesAutocompleteEntry) {
 export function infoWindow(
   listing: Listing,
   destination: Option<LatLngLiteral>,
-  travelTime?: TravelTime,
+  travelTime?: TravelInfo,
 ): string {
   if (destination.isEmpty()) {
     return infoWindowContent(listing);
@@ -42,7 +42,7 @@ function infoWindowContent(listing: Listing) {
 function infoWindowContentWithDestination(
   listing: Listing,
   destination: LatLngLiteral,
-  travelTime: TravelTime
+  travelTime: TravelInfo
 ) {
   const listingLocation = listing.location;
   const listingUrl = `https://flatmates.com.au${listingLocation.listingLink}`;

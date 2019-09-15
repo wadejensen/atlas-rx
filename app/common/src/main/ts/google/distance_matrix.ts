@@ -32,26 +32,34 @@ export class TravelTimeRequest {
   }
 }
 
-export class TravelTime {
+export class TravelInfo {
   readonly duration: number;
   readonly durationDisplay: string;
   readonly travelMode: TravelMode;
   readonly transitMode?: TransitMode;
+  readonly distance?: string;
+  readonly originApproxAddress?: string;
 
   constructor({
       duration,
       durationDisplay,
       travelMode,
       transitMode,
+      distance,
+      originApproxAddress,
   }: {
     duration: number,
     durationDisplay: string,
     travelMode: TravelMode,
     transitMode?: TransitMode,
+    distance?: string,
+    originApproxAddress?: string,
   }) {
     this.duration = duration;
     this.durationDisplay = durationDisplay;
     this.travelMode = travelMode;
     this.transitMode = transitMode;
+    this.distance = distance;
+    this.originApproxAddress = originApproxAddress;
   }
 }

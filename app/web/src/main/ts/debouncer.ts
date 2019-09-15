@@ -14,7 +14,7 @@ export class Debouncer {
    * @param intervalMs number of milliseconds of inactivity required before the
    * debouncer's apply method is called.
    */
-  constructor(readonly intervalMs: number) {}
+  constructor(private readonly intervalMs: number) {}
 
   /**
    * Ensure user input has ceased before triggering a function call.

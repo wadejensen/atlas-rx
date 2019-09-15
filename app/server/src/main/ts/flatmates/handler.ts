@@ -7,7 +7,7 @@ import {
   Listing, ListingLocation,
   ListingsResponse
 } from "../../../../../common/src/main/ts/flatmates/listings_response";
-import {TravelTime} from "../../../../../common/src/main/ts/google/distance_matrix";
+import {TravelInfo} from "../../../../../common/src/main/ts/google/distance_matrix";
 import {ListingsRequest} from "../../../../../common/src/main/ts/listing";
 
 /**

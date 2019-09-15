@@ -1,7 +1,7 @@
 import {FlatmatesClient} from "./flatmates/flatmates_client";
 import {Request, Response} from "express";
 import {ListingsRequest} from "../../../../common/src/main/ts/listing";
-import {TravelTime} from "../../../../common/src/main/ts/google/distance_matrix";
+import {TravelInfo} from "../../../../common/src/main/ts/google/distance_matrix";
 import {
   FlatmatesListing, Listing, ListingLocation,
   ListingsResponse
@@ -51,7 +51,7 @@ export async function getListingsHandler(
       res.send(new ListingsResponse(compatibleListings));
     } else {
       // no travel time criteria available for refinement
-      const travelTime: TravelTime | undefined = undefined;
+      const travelTime: TravelInfo | undefined = undefined;
       const listings = Array.from(flatmatesListings).map(fml => toListing(fml, travelTime));
       res.send(new ListingsResponse(listings));
     }
@@ -119,14 +119,23 @@ async function flatmatesListingsDistanceMatrix(
   }).asPromise();
   console.warn(resp);
   if (resp.status == 200) {
-    const distanceRow: DistanceMatrixRowElement[] = resp.json.rows[0].elements;
-    console.warn(distanceRow);
-    const travelTimes = distanceRow.map(elem => new TravelTime({
-      duration: getDurationValue(elem, travelMode),
-      durationDisplay: getDurationDisplay(elem, travelMode),
-      travelMode: travelMode,
-      transitMode: transitMode,
-    }));
+    const approxAddresses = resp.json.origin_addresses;
+    const distances: DistanceMatrixRowElement[] = resp
+      .json
+      .rows
+      .map(row => row.elements[0]);
+
+    console.warn(distances);
+    const travelTimes = distances.map((elem: DistanceMatrixRowElement, i: number) =>
+      new TravelInfo({
+        duration: getDurationValue(elem, travelMode),
+        durationDisplay: getDurationDisplay(elem, travelMode),
+        travelMode: travelMode,
+        transitMode: transitMode,
+        distance: elem.distance.text,
+        originApproxAddress: approxAddresses[i],
+      })
+    );
     console.warn(travelTimes);
     return listings.map((fml: FlatmatesListing, i: number) =>
       toListing(fml, travelTimes[i]))
@@ -137,7 +146,7 @@ async function flatmatesListingsDistanceMatrix(
 
 function toListing(
   fml: FlatmatesListing,
-  travelTime?: TravelTime
+  travelTime?: TravelInfo
 ): Listing {
   return new Listing({
     listingLocation: new ListingLocation({

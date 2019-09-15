@@ -1,4 +1,4 @@
-import {TravelTime} from "../google/distance_matrix";
+import {TravelInfo} from "../google/distance_matrix";
 
 export class ListingsResponse {
   constructor(readonly matches: Array<Listing>) {}
@@ -6,11 +6,11 @@ export class ListingsResponse {
 
 export class Listing {
   readonly location: ListingLocation;
-  readonly traveTime?: TravelTime;
+  readonly traveTime?: TravelInfo;
 
   constructor(opts: {
     listingLocation: ListingLocation,
-    travelTime?: TravelTime,
+    travelTime?: TravelInfo,
   }) {
     this.location = opts.listingLocation;
     this.traveTime = opts.travelTime;
