@@ -46,7 +46,7 @@
     "compression": "^1.7.4",
     "express": "4.16.4",
     "hbs": "^4.0.4",
-    "node-fetch": "^2.5.0",
+    "node-fetch": "^2.6.1",
     "typescript": "3.4.2"
   },
   "engines": {
